@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
+import { jwtDecode } from "jwt-decode";
 
 export const loginUser = async (userData: FieldValues) => {
   try {
@@ -26,4 +27,21 @@ export const loginUser = async (userData: FieldValues) => {
     console.error("Login error:", error);
     return { success: false, message: "An error occurred" };
   }
+};
+
+export const getUser = async () => {
+  const storeCookie = await cookies();
+  const token = storeCookie.get("token")?.value;
+  let decodedData = null;
+  if (token) {
+    decodedData = await jwtDecode(token);
+    return decodedData;
+  } else {
+    return null;
+  }
+};
+
+export const logOut= async () => {
+  const storeCookie = await cookies();
+  storeCookie.delete("token");
 };

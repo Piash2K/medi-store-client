@@ -27,6 +27,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useEffect, useState } from "react";
+import { getUser, logOut } from "@/services/auth";
 
 interface MenuItem {
   title: string;
@@ -57,6 +59,21 @@ const menu: MenuItem[] = [
 ];
 
 export function Navbar() {
+  const [user, setUser] = useState(null);
+  console.log(user);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const userData = await getUser();
+      setUser(userData);
+    };
+    getCurrentUser();
+  }, []);
+
+  const handleLogOut= async () => {
+   logOut();
+   setUser(null);
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="mx-auto w-full  px-4 sm:px-6 lg:px-8">
@@ -116,12 +133,18 @@ export function Navbar() {
             </NavigationMenu>
           </div>
           <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/register">Register</Link>
-            </Button>
+            {user ? (
+              <Button onClick={handleLogOut}>Logout</Button>
+            ) : (
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/register">Register</Link>
+                </Button>
+              </>
+            )}
           </div>
         </nav>
 
@@ -190,23 +213,27 @@ export function Navbar() {
                   )}
                 </Accordion>
 
-                <div className="flex flex-col gap-3">
-                  <Link
-                    href="/login"
-                    className={cn(
-                      buttonVariants({ variant: "outline" }),
-                      "w-full",
-                    )}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className={cn(buttonVariants(), "w-full")}
-                  >
-                    Register
-                  </Link>
-                </div>
+                {user ? (
+                  <Button onClick={handleLogOut}>Logout</Button>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <Link
+                      href="/login"
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        "w-full",
+                      )}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      className={cn(buttonVariants(), "w-full")}
+                    >
+                      Register
+                    </Link>
+                  </div>
+                )}
               </div>
             </SheetContent>
           </Sheet>
