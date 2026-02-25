@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import * as React from "react";
 import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCart } from "@/providers/cart-provider";
 import { getCategories, getMedicines } from "@/services/medicine";
 import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
 
@@ -14,6 +14,7 @@ const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
 
 export default function ShopPageContent() {
+  const { addItem } = useCart();
   const [medicines, setMedicines] = React.useState<Medicine[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]);
 
@@ -165,6 +166,17 @@ export default function ShopPageContent() {
 
     return medicines;
   }, [medicines, sortBy]);
+
+  const getMedicineCartId = React.useCallback((medicine: Medicine) => {
+    const medicineWithOptionalId = medicine as Medicine & { id?: string };
+
+    return (
+      medicine._id ||
+      medicineWithOptionalId.id ||
+      medicine.slug ||
+      `${medicine.name}-${medicine.manufacturer || "unknown"}-${medicine.price}`
+    );
+  }, []);
 
   return (
     <section className="mx-auto max-w-325 px-4 py-8 sm:px-6 lg:px-8">
@@ -343,11 +355,22 @@ export default function ShopPageContent() {
 
                       <div className="flex items-center justify-between pt-2">
                         <p className="text-3xl font-semibold">BDT {medicine.price}</p>
-                        <Button asChild size="sm" className="h-8 px-4">
-                          <Link href={`/shop/${medicine._id}`}>
-                            <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-                            Add
-                          </Link>
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-8 px-4"
+                          onClick={() =>
+                            addItem({
+                              id: getMedicineCartId(medicine),
+                              name: medicine.name,
+                              price: medicine.price,
+                              manufacturer: medicine.manufacturer,
+                              category: medicine.category?.name,
+                            })
+                          }
+                        >
+                          <ShoppingCart className="mr-1 h-3.5 w-3.5" />
+                          Add
                         </Button>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, ShoppingCart } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 import { getUser, logOut } from "@/services/auth";
+import { useCart } from "@/providers/cart-provider";
 
 interface MenuItem {
   title: string;
@@ -60,6 +61,7 @@ const menu: MenuItem[] = [
 
 export function Navbar() {
   const [user, setUser] = useState(null);
+  const { totalItems } = useCart();
   console.log(user);
 
   useEffect(() => {
@@ -70,10 +72,11 @@ export function Navbar() {
     getCurrentUser();
   }, []);
 
-  const handleLogOut= async () => {
-   logOut();
-   setUser(null);
+  const handleLogOut = async () => {
+    logOut();
+    setUser(null);
   };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto w-full  px-4 sm:px-6 lg:px-8">
@@ -132,7 +135,18 @@ export function Navbar() {
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
+              <Link href="/cart">
+                <ShoppingCart className="size-5" />
+                {totalItems > 0 && (
+                  <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            </Button>
+
             {user ? (
               <Button onClick={handleLogOut}>Logout</Button>
             ) : (
@@ -149,9 +163,21 @@ export function Navbar() {
         </nav>
 
         <div className="flex h-16 items-center justify-between lg:hidden">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            MediStore 💊
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/" className="text-lg font-semibold tracking-tight">
+              MediStore 💊
+            </Link>
+            <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
+              <Link href="/cart">
+                <ShoppingCart className="size-5" />
+                {totalItems > 0 && (
+                  <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+            </Button>
+          </div>
 
           <Sheet>
             <SheetTrigger asChild>
