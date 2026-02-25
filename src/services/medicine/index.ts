@@ -1,4 +1,9 @@
-import { Category, MedicinesQueryParams, MedicinesResponse } from "@/types/medicine";
+import {
+  Category,
+  MedicineResponse,
+  MedicinesQueryParams,
+  MedicinesResponse,
+} from "@/types/medicine";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -66,5 +71,29 @@ export const getCategories = async (): Promise<Category[]> => {
   } catch (error) {
     console.error("Get categories error:", error);
     return [];
+  }
+};
+
+export const getMedicineById = async (medicineId: string): Promise<MedicineResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/medicines/${medicineId}`, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: result?.data ?? null,
+    };
+  } catch (error) {
+    console.error("Get medicine by id error:", error);
+    return {
+      success: false,
+      message: "Failed to fetch medicine",
+      data: null,
+    };
   }
 };

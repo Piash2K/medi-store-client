@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import * as React from "react";
 import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
 
@@ -188,6 +189,10 @@ export default function ShopPageContent() {
     );
   }, []);
 
+  const getMedicinePathId = React.useCallback((medicine: Medicine) => {
+    return medicine._id || medicine.id || medicine.slug || getMedicineCartId(medicine);
+  }, [getMedicineCartId]);
+
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
       <h1 className="text-4xl font-bold tracking-tight">Shop All Medicines</h1>
@@ -367,23 +372,28 @@ export default function ShopPageContent() {
 
                         <div className="flex items-center justify-between pt-2">
                           <p className="text-2xl font-semibold">BDT {medicine.price}</p>
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="h-8 px-4"
-                            onClick={() =>
-                              addItem({
-                                id: getMedicineCartId(medicine),
-                                name: medicine.name,
-                                price: medicine.price,
-                                manufacturer: medicine.manufacturer,
-                                category: medicine.category?.name,
-                              })
-                            }
-                          >
-                            <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-                            Add
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Button asChild size="sm" variant="outline" className="h-8 px-3">
+                              <Link href={`/shop/${getMedicinePathId(medicine)}`}>View</Link>
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              className="h-8 px-4"
+                              onClick={() =>
+                                addItem({
+                                  id: getMedicineCartId(medicine),
+                                  name: medicine.name,
+                                  price: medicine.price,
+                                  manufacturer: medicine.manufacturer,
+                                  category: medicine.category?.name,
+                                })
+                              }
+                            >
+                              <ShoppingCart className="mr-1 h-3.5 w-3.5" />
+                              Add
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </article>
