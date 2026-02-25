@@ -15,7 +15,7 @@ export default async function FeaturedMedicines() {
   const featuredMedicines = result.success ? result.data.slice(0, 4) : [];
 
   return (
-    <section className="bg-muted/40 py-14">
+    <section className="bg-muted/40 p-16">
       <div className="mx-auto  px-4 sm:px-6 lg:px-8">
         <div className="flex items-start justify-between gap-4">
           <div>

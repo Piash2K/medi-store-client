@@ -25,8 +25,8 @@ export default function CartPageContent() {
   const leftForFreeShipping = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
   return (
-    <section className="mx-auto max-w-325 px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-5xl font-bold tracking-tight">Shopping Cart</h1>
+    <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <h1 className="text-4xl font-bold tracking-tight">Shopping Cart</h1>
 
       {items.length === 0 ? (
         <div className="mt-8 rounded-2xl border bg-card p-8 text-center">
@@ -49,11 +49,11 @@ export default function CartPageContent() {
                   </div>
 
                   <div className="min-w-0">
-                    <h2 className="truncate text-3xl leading-none font-semibold">{item.name}</h2>
+                    <h2 className="truncate text-xl leading-tight font-semibold">{item.name}</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       by {item.manufacturer || "Unknown manufacturer"}
                     </p>
-                    <p className="mt-1 text-2xl font-medium">BDT {currencyFormatter.format(item.price)}</p>
+                    <p className="mt-1 text-lg font-medium">BDT {currencyFormatter.format(item.price)}</p>
                   </div>
                 </div>
 
@@ -79,7 +79,7 @@ export default function CartPageContent() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-3xl font-semibold">
+                    <p className="text-2xl font-semibold">
                       BDT {currencyFormatter.format(item.price * item.quantity)}
                     </p>
                     <button
@@ -97,7 +97,7 @@ export default function CartPageContent() {
           </div>
 
           <aside className="h-fit rounded-2xl border bg-card p-6">
-            <h2 className="text-4xl font-semibold tracking-tight">Order Summary</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">Order Summary</h2>
 
             <div className="mt-5 space-y-2 text-lg">
               <div className="flex items-center justify-between text-muted-foreground">
@@ -118,8 +118,8 @@ export default function CartPageContent() {
             <div className="my-5 border-t" />
 
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-semibold">Total</span>
-              <span className="text-4xl font-bold">BDT {currencyFormatter.format(total)}</span>
+              <span className="text-2xl font-semibold">Total</span>
+              <span className="text-3xl font-bold">BDT {currencyFormatter.format(total)}</span>
             </div>
 
             <Button className="mt-6 h-11 w-full text-base">Proceed to Checkout</Button>

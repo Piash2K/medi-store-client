@@ -19,6 +19,7 @@ export default function ShopPageContent() {
   const [categories, setCategories] = React.useState<Category[]>([]);
 
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [manufacturer, setManufacturer] = React.useState("");
   const [minPrice, setMinPrice] = React.useState("");
@@ -39,7 +40,7 @@ export default function ShopPageContent() {
     setErrorMessage("");
 
     const result = await getMedicines({
-      searchTerm: searchTerm || undefined,
+      searchTerm: debouncedSearchTerm || undefined,
       category: category || undefined,
       manufacturer: manufacturer || undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
@@ -61,7 +62,7 @@ export default function ShopPageContent() {
     setTotalPage(result.meta?.totalPage || 1);
     setTotalMedicines(result.meta?.total || result.data.length);
     setIsLoading(false);
-  }, [searchTerm, category, manufacturer, minPrice, maxPrice, page]);
+  }, [debouncedSearchTerm, category, manufacturer, minPrice, maxPrice, page]);
 
   const loadFilterStats = React.useCallback(async () => {
     const firstPage = await getMedicines({
@@ -137,6 +138,15 @@ export default function ShopPageContent() {
     loadMedicines();
   }, [loadMedicines]);
 
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setPage(DEFAULT_PAGE);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const handleApplyFilters = () => {
     setPage(DEFAULT_PAGE);
     loadMedicines();
@@ -179,12 +189,12 @@ export default function ShopPageContent() {
   }, []);
 
   return (
-    <section className="mx-auto  px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="text-5xl font-bold tracking-tight">Shop All Medicines</h1>
-      <p className="mt-3 text-lg text-muted-foreground">Browse our collection of quality OTC medicines</p>
+    <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <h1 className="text-4xl font-bold tracking-tight">Shop All Medicines</h1>
+      <p className="mt-2 text-base text-muted-foreground">Browse our collection of quality OTC medicines</p>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-2xl border bg-card p-5">
+      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[260px_1fr]">
+        <aside className="sticky top-20 h-fit rounded-2xl border bg-card p-5">
           <h2 className="text-2xl font-semibold">Filters</h2>
 
           <div className="mt-5 space-y-7">
@@ -286,17 +296,18 @@ export default function ShopPageContent() {
               <span>In Stock Only</span>
             </label>
 
-            <Button type="button" variant="outline" onClick={handleResetFilters} className="w-full">
-              Clear Filters
-            </Button>
-
-            <Button type="button" onClick={handleApplyFilters} className="hidden">
-              Apply Filters
-            </Button>
+            <div className="flex gap-2">
+              <Button type="button" onClick={handleApplyFilters} className="flex-1">
+                Apply
+              </Button>
+              <Button type="button" variant="outline" onClick={handleResetFilters} className="flex-1">
+                Clear
+              </Button>
+            </div>
           </div>
         </aside>
 
-        <div className="min-w-0">
+        <div className="flex min-w-0 flex-col">
           <div className="mb-5 flex items-center justify-between gap-3">
             <p className="text-lg text-muted-foreground">Showing {totalMedicines} medicines</p>
             <select
@@ -310,77 +321,84 @@ export default function ShopPageContent() {
             </select>
           </div>
 
-          {isLoading && (
-            <div className="mt-10 flex items-center justify-center">
-              <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-            </div>
-          )}
+          <div className="min-h-170">
+            {isLoading && (
+              <div className="mt-10 flex items-center justify-center">
+                <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+              </div>
+            )}
 
-          {!isLoading && errorMessage && <p className="mt-6 text-sm text-destructive">{errorMessage}</p>}
+            {!isLoading && errorMessage && <p className="mt-6 text-sm text-destructive">{errorMessage}</p>}
 
-          {!isLoading && !errorMessage && sortedMedicines.length === 0 && (
-            <p className="mt-6 text-sm text-muted-foreground">No medicines found.</p>
-          )}
+            {!isLoading && !errorMessage && sortedMedicines.length === 0 && (
+              <p className="mt-6 text-sm text-muted-foreground">No medicines found.</p>
+            )}
 
-          {!isLoading && !errorMessage && sortedMedicines.length > 0 && (
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {sortedMedicines.map((medicine, index) => {
-                return (
-                  <article
-                    key={`${medicine._id}-${medicine.name}-${index}`}
-                    className="overflow-hidden rounded-2xl border bg-card"
-                  >
-                    <div className="bg-muted/50 relative flex h-52 items-center justify-center">
-                      <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
-                        <ShoppingCart className="h-8 w-8" />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5 p-4">
-                      <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
-                        {medicine.category?.name || "General"}
-                      </span>
-                      <h2 className="text-[30px] leading-none font-semibold tracking-tight">
-                        {medicine.name}
-                      </h2>
-                      <p className="text-sm text-muted-foreground">
-                        by {medicine.manufacturer || "Unknown manufacturer"}
-                      </p>
-
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                        <span>4.{index % 6 + 3}</span>
-                        <span>({(index + 1) * 29})</span>
+            {!isLoading && !errorMessage && sortedMedicines.length > 0 && (
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {sortedMedicines.map((medicine, index) => {
+                  return (
+                    <article
+                      key={`${medicine._id}-${medicine.name}-${index}`}
+                      className="overflow-hidden rounded-2xl border bg-card"
+                    >
+                      <div className="bg-muted/50 relative flex h-52 items-center justify-center">
+                        <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
+                          <ShoppingCart className="h-8 w-8" />
+                        </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2">
-                        <p className="text-3xl font-semibold">BDT {medicine.price}</p>
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="h-8 px-4"
-                          onClick={() =>
-                            addItem({
-                              id: getMedicineCartId(medicine),
-                              name: medicine.name,
-                              price: medicine.price,
-                              manufacturer: medicine.manufacturer,
-                              category: medicine.category?.name,
-                            })
-                          }
-                        >
-                          <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-                          Add
-                        </Button>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
+                      <div className="space-y-1.5 p-4">
+                        <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
+                          {medicine.category?.name || "General"}
+                        </span>
+                        <h2 className="text-2xl leading-tight font-semibold tracking-tight">
+                          {medicine.name}
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                          by {medicine.manufacturer || "Unknown manufacturer"}
+                        </p>
 
-          <div className="mt-6 flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                          <span>4.{index % 6 + 3}</span>
+                          <span>({(index + 1) * 29})</span>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2">
+                          <p className="text-2xl font-semibold">BDT {medicine.price}</p>
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="h-8 px-4"
+                            onClick={() =>
+                              addItem({
+                                id: getMedicineCartId(medicine),
+                                name: medicine.name,
+                                price: medicine.price,
+                                manufacturer: medicine.manufacturer,
+                                category: medicine.category?.name,
+                              })
+                            }
+                          >
+                            <ShoppingCart className="mr-1 h-3.5 w-3.5" />
+                            Add
+                          </Button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 flex items-center justify-between rounded-xl border bg-card p-3">
+            <p className="px-2 text-sm text-muted-foreground">
+              Page {page} of {totalPage}
+            </p>
+
+            <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="outline"
@@ -389,9 +407,6 @@ export default function ShopPageContent() {
             >
               Previous
             </Button>
-            <p className="text-sm text-muted-foreground">
-              Page {page} of {totalPage}
-            </p>
             <Button
               type="button"
               variant="outline"
@@ -400,6 +415,7 @@ export default function ShopPageContent() {
             >
               Next
             </Button>
+            </div>
           </div>
         </div>
       </div>
