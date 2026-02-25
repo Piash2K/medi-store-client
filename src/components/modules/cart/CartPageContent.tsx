@@ -1,10 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Minus, Package, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
+import { getUser } from "@/services/auth";
+import { createOrder } from "@/services/order";
 
 const SHIPPING_COST = 120;
 const FREE_SHIPPING_THRESHOLD = 1000;
@@ -15,7 +20,12 @@ const currencyFormatter = new Intl.NumberFormat("en-BD", {
 });
 
 export default function CartPageContent() {
-  const { items, removeItem, updateQuantity } = useCart();
+  const router = useRouter();
+  const { items, removeItem, updateQuantity, clearCart } = useCart();
+  const [shippingAddress, setShippingAddress] = React.useState("");
+  const [isPlacingOrder, setIsPlacingOrder] = React.useState(false);
+  const [checkoutMessage, setCheckoutMessage] = React.useState("");
+  const [checkoutError, setCheckoutError] = React.useState("");
 
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
   const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
@@ -23,6 +33,53 @@ export default function CartPageContent() {
   const total = subtotal + shipping;
   const itemsCount = items.reduce((totalQty, item) => totalQty + item.quantity, 0);
   const leftForFreeShipping = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
+
+  const handlePlaceOrder = async () => {
+    if (!shippingAddress.trim()) {
+      setCheckoutError("Please provide your shipping address.");
+      setCheckoutMessage("");
+      return;
+    }
+
+    if (items.length === 0) {
+      setCheckoutError("Your cart is empty.");
+      setCheckoutMessage("");
+      return;
+    }
+
+    setIsPlacingOrder(true);
+    setCheckoutError("");
+    setCheckoutMessage("");
+
+    const currentUser = (await getUser()) as Record<string, unknown> | null;
+    const customerId =
+      (currentUser?.id as string | undefined) ||
+      (currentUser?.userId as string | undefined) ||
+      (currentUser?.sub as string | undefined);
+
+    const result = await createOrder({
+      customerId,
+      paymentMethod: "COD",
+      shippingAddress: shippingAddress.trim(),
+      totalAmount: Number(total.toFixed(2)),
+      items: items.map((item) => ({
+        medicineId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    });
+
+    if (!result.success) {
+      setCheckoutError(result.message || "Failed to place order.");
+      setIsPlacingOrder(false);
+      return;
+    }
+
+    setCheckoutMessage(result.message || "Order created successfully.");
+    clearCart();
+    setIsPlacingOrder(false);
+    router.push("/orders");
+  };
 
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
@@ -122,7 +179,25 @@ export default function CartPageContent() {
               <span className="text-3xl font-bold">BDT {currencyFormatter.format(total)}</span>
             </div>
 
-            <Button className="mt-6 h-11 w-full text-base">Proceed to Checkout</Button>
+            <div className="mt-5 space-y-2">
+              <p className="text-sm font-medium">Shipping Address</p>
+              <Input
+                value={shippingAddress}
+                onChange={(event) => setShippingAddress(event.target.value)}
+                placeholder="Piash Islam, 123 Main St, City, Country"
+              />
+            </div>
+
+            {checkoutError && <p className="text-destructive mt-3 text-sm">{checkoutError}</p>}
+            {checkoutMessage && <p className="text-primary mt-3 text-sm">{checkoutMessage}</p>}
+
+            <Button
+              className="mt-6 h-11 w-full text-base"
+              onClick={handlePlaceOrder}
+              disabled={isPlacingOrder}
+            >
+              {isPlacingOrder ? "Placing Order..." : "Proceed to Checkout"}
+            </Button>
             <Button asChild variant="outline" className="mt-3 h-11 w-full text-base">
               <Link href="/shop">Continue Shopping</Link>
             </Button>
