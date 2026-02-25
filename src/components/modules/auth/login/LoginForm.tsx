@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -50,7 +51,8 @@ export default function LoginForm() {
         position: "top-right",
       });
 
-      router.push("/");
+      const redirectPath = searchParams.get("redirect") || "/dashboard";
+      router.push(redirectPath);
     } catch (error) {
       console.log(error)
       toast.error("Something went wrong. Please try again.", {

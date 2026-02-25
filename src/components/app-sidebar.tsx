@@ -2,173 +2,139 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+  LayoutDashboard,
+  Pill,
+  ShoppingBag,
+  ShoppingCart,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+type NavMainItems = React.ComponentProps<typeof NavMain>["items"]
+
+const adminNavMain: NavMainItems = [
+  {
+    title: "Admin Panel",
+    url: "/admin",
+    icon: LayoutDashboard,
+    isActive: true,
+    items: [
+      {
+        title: "Dashboard",
+        url: "/admin",
+      },
+      {
+        title: "Users",
+        url: "/admin/users",
+      },
+      {
+        title: "Orders",
+        url: "/admin/orders",
+      },
+      {
+        title: "Categories",
+        url: "/admin/categories",
+      },
+    ],
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+]
+
+const sellerNavMain: NavMainItems = [
+  {
+    title: "Seller Panel",
+    url: "/seller/dashboard",
+    icon: ShoppingBag,
+    isActive: true,
+    items: [
+      {
+        title: "Dashboard",
+        url: "/seller/dashboard",
+      },
+      {
+        title: "Medicines",
+        url: "/seller/medicines",
+      },
+      {
+        title: "Orders",
+        url: "/seller/orders",
+      },
+      {
+        title: "Stock",
+        url: "/seller/medicines",
+      },
+    ],
+  },
+]
+
+const customerNavMain: NavMainItems = [
+  {
+    title: "Customer",
+    url: "/shop",
+    icon: Pill,
+    isActive: true,
+    items: [
+      {
+        title: "Shop",
+        url: "/shop",
+      },
+      {
+        title: "Cart",
+        url: "/cart",
+      },
+      {
+        title: "Checkout",
+        url: "/checkout",
+      },
+      {
+        title: "My Orders",
+        url: "/orders",
+      },
+      {
+        title: "Profile",
+        url: "/profile",
+      },
+    ],
+  },
+  {
+    title: "Quick Access",
+    url: "/",
+    icon: ShoppingCart,
+    items: [
+      {
+        title: "Home",
+        url: "/",
+      },
+      {
+        title: "Shop",
+        url: "/shop",
+      },
+    ],
+  },
+]
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  UserRole: "ADMIN" | "SELLER" | "CUSTOMER"
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ UserRole, ...props }: AppSidebarProps) {
+  const navItemsByRole: Record<AppSidebarProps["UserRole"], NavMainItems> = {
+    ADMIN: adminNavMain,
+    SELLER: sellerNavMain,
+    CUSTOMER: customerNavMain,
+  }
+
+  const navItems = navItemsByRole[UserRole]
+
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-      </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navItems} />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
