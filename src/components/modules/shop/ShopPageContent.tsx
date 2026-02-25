@@ -179,7 +179,7 @@ export default function ShopPageContent() {
   }, []);
 
   return (
-    <section className="mx-auto max-w-325 px-4 py-8 sm:px-6 lg:px-8">
+    <section className="mx-auto  px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="text-5xl font-bold tracking-tight">Shop All Medicines</h1>
       <p className="mt-3 text-lg text-muted-foreground">Browse our collection of quality OTC medicines</p>
 
