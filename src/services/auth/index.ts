@@ -29,6 +29,27 @@ export const loginUser = async (userData: FieldValues) => {
   }
 };
 
+export const registerUser = async (userData: FieldValues) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      },
+    );
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Register error:", error);
+    return { success: false, message: "An error occurred" };
+  }
+};
+
 export const getUser = async () => {
   const storeCookie = await cookies();
   const token = storeCookie.get("token")?.value;

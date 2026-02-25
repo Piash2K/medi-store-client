@@ -16,7 +16,7 @@ const slides = [
 	},
 	{
 		image:
-			"https://images.unsplash.com/photo-1631549916768-4119b4123a28?auto=format&fit=crop&w=1600&q=80",
+			"https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1600&q=80",
 		title: "Fast Delivery to Your Door",
 		description:
 			"Place your order in minutes and get essential medicines delivered quickly.",
