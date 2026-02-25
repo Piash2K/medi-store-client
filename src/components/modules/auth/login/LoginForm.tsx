@@ -51,7 +51,7 @@ export default function LoginForm() {
         position: "top-right",
       });
 
-      const redirectPath = searchParams.get("redirect") || "/dashboard";
+      const redirectPath = searchParams.get("redirect") || "/";
       router.push(redirectPath);
     } catch (error) {
       console.log(error)

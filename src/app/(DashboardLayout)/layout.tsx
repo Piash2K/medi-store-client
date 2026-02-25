@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { getUser } from "@/services/auth";
-import { get } from "http";
+
 
 export default async function Page({
   admin,
