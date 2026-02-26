@@ -26,11 +26,17 @@ const CartContext = React.createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = React.useState<CartItem[]>([]);
+  const [isHydrated, setIsHydrated] = React.useState(false);
 
   React.useEffect(() => {
-    const savedCart = localStorage.getItem(STORAGE_KEY);
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const savedCart = window.localStorage.getItem(STORAGE_KEY);
 
     if (!savedCart) {
+      setIsHydrated(true);
       return;
     }
 
@@ -40,11 +46,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch {
       setItems([]);
     }
+
+    setIsHydrated(true);
   }, []);
 
   React.useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    if (!isHydrated || typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }, [items, isHydrated]);
 
   const addItem = React.useCallback((item: Omit<CartItem, "quantity">) => {
     setItems((previousItems) => {

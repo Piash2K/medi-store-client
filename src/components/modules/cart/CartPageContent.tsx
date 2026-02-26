@@ -35,6 +35,13 @@ export default function CartPageContent() {
   const leftForFreeShipping = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
   const handlePlaceOrder = async () => {
+    const currentUser = (await getUser()) as Record<string, unknown> | null;
+
+    if (!currentUser) {
+      router.push("/login?redirect=/cart");
+      return;
+    }
+
     if (!shippingAddress.trim()) {
       setCheckoutError("Please provide your shipping address.");
       setCheckoutMessage("");
@@ -51,11 +58,17 @@ export default function CartPageContent() {
     setCheckoutError("");
     setCheckoutMessage("");
 
-    const currentUser = (await getUser()) as Record<string, unknown> | null;
     const customerId =
       (currentUser?.id as string | undefined) ||
       (currentUser?.userId as string | undefined) ||
       (currentUser?.sub as string | undefined);
+
+    if (!customerId) {
+      setCheckoutError("Please login again to continue checkout.");
+      setIsPlacingOrder(false);
+      router.push("/login?redirect=/cart");
+      return;
+    }
 
     const result = await createOrder({
       customerId,
