@@ -103,6 +103,43 @@ export const getOrders = async (): Promise<OrdersResponse> => {
   }
 };
 
+export const getSellerOrders = async (): Promise<OrdersResponse> => {
+  try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+        data: [],
+      };
+    }
+
+    const response = await fetch(`${API_URL}/seller/orders`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: result?.data ?? [],
+    };
+  } catch (error) {
+    console.error("Get seller orders error:", error);
+    return {
+      success: false,
+      message: "Failed to fetch seller orders",
+      data: [],
+    };
+  }
+};
+
 export const getOrderById = async (orderId: string): Promise<OrderResponse> => {
   try {
     const token = await getToken();
