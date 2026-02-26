@@ -49,7 +49,7 @@ const sellerNavMain: NavMainItems = [
   },
   {
     title: "Medicines",
-    url: "/seller/medicines",
+    url: "/medicines",
     icon: Pill,
   },
   {
