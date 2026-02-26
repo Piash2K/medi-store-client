@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
 
 export default function ShopPageContent() {
+  const searchParams = useSearchParams();
   const { addItem } = useCart();
   const [medicines, setMedicines] = React.useState<Medicine[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]);
@@ -147,6 +149,16 @@ export default function ShopPageContent() {
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  React.useEffect(() => {
+    const categoryFromQuery = searchParams.get("category")?.trim() || "";
+    if (!categoryFromQuery) {
+      return;
+    }
+
+    setCategory(categoryFromQuery);
+    setPage(DEFAULT_PAGE);
+  }, [searchParams]);
 
   const handleApplyFilters = () => {
     setPage(DEFAULT_PAGE);
