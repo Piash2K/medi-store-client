@@ -22,6 +22,13 @@ export type UserProfileResponse = {
   data: UserProfile | null;
 };
 
+export type UpdateProfilePayload = {
+  name: string;
+  email: string;
+  phone?: string | null;
+  address?: string | null;
+};
+
 export const loginUser = async (userData: FieldValues) => {
   try {
     const response = await fetch(
@@ -118,6 +125,48 @@ export const getMyProfile = async (): Promise<UserProfileResponse> => {
     return {
       success: false,
       message: "Failed to fetch profile",
+      data: null,
+    };
+  }
+};
+
+export const updateMyProfile = async (
+  payload: UpdateProfilePayload,
+): Promise<UserProfileResponse> => {
+  try {
+    const storeCookie = await cookies();
+    const token = storeCookie.get("token")?.value;
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      };
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: result?.data ?? null,
+    };
+  } catch (error) {
+    console.error("Update profile error:", error);
+    return {
+      success: false,
+      message: "Failed to update profile",
       data: null,
     };
   }
