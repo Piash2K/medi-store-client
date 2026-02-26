@@ -1,3 +1,3 @@
-export const CustomerDefault = () => {
+export default function CustomerDefault() {
   return null;
 }

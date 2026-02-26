@@ -1,3 +1,3 @@
-export const AdminDefault = () => {
+export default function AdminDefault() {
   return null;
-};
+}

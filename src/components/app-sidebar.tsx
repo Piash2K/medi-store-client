@@ -2,8 +2,11 @@
 
 import * as React from "react"
 import {
+  House,
   LayoutDashboard,
+  Package,
   Pill,
+  User,
   ShoppingBag,
   ShoppingCart,
 } from "lucide-react"
@@ -19,101 +22,81 @@ type NavMainItems = React.ComponentProps<typeof NavMain>["items"]
 
 const adminNavMain: NavMainItems = [
   {
-    title: "Admin Panel",
-    url: "/admin",
+    title: "Dashboard",
+    url: "/dashboard",
     icon: LayoutDashboard,
     isActive: true,
-    items: [
-      {
-        title: "Dashboard",
-        url: "/admin",
-      },
-      {
-        title: "Users",
-        url: "/admin/users",
-      },
-      {
-        title: "Orders",
-        url: "/admin/orders",
-      },
-      {
-        title: "Categories",
-        url: "/admin/categories",
-      },
-    ],
+  },
+  {
+    title: "Orders",
+    url: "/admin/orders",
+    icon: Package,
+  },
+  {
+    title: "Home",
+    url: "/",
+    icon: House,
+    separatorBefore: true,
   },
 ]
 
 const sellerNavMain: NavMainItems = [
   {
-    title: "Seller Panel",
-    url: "/seller/dashboard",
+    title: "Dashboard",
+    url: "/dashboard",
     icon: ShoppingBag,
     isActive: true,
-    items: [
-      {
-        title: "Dashboard",
-        url: "/seller/dashboard",
-      },
-      {
-        title: "Medicines",
-        url: "/seller/medicines",
-      },
-      {
-        title: "Orders",
-        url: "/seller/orders",
-      },
-      {
-        title: "Stock",
-        url: "/seller/medicines",
-      },
-    ],
+  },
+  {
+    title: "Medicines",
+    url: "/seller/medicines",
+    icon: Pill,
+  },
+  {
+    title: "Orders",
+    url: "/seller/orders",
+    icon: Package,
+  },
+  {
+    title: "Home",
+    url: "/",
+    icon: House,
+    separatorBefore: true,
   },
 ]
 
 const customerNavMain: NavMainItems = [
   {
-    title: "Customer",
-    url: "/shop",
-    icon: Pill,
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
     isActive: true,
-    items: [
-      {
-        title: "Shop",
-        url: "/shop",
-      },
-      {
-        title: "Cart",
-        url: "/cart",
-      },
-      {
-        title: "Checkout",
-        url: "/checkout",
-      },
-      {
-        title: "My Orders",
-        url: "/orders",
-      },
-      {
-        title: "Profile",
-        url: "/profile",
-      },
-    ],
   },
   {
-    title: "Quick Access",
-    url: "/",
+    title: "Shop",
+    url: "/shop",
+    icon: Pill,
+  },
+  {
+    title: "Cart",
+    url: "/cart",
     icon: ShoppingCart,
-    items: [
-      {
-        title: "Home",
-        url: "/",
-      },
-      {
-        title: "Shop",
-        url: "/shop",
-      },
-    ],
+  },
+  {
+    title: "Orders",
+    url: "/orders",
+    icon: Package,
+  },
+  {
+    title: "Profile",
+    url: "/profile",
+    icon: User,
+  },
+  {
+    title: "Home",
+    url: "/",
+    icon: House,
+    separatorBefore: true,
   },
 ]
 
