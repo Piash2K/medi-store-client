@@ -9,20 +9,34 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { deleteSellerMedicine, updateSellerMedicine } from "@/services/seller-medicine";
-import { Medicine } from "@/types/medicine";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  createSellerMedicine,
+  deleteSellerMedicine,
+  updateSellerMedicine,
+} from "@/services/seller-medicine";
+import { Category, Medicine } from "@/types/medicine";
 
 type SellerMedicinesPageContentProps = {
   initialMedicines: Medicine[];
+  initialCategories: { id: string; name: string }[];
 };
 
 const getMedicineId = (medicine: Medicine) => medicine.id || medicine._id || medicine.slug || medicine.name;
 
 export default function SellerMedicinesPageContent({
   initialMedicines,
+  initialCategories,
 }: SellerMedicinesPageContentProps) {
   const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
   const [editName, setEditName] = useState("");
   const [editPrice, setEditPrice] = useState("");
@@ -31,6 +45,12 @@ export default function SellerMedicinesPageContent({
   const [editDescription, setEditDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [deletingMedicineId, setDeletingMedicineId] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [newStock, setNewStock] = useState("");
+  const [newManufacturer, setNewManufacturer] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [newCategoryId, setNewCategoryId] = useState("");
 
   const filteredMedicines = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -56,6 +76,67 @@ export default function SellerMedicinesPageContent({
     setEditStock(String(medicine.stock ?? 0));
     setEditManufacturer(medicine.manufacturer || "");
     setEditDescription(medicine.description || "");
+  };
+
+  const handleOpenAddModal = () => {
+    setNewName("");
+    setNewPrice("");
+    setNewStock("");
+    setNewManufacturer("");
+    setNewDescription("");
+    setNewCategoryId("");
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    if (isSaving) {
+      return;
+    }
+    setIsAddModalOpen(false);
+  };
+
+  const handleCreateMedicine = async () => {
+    const parsedPrice = Number(newPrice);
+    const parsedStock = Number(newStock);
+
+    if (!newName.trim() || Number.isNaN(parsedPrice) || parsedPrice <= 0 || Number.isNaN(parsedStock) || parsedStock < 0 || !newCategoryId) {
+      toast.error("Name, category, valid price, and stock are required", { position: "top-right" });
+      return;
+    }
+
+    setIsSaving(true);
+
+    const result = await createSellerMedicine({
+      name: newName.trim(),
+      price: parsedPrice,
+      stock: parsedStock,
+      manufacturer: newManufacturer.trim() || undefined,
+      description: newDescription.trim() || undefined,
+      categoryId: newCategoryId,
+    });
+
+    setIsSaving(false);
+
+    if (!result.success || !result.data) {
+      toast.error(result.message || "Failed to create medicine", { position: "top-right" });
+      return;
+    }
+
+    const selectedCategory = initialCategories.find((category) => category.id === newCategoryId);
+
+    const createdMedicine = {
+      ...result.data,
+      categoryId: result.data.categoryId || newCategoryId,
+      category:
+        result.data.category ||
+        (selectedCategory
+          ? ({ _id: selectedCategory.id, name: selectedCategory.name } as Category)
+          : undefined),
+    };
+
+    setMedicines((previous) => [createdMedicine, ...previous]);
+    toast.success(result.message || "Medicine added successfully", { position: "top-right" });
+    setIsAddModalOpen(false);
   };
 
   const handleCancelEdit = () => {
@@ -171,7 +252,7 @@ export default function SellerMedicinesPageContent({
     <section className="space-y-6 p-1">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-semibold tracking-tight">Manage Medicines</h1>
-        <Button className="gap-2" type="button">
+        <Button className="gap-2" type="button" onClick={handleOpenAddModal}>
           <Plus className="h-4 w-4" />
           Add Medicine
         </Button>
@@ -262,6 +343,88 @@ export default function SellerMedicinesPageContent({
           </div>
         </CardContent>
       </Card>
+
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-xl">
+            <CardContent className="space-y-5 pt-6">
+              <div>
+                <h2 className="text-2xl font-semibold">Add Medicine</h2>
+                <p className="text-muted-foreground mt-1 text-sm">Fill out the fields to add a new medicine.</p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-sm font-medium">Name</label>
+                  <Input value={newName} onChange={(event) => setNewName(event.target.value)} />
+                </div>
+
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-sm font-medium">Category</label>
+                  <Select value={newCategoryId} onValueChange={setNewCategoryId}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {initialCategories.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Price</label>
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={newPrice}
+                    onChange={(event) => setNewPrice(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Stock</label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={newStock}
+                    onChange={(event) => setNewStock(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Manufacturer</label>
+                  <Input
+                    value={newManufacturer}
+                    onChange={(event) => setNewManufacturer(event.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Description</label>
+                  <Input
+                    value={newDescription}
+                    onChange={(event) => setNewDescription(event.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={handleCloseAddModal} disabled={isSaving}>
+                  Cancel
+                </Button>
+                <Button type="button" onClick={handleCreateMedicine} disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Add Medicine"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {editingMedicine && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

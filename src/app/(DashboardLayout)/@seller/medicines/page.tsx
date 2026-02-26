@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import SellerMedicinesPageContent from "../../../../components/modules/seller/SellerMedicinesPageContent";
 import { getUser } from "@/services/auth";
-import { getMedicines } from "@/services/medicine";
+import { getCategories, getMedicines } from "@/services/medicine";
 
 export default async function SellerMedicinesPage() {
   const user = (await getUser()) as Record<string, unknown> | null;
@@ -27,6 +27,22 @@ export default async function SellerMedicinesPage() {
 
   const medicinesResult = await getMedicines({ page: 1, limit: 1000 });
   const allMedicines = medicinesResult.success ? medicinesResult.data : [];
+  const categories = await getCategories();
+
+  const initialCategories = categories
+    .map((category) => {
+      const optionId =
+        (typeof (category as { id?: string }).id === "string" &&
+          (category as { id?: string }).id) ||
+        (typeof category._id === "string" && category._id) ||
+        "";
+
+      return {
+        id: optionId,
+        name: category.name,
+      };
+    })
+    .filter((category) => Boolean(category.id));
 
   const initialMedicines = allMedicines.filter((medicine) => {
     if (role === "ADMIN") {
@@ -43,5 +59,10 @@ export default async function SellerMedicinesPage() {
     return medicineSellerId === sellerId || medicineSellerEmail === userEmail;
   });
 
-  return <SellerMedicinesPageContent initialMedicines={initialMedicines} />;
+  return (
+    <SellerMedicinesPageContent
+      initialMedicines={initialMedicines}
+      initialCategories={initialCategories}
+    />
+  );
 }

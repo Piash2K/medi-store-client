@@ -15,6 +15,21 @@ export type UpdateSellerMedicinePayload = {
   categoryId?: string;
 };
 
+export type CreateSellerMedicinePayload = {
+  name: string;
+  price: number;
+  stock: number;
+  manufacturer?: string;
+  description?: string;
+  categoryId?: string;
+};
+
+export type CreateSellerMedicineResponse = {
+  success: boolean;
+  message?: string;
+  data?: Medicine | null;
+};
+
 export type UpdateSellerMedicineResponse = {
   success: boolean;
   message?: string;
@@ -30,6 +45,46 @@ export type DeleteSellerMedicineResponse = {
 const getToken = async () => {
   const storeCookie = await cookies();
   return storeCookie.get("token")?.value;
+};
+
+export const createSellerMedicine = async (
+  payload: CreateSellerMedicinePayload,
+): Promise<CreateSellerMedicineResponse> => {
+  try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
+    const response = await fetch(`${API_URL}/seller/medicines`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: result?.data ?? null,
+    };
+  } catch (error) {
+    console.error("Create seller medicine error:", error);
+    return {
+      success: false,
+      message: "Failed to create medicine",
+      data: null,
+    };
+  }
 };
 
 export const updateSellerMedicine = async (
