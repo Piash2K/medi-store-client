@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { updateSellerMedicine } from "@/services/seller-medicine";
+import { deleteSellerMedicine, updateSellerMedicine } from "@/services/seller-medicine";
 import { Medicine } from "@/types/medicine";
 
 type SellerMedicinesPageContentProps = {
@@ -29,6 +30,7 @@ export default function SellerMedicinesPageContent({
   const [editManufacturer, setEditManufacturer] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingMedicineId, setDeletingMedicineId] = useState("");
 
   const filteredMedicines = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -128,6 +130,43 @@ export default function SellerMedicinesPageContent({
     handleCancelEdit();
   };
 
+  const handleDeleteClick = async (medicine: Medicine) => {
+    const medicineId = getMedicineId(medicine);
+
+    if (!medicineId) {
+      toast.error("Invalid medicine id", { position: "top-right" });
+      return;
+    }
+
+    const confirmation = await Swal.fire({
+      title: "Delete medicine?",
+      text: `This will permanently remove ${medicine.name}.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+      focusCancel: true,
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
+    setDeletingMedicineId(medicineId);
+
+    const result = await deleteSellerMedicine(medicineId);
+
+    setDeletingMedicineId("");
+
+    if (!result.success) {
+      toast.error(result.message || "Failed to delete medicine", { position: "top-right" });
+      return;
+    }
+
+    setMedicines((previous) => previous.filter((item) => getMedicineId(item) !== medicineId));
+    toast.success(result.message || "Medicine deleted successfully", { position: "top-right" });
+  };
+
   return (
     <section className="space-y-6 p-1">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -198,10 +237,18 @@ export default function SellerMedicinesPageContent({
                               type="button"
                               aria-label="Edit medicine"
                               onClick={() => handleEditClick(medicine)}
+                              disabled={deletingMedicineId === medicineId}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" type="button" aria-label="Delete medicine">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              aria-label="Delete medicine"
+                              onClick={() => handleDeleteClick(medicine)}
+                              disabled={deletingMedicineId === medicineId}
+                            >
                               <Trash2 className="h-4 w-4 text-red-500" />
                             </Button>
                           </div>

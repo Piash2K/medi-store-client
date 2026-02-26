@@ -21,6 +21,12 @@ export type UpdateSellerMedicineResponse = {
   data?: Medicine | null;
 };
 
+export type DeleteSellerMedicineResponse = {
+  success: boolean;
+  message?: string;
+  data?: Medicine | null;
+};
+
 const getToken = async () => {
   const storeCookie = await cookies();
   return storeCookie.get("token")?.value;
@@ -62,6 +68,44 @@ export const updateSellerMedicine = async (
     return {
       success: false,
       message: "Failed to update medicine",
+      data: null,
+    };
+  }
+};
+
+export const deleteSellerMedicine = async (
+  medicineId: string,
+): Promise<DeleteSellerMedicineResponse> => {
+  try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
+    const response = await fetch(`${API_URL}/seller/medicines/${medicineId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: result?.data ?? null,
+    };
+  } catch (error) {
+    console.error("Delete seller medicine error:", error);
+    return {
+      success: false,
+      message: "Failed to delete medicine",
       data: null,
     };
   }
