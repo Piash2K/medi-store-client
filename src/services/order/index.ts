@@ -23,6 +23,21 @@ export type CreateOrderResponse = {
   };
 };
 
+export type UpdateSellerOrderStatusPayload = {
+  orderId: string;
+  status: "PLACED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+};
+
+export type UpdateSellerOrderStatusResponse = {
+  success: boolean;
+  message?: string;
+  data?: {
+    id?: string;
+    status?: string;
+    updatedAt?: string;
+  } | null;
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const getToken = async () => {
@@ -136,6 +151,63 @@ export const getSellerOrders = async (): Promise<OrdersResponse> => {
       success: false,
       message: "Failed to fetch seller orders",
       data: [],
+    };
+  }
+};
+
+export const updateSellerOrderStatus = async (
+  payload: UpdateSellerOrderStatusPayload,
+): Promise<UpdateSellerOrderStatusResponse> => {
+  try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
+    const requestBody = JSON.stringify({
+      orderId: payload.orderId,
+      status: payload.status,
+    });
+
+    let response = await fetch(`${API_URL}/seller/orders`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: requestBody,
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      response = await fetch(`${API_URL}/seller/orders/${payload.orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: payload.status }),
+        cache: "no-store",
+      });
+    }
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: result?.data ?? null,
+    };
+  } catch (error) {
+    console.error("Update seller order status error:", error);
+    return {
+      success: false,
+      message: "Failed to update order status",
+      data: null,
     };
   }
 };

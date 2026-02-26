@@ -23,6 +23,11 @@ export type Order = {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
+  customer?: {
+    id?: string;
+    name?: string;
+    email?: string;
+  };
 };
 
 export type OrdersResponse = {

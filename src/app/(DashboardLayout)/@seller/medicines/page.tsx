@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 
-import SellerMedicinesPageContent from "../../../../components/modules/seller/SellerMedicinesPageContent";
+
 import { getUser } from "@/services/auth";
 import { getCategories, getMedicines } from "@/services/medicine";
+import SellerMedicinesPageContent from "@/components/modules/seller/SellerMedicinesPageContent";
 
 export default async function SellerMedicinesPage() {
   const user = (await getUser()) as Record<string, unknown> | null;
