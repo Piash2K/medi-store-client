@@ -4,20 +4,12 @@ import Link from "next/link";
 import { Menu, ShoppingCart } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import {
@@ -34,35 +26,25 @@ import { useCart } from "@/providers/cart-provider";
 interface MenuItem {
   title: string;
   url: string;
-  description?: string;
-  items?: MenuItem[];
 }
 
-const menu: MenuItem[] = [
+const baseMenu: MenuItem[] = [
   { title: "Home", url: "/" },
-  {
-    title: "Shop",
-    url: "/shop",
-    items: [
-      {
-        title: "All Medicines",
-        description: "Browse all available OTC medicines",
-        url: "/shop",
-      },
-      {
-        title: "Track Orders",
-        description: "View order progress and delivery status",
-        url: "/orders",
-      },
-    ],
-  },
-  { title: "Track Order", url: "/orders" },
+  { title: "Shop", url: "/shop" },
 ];
+
+const isCustomerUser = (user: unknown) => {
+  const role = (user as { role?: string } | null)?.role;
+  return role?.toUpperCase() === "CUSTOMER";
+};
 
 export function Navbar() {
   const [user, setUser] = useState(null);
   const { totalItems } = useCart();
-  console.log(user);
+
+  const menu = isCustomerUser(user)
+    ? [...baseMenu, { title: "Track Order", url: "/orders" }]
+    : baseMenu;
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -89,49 +71,18 @@ export function Navbar() {
           <div>
             <NavigationMenu>
               <NavigationMenuList>
-                {menu.map((item) =>
-                  item.items ? (
-                    <NavigationMenuItem key={item.title}>
-                      <NavigationMenuTrigger>
+                {menu.map((item) => (
+                  <NavigationMenuItem key={item.title}>
+                    <NavigationMenuLink asChild>
+                      <Link
+                        href={item.url}
+                        className={navigationMenuTriggerStyle()}
+                      >
                         {item.title}
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent className="bg-popover text-popover-foreground">
-                        <ul className="grid w-[320px] gap-1 p-2">
-                          {item.items.map((subItem) => (
-                            <li key={subItem.title}>
-                              <NavigationMenuLink asChild>
-                                <Link
-                                  href={subItem.url}
-                                  className="block rounded-md p-3 leading-none no-underline transition-colors hover:bg-muted"
-                                >
-                                  <div className="text-sm font-semibold">
-                                    {subItem.title}
-                                  </div>
-                                  {subItem.description && (
-                                    <p className="text-sm leading-snug text-muted-foreground">
-                                      {subItem.description}
-                                    </p>
-                                  )}
-                                </Link>
-                              </NavigationMenuLink>
-                            </li>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  ) : (
-                    <NavigationMenuItem key={item.title}>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          href={item.url}
-                          className={navigationMenuTriggerStyle()}
-                        >
-                          {item.title}
-                        </Link>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                  ),
-                )}
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                ))}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -198,46 +149,17 @@ export function Navbar() {
               </SheetHeader>
 
               <div className="flex flex-col gap-6 p-4">
-                <Accordion
-                  type="single"
-                  collapsible
-                  className="flex w-full flex-col gap-2"
-                >
-                  {menu.map((item) =>
-                    item.items ? (
-                      <AccordionItem
-                        key={item.title}
-                        value={item.title}
-                        className="border-b-0"
-                      >
-                        <AccordionTrigger className="py-2 text-base font-semibold hover:no-underline">
-                          {item.title}
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="flex flex-col gap-1">
-                            {item.items.map((subItem) => (
-                              <Link
-                                key={subItem.title}
-                                href={subItem.url}
-                                className="rounded-md p-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                              >
-                                {subItem.title}
-                              </Link>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ) : (
-                      <Link
-                        key={item.title}
-                        href={item.url}
-                        className="text-base font-semibold"
-                      >
-                        {item.title}
-                      </Link>
-                    ),
-                  )}
-                </Accordion>
+                <div className="flex w-full flex-col gap-2">
+                  {menu.map((item) => (
+                    <Link
+                      key={item.title}
+                      href={item.url}
+                      className="text-base font-semibold"
+                    >
+                      {item.title}
+                    </Link>
+                  ))}
+                </div>
 
                 {user ? (
                   <Button onClick={handleLogOut}>Logout</Button>

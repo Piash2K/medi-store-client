@@ -36,8 +36,8 @@ export async function Footer() {
                   Shop All
                 </Link>
               </li>
-              {quickCategories.map((category) => (
-                <li key={category._id}>
+              {quickCategories.map((category, index) => (
+                <li key={`${category._id || category.name}-${index}`}>
                   <Link
                     href={`/shop?category=${encodeURIComponent(category.name)}`}
                     className="hover:text-foreground transition-colors"
