@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Menu, ShoppingCart, User } from "lucide-react";
 
-import { cn } from "@/lib/utils";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -38,7 +47,89 @@ const isCustomerUser = (user: unknown) => {
   return role?.toUpperCase() === "CUSTOMER";
 };
 
+const getUserName = (user: unknown) => {
+  const userData = user as Record<string, unknown> | null;
+  return (userData?.name as string | undefined) || (userData?.email as string | undefined) || "User";
+};
+
+const getUserImage = (user: unknown) => {
+  const userData = user as Record<string, unknown> | null;
+
+  return (
+    (userData?.image as string | undefined) ||
+    (userData?.profileImage as string | undefined) ||
+    (userData?.avatar as string | undefined) ||
+    (userData?.photoURL as string | undefined) ||
+    ""
+  );
+};
+
+const getInitials = (name: string) => {
+  const parts = name.split(" ").filter(Boolean);
+  if (parts.length === 0) {
+    return "U";
+  }
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("");
+};
+
+function UserMenu({ user, onLogout }: { user: unknown; onLogout: () => void }) {
+  const userName = getUserName(user);
+  const userImage = getUserImage(user);
+
+  if (!user) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="rounded-full" aria-label="Account menu">
+            <User className="size-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem asChild>
+            <Link href="/login">Login</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/register">Register</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="rounded-full p-0" aria-label="User menu">
+          <Avatar size="default" className="h-8 w-8 overflow-hidden rounded-full">
+            {userImage ? <AvatarImage src={userImage} alt={userName} /> : null}
+            <AvatarFallback className="bg-muted-foreground/20 text-foreground ring-border rounded-full text-xs font-semibold ring-1">
+              {getInitials(userName)}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuLabel className="truncate">{userName}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/profile">Profile</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard">Dashboard</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={onLogout}>Logout</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function Navbar() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const { totalItems } = useCart();
 
@@ -54,9 +145,10 @@ export function Navbar() {
     getCurrentUser();
   }, []);
 
-  const handleLogOut = async () => {
-    logOut();
+  const handleLogout = async () => {
+    await logOut();
     setUser(null);
+    router.refresh();
   };
 
   return (
@@ -97,19 +189,7 @@ export function Navbar() {
                 )}
               </Link>
             </Button>
-
-            {user ? (
-              <Button onClick={handleLogOut}>Logout</Button>
-            ) : (
-              <>
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/register">Register</Link>
-                </Button>
-              </>
-            )}
+            <UserMenu user={user} onLogout={handleLogout} />
           </div>
         </nav>
 
@@ -130,13 +210,15 @@ export function Navbar() {
             </Button>
           </div>
 
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" aria-label="Open menu">
-                <Menu className="size-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="overflow-y-auto">
+          <div className="flex items-center gap-1">
+            <UserMenu user={user} onLogout={handleLogout} />
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Open menu">
+                  <Menu className="size-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>
                   <Link
@@ -160,31 +242,10 @@ export function Navbar() {
                     </Link>
                   ))}
                 </div>
-
-                {user ? (
-                  <Button onClick={handleLogOut}>Logout</Button>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <Link
-                      href="/login"
-                      className={cn(
-                        buttonVariants({ variant: "outline" }),
-                        "w-full",
-                      )}
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      href="/register"
-                      className={cn(buttonVariants(), "w-full")}
-                    >
-                      Register
-                    </Link>
-                  </div>
-                )}
               </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
