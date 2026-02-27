@@ -51,6 +51,9 @@ export const getMedicines = async (
     if (params.maxPrice !== undefined) {
       queryParams.set("maxPrice", String(params.maxPrice));
     }
+    if (params.inStock !== undefined) {
+      queryParams.set("inStock", String(params.inStock));
+    }
     if (params.page !== undefined) {
       queryParams.set("page", String(params.page));
     }

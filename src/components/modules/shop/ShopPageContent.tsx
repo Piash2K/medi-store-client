@@ -33,6 +33,7 @@ export default function ShopPageContent() {
   const [manufacturer, setManufacturer] = React.useState("");
   const [minPrice, setMinPrice] = React.useState("");
   const [maxPrice, setMaxPrice] = React.useState("");
+  const [inStockOnly, setInStockOnly] = React.useState(false);
 
   const [page, setPage] = React.useState(DEFAULT_PAGE);
   const [totalPage, setTotalPage] = React.useState(1);
@@ -57,6 +58,7 @@ export default function ShopPageContent() {
       manufacturer: manufacturer || undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      inStock: inStockOnly ? true : false,
       page,
       limit: DEFAULT_LIMIT,
     });
@@ -107,10 +109,11 @@ export default function ShopPageContent() {
     setTotalPage(result.meta?.totalPage || 1);
     setTotalMedicines(result.meta?.total || result.data.length);
     setIsLoading(false);
-  }, [debouncedSearchTerm, category, manufacturer, minPrice, maxPrice, page]);
+  }, [debouncedSearchTerm, category, manufacturer, minPrice, maxPrice, inStockOnly, page]);
 
   const loadFilterStats = React.useCallback(async () => {
     const firstPage = await getMedicines({
+      inStock: false,
       page: 1,
       limit: STATS_LIMIT,
     });
@@ -131,6 +134,7 @@ export default function ShopPageContent() {
       for (let currentPage = 2; currentPage <= totalPages; currentPage += 1) {
         remainingRequests.push(
           getMedicines({
+            inStock: false,
             page: currentPage,
             limit: STATS_LIMIT,
           }),
@@ -213,11 +217,16 @@ export default function ShopPageContent() {
     setManufacturer("");
     setMinPrice("");
     setMaxPrice("");
+    setInStockOnly(false);
     setPage(DEFAULT_PAGE);
   };
 
   const sortedMedicines = React.useMemo(() => {
-    const nextMedicines = [...medicines];
+    const filteredMedicines = inStockOnly
+      ? medicines.filter((medicine) => (medicine.stock || 0) > 0)
+      : medicines;
+
+    const nextMedicines = [...filteredMedicines];
 
     if (sortBy === "price-low-high") {
       nextMedicines.sort((firstMedicine, secondMedicine) => firstMedicine.price - secondMedicine.price);
@@ -229,8 +238,8 @@ export default function ShopPageContent() {
       return nextMedicines;
     }
 
-    return medicines;
-  }, [medicines, sortBy]);
+    return filteredMedicines;
+  }, [medicines, sortBy, inStockOnly]);
 
   const getMedicineCartId = React.useCallback((medicine: Medicine) => {
     const medicineWithOptionalId = medicine as Medicine & { id?: string };
@@ -380,7 +389,12 @@ export default function ShopPageContent() {
             </div>
 
             <label className="flex items-center gap-2 text-base">
-              <input type="checkbox" className="accent-primary" />
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(event) => setInStockOnly(event.target.checked)}
+                className="accent-primary"
+              />
               <span>In Stock Only</span>
             </label>
 
@@ -397,7 +411,9 @@ export default function ShopPageContent() {
 
         <div className="flex min-w-0 flex-col">
           <div className="mb-5 flex items-center justify-between gap-3">
-            <p className="text-lg text-muted-foreground">Showing {totalMedicines} medicines</p>
+            <p className="text-lg text-muted-foreground">
+              {totalMedicines > 0 ? "Available medicines" : "No medicines found"}
+            </p>
             <select
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value)}
@@ -429,6 +445,7 @@ export default function ShopPageContent() {
                   const medicineCheckoutId = getMedicineCheckoutId(medicine);
                   const medicineCartId = getMedicineCartId(medicine);
                   const isAlreadyInCart = cartItemIdSet.has(medicineCartId);
+                  const isInStock = (medicine.stock || 0) > 0;
                   const reviewStats = reviewStatsByMedicineId.get(medicineReviewId);
                   const averageRating = reviewStats?.averageRating || 0;
                   const totalReviewsForMedicine = reviewStats?.totalReviews || 0;
@@ -444,6 +461,11 @@ export default function ShopPageContent() {
                         aria-label={`View details for ${medicine.name}`}
                       >
                         <div className="bg-muted/50 relative flex h-52 items-center justify-center">
+                          {!isInStock && (
+                            <span className="bg-destructive text-destructive-foreground absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold">
+                              Out of Stock
+                            </span>
+                          )}
                           <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
                             <ShoppingCart className="h-8 w-8" />
                           </div>
@@ -466,6 +488,14 @@ export default function ShopPageContent() {
                             by {medicine.manufacturer || "Unknown manufacturer"}
                           </p>
 
+                          <p className="text-sm">
+                            {isInStock ? (
+                              <span className="text-primary">In stock ({medicine.stock})</span>
+                            ) : (
+                              <span className="text-destructive font-medium">Stock out</span>
+                            )}
+                          </p>
+
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                             <span>{averageRating.toFixed(1)}</span>
@@ -481,7 +511,7 @@ export default function ShopPageContent() {
                               size="sm"
                               variant="outline"
                               className="h-8 px-3"
-                              disabled={!medicineCheckoutId}
+                              disabled={!medicineCheckoutId || !isInStock}
                               onClick={async () => {
                                 const hasAccess = await guardCustomerPurchaseAccess();
 

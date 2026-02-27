@@ -7,10 +7,8 @@ import {
   Package,
   Tags,
   Pill,
-  User,
   Users,
   ShoppingBag,
-  ShoppingCart,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -25,12 +23,12 @@ type NavMainItems = React.ComponentProps<typeof NavMain>["items"]
 const adminNavMain: NavMainItems = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/admin",
     icon: LayoutDashboard,
   },
   {
     title: "Users",
-    url: "/users",
+    url: "/admin/users",
     icon: Users,
   },
   {
@@ -59,13 +57,13 @@ const adminNavMain: NavMainItems = [
 const sellerNavMain: NavMainItems = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/seller/dashboard",
     icon: ShoppingBag,
     isActive: true,
   },
   {
     title: "Medicines",
-    url: "/medicines",
+    url: "/seller/medicines",
     icon: Pill,
   },
   {
@@ -89,24 +87,9 @@ const customerNavMain: NavMainItems = [
     isActive: true,
   },
   {
-    title: "Shop",
-    url: "/shop",
-    icon: Pill,
-  },
-  {
-    title: "Cart",
-    url: "/cart",
-    icon: ShoppingCart,
-  },
-  {
     title: "Orders",
     url: "/orders",
     icon: Package,
-  },
-  {
-    title: "Profile",
-    url: "/profile",
-    icon: User,
   },
   {
     title: "Home",

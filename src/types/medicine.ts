@@ -29,6 +29,7 @@ export type MedicinesQueryParams = {
   manufacturer?: string;
   minPrice?: number;
   maxPrice?: number;
+  inStock?: boolean;
   page?: number;
   limit?: number;
 };

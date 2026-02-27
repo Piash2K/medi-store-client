@@ -6,6 +6,7 @@ import { Minus, Package, Plus, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
+import { getMedicineById } from "@/services/medicine";
 import { useCart } from "@/providers/cart-provider";
 
 const SHIPPING_COST = 120;
@@ -19,8 +20,47 @@ const currencyFormatter = new Intl.NumberFormat("en-BD", {
 export default function CartPageContent() {
   const { items, removeItem, updateQuantity } = useCart();
   const [selectedItemIds, setSelectedItemIds] = React.useState<string[]>([]);
+  const [stockByItemId, setStockByItemId] = React.useState<Record<string, number | null>>({});
   const hasInitializedSelection = React.useRef(false);
   const previousItemIdsRef = React.useRef<string[]>([]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const loadStock = async () => {
+      if (items.length === 0) {
+        if (isMounted) {
+          setStockByItemId({});
+        }
+        return;
+      }
+
+      const stockEntries = await Promise.all(
+        items.map(async (item) => {
+          const result = await getMedicineById(item.id, { noStore: true });
+
+          if (!result.success || !result.data) {
+            return [item.id, null] as const;
+          }
+
+          const stock = typeof result.data.stock === "number" ? result.data.stock : null;
+          return [item.id, stock] as const;
+        }),
+      );
+
+      if (!isMounted) {
+        return;
+      }
+
+      setStockByItemId(Object.fromEntries(stockEntries));
+    };
+
+    loadStock();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [items]);
 
   React.useEffect(() => {
     const currentItemIds = items.map((item) => item.id);
@@ -53,6 +93,26 @@ export default function CartPageContent() {
     () => items.filter((item) => selectedItemIds.includes(item.id)),
     [items, selectedItemIds],
   );
+
+  const hasSelectedOutOfStock = React.useMemo(
+    () =>
+      selectedItems.some((item) => {
+        const stock = stockByItemId[item.id];
+        return typeof stock === "number" && stock <= 0;
+      }),
+    [selectedItems, stockByItemId],
+  );
+
+  const hasSelectedOverQuantity = React.useMemo(
+    () =>
+      selectedItems.some((item) => {
+        const stock = stockByItemId[item.id];
+        return typeof stock === "number" && stock > 0 && item.quantity > stock;
+      }),
+    [selectedItems, stockByItemId],
+  );
+
+  const hasCheckoutStockIssue = hasSelectedOutOfStock || hasSelectedOverQuantity;
 
   const subtotal = selectedItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
@@ -139,6 +199,17 @@ export default function CartPageContent() {
                       by {item.manufacturer || "Unknown manufacturer"}
                     </p>
                     <p className="mt-1 text-lg font-medium">BDT {currencyFormatter.format(item.price)}</p>
+                    <p className="mt-1 text-sm">
+                      {typeof stockByItemId[item.id] === "number" ? (
+                        stockByItemId[item.id]! > 0 ? (
+                          <span className="text-primary">Stock: {stockByItemId[item.id]}</span>
+                        ) : (
+                          <span className="text-destructive font-medium">Stock out</span>
+                        )
+                      ) : (
+                        <span className="text-muted-foreground">Stock: N/A</span>
+                      )}
+                    </p>
                   </div>
                 </div>
 
@@ -157,6 +228,11 @@ export default function CartPageContent() {
                       type="button"
                       aria-label="Increase quantity"
                       className="inline-flex h-8 w-8 items-center justify-center"
+                      disabled={
+                        typeof stockByItemId[item.id] === "number" &&
+                        stockByItemId[item.id] !== null &&
+                        item.quantity >= stockByItemId[item.id]!
+                      }
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
                     >
                       <Plus className="h-4 w-4" />
@@ -207,7 +283,7 @@ export default function CartPageContent() {
               <span className="text-3xl font-bold">BDT {currencyFormatter.format(total)}</span>
             </div>
 
-            {selectedItemIds.length > 0 ? (
+            {selectedItemIds.length > 0 && !hasCheckoutStockIssue ? (
               <Button asChild className="mt-6 h-11 w-full text-base">
                 <Link href={checkoutHref}>Proceed to Checkout</Link>
               </Button>
@@ -218,6 +294,11 @@ export default function CartPageContent() {
             )}
             {selectedItemIds.length === 0 && (
               <p className="mt-2 text-sm text-destructive">Select at least one product to checkout.</p>
+            )}
+            {selectedItemIds.length > 0 && hasCheckoutStockIssue && (
+              <p className="mt-2 text-sm text-destructive">
+                Some selected items are stock out or exceed available stock. Please update cart first.
+              </p>
             )}
             <Button asChild variant="outline" className="mt-3 h-11 w-full text-base">
               <Link href="/shop">Continue Shopping</Link>
