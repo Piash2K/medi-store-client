@@ -251,7 +251,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   const isAlreadyInCart = items.some((item) => item.id === String(medicineIdValue));
   const isInStock = (medicine.stock || 0) > 0;
 
-  const addCurrentMedicineToCart = React.useCallback(() => {
+  const addCurrentMedicineToCart = () => {
     for (let cartCount = 0; cartCount < quantity; cartCount += 1) {
       addItem({
         id: String(medicineIdValue),
@@ -261,7 +261,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         category: medicine.category?.name,
       });
     }
-  }, [addItem, medicine.category?.name, medicine.manufacturer, medicine.name, medicine.price, medicineIdValue, quantity]);
+  };
 
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
