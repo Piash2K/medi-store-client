@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Package, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
 import Swal from "sweetalert2";
 
@@ -45,7 +46,8 @@ type MedicineDetailsContentProps = {
 };
 
 export default function MedicineDetailsContent({ medicineId }: MedicineDetailsContentProps) {
-  const { addItem } = useCart();
+  const router = useRouter();
+  const { addItem, items } = useCart();
   const [medicine, setMedicine] = React.useState<Medicine | null>(null);
   const [quantity, setQuantity] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -245,7 +247,21 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   }
 
   const medicineIdValue = medicine._id || medicine.id || medicine.slug || medicine.name;
+  const medicineCheckoutId = medicine._id || medicine.id || "";
+  const isAlreadyInCart = items.some((item) => item.id === String(medicineIdValue));
   const isInStock = (medicine.stock || 0) > 0;
+
+  const addCurrentMedicineToCart = React.useCallback(() => {
+    for (let cartCount = 0; cartCount < quantity; cartCount += 1) {
+      addItem({
+        id: String(medicineIdValue),
+        name: medicine.name,
+        price: medicine.price,
+        manufacturer: medicine.manufacturer,
+        category: medicine.category?.name,
+      });
+    }
+  }, [addItem, medicine.category?.name, medicine.manufacturer, medicine.name, medicine.price, medicineIdValue, quantity]);
 
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
@@ -315,21 +331,25 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
             <Button
               type="button"
               className="h-10 min-w-55"
-              disabled={!isInStock}
-              onClick={() => {
-                for (let cartCount = 0; cartCount < quantity; cartCount += 1) {
-                  addItem({
-                    id: String(medicineIdValue),
-                    name: medicine.name,
-                    price: medicine.price,
-                    manufacturer: medicine.manufacturer,
-                    category: medicine.category?.name,
-                  });
-                }
-              }}
+              disabled={!isInStock || isAlreadyInCart}
+              onClick={addCurrentMedicineToCart}
             >
               <ShoppingCart className="mr-2 h-4 w-4" />
-              Add to Cart
+              {isAlreadyInCart ? "Added to Cart" : "Add to Cart"}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="h-10 min-w-35"
+              disabled={!isInStock || !medicineCheckoutId}
+              onClick={() => {
+                router.push(
+                  `/checkout?buyNow=${encodeURIComponent(medicineCheckoutId)}&qty=${Math.max(quantity, 1)}`,
+                );
+              }}
+            >
+              Buy Now
             </Button>
           </div>
 

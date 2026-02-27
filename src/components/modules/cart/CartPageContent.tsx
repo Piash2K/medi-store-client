@@ -2,14 +2,10 @@
 
 import Link from "next/link";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Minus, Package, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
-import { getUser } from "@/services/auth";
-import { createOrder } from "@/services/order";
 
 const SHIPPING_COST = 120;
 const FREE_SHIPPING_THRESHOLD = 1000;
@@ -20,78 +16,68 @@ const currencyFormatter = new Intl.NumberFormat("en-BD", {
 });
 
 export default function CartPageContent() {
-  const router = useRouter();
-  const { items, removeItem, updateQuantity, clearCart } = useCart();
-  const [shippingAddress, setShippingAddress] = React.useState("");
-  const [isPlacingOrder, setIsPlacingOrder] = React.useState(false);
-  const [checkoutMessage, setCheckoutMessage] = React.useState("");
-  const [checkoutError, setCheckoutError] = React.useState("");
+  const { items, removeItem, updateQuantity } = useCart();
+  const [selectedItemIds, setSelectedItemIds] = React.useState<string[]>([]);
+  const hasInitializedSelection = React.useRef(false);
+  const previousItemIdsRef = React.useRef<string[]>([]);
 
-  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  React.useEffect(() => {
+    const currentItemIds = items.map((item) => item.id);
+
+    setSelectedItemIds((previousSelectedIds) => {
+      const itemIdSet = new Set(currentItemIds);
+
+      if (!hasInitializedSelection.current) {
+        hasInitializedSelection.current = true;
+        previousItemIdsRef.current = currentItemIds;
+        return currentItemIds;
+      }
+
+      const nextSelectedSet = new Set(previousSelectedIds.filter((id) => itemIdSet.has(id)));
+      const previousItemIdSet = new Set(previousItemIdsRef.current);
+
+      currentItemIds.forEach((itemId) => {
+        if (!previousItemIdSet.has(itemId)) {
+          nextSelectedSet.add(itemId);
+        }
+      });
+
+      previousItemIdsRef.current = currentItemIds;
+
+      return Array.from(nextSelectedSet);
+    });
+  }, [items]);
+
+  const selectedItems = React.useMemo(
+    () => items.filter((item) => selectedItemIds.includes(item.id)),
+    [items, selectedItemIds],
+  );
+
+  const subtotal = selectedItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-  const shipping = items.length > 0 && !hasFreeShipping ? SHIPPING_COST : 0;
+  const shipping = selectedItems.length > 0 && !hasFreeShipping ? SHIPPING_COST : 0;
   const total = subtotal + shipping;
-  const itemsCount = items.reduce((totalQty, item) => totalQty + item.quantity, 0);
+  const itemsCount = selectedItems.reduce((totalQty, item) => totalQty + item.quantity, 0);
   const leftForFreeShipping = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
-  const handlePlaceOrder = async () => {
-    const currentUser = (await getUser()) as Record<string, unknown> | null;
+  const areAllItemsSelected = items.length > 0 && selectedItemIds.length === items.length;
 
-    if (!currentUser) {
-      router.push("/login?redirect=/cart");
-      return;
-    }
+  const checkoutSearchParams = new URLSearchParams();
+  selectedItemIds.forEach((itemId) => checkoutSearchParams.append("items", itemId));
+  const checkoutHref = `/checkout?${checkoutSearchParams.toString()}`;
 
-    if (!shippingAddress.trim()) {
-      setCheckoutError("Please provide your shipping address.");
-      setCheckoutMessage("");
-      return;
-    }
+  const handleToggleSelectAll = () => {
+    setSelectedItemIds((previousSelectedIds) =>
+      previousSelectedIds.length === items.length ? [] : items.map((item) => item.id),
+    );
+  };
 
-    if (items.length === 0) {
-      setCheckoutError("Your cart is empty.");
-      setCheckoutMessage("");
-      return;
-    }
-
-    setIsPlacingOrder(true);
-    setCheckoutError("");
-    setCheckoutMessage("");
-
-    const customerId =
-      (currentUser?.id as string | undefined) ||
-      (currentUser?.userId as string | undefined) ||
-      (currentUser?.sub as string | undefined);
-
-    if (!customerId) {
-      setCheckoutError("Please login again to continue checkout.");
-      setIsPlacingOrder(false);
-      router.push("/login?redirect=/cart");
-      return;
-    }
-
-    const result = await createOrder({
-      customerId,
-      paymentMethod: "COD",
-      shippingAddress: shippingAddress.trim(),
-      totalAmount: Number(total.toFixed(2)),
-      items: items.map((item) => ({
-        medicineId: item.id,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-    });
-
-    if (!result.success) {
-      setCheckoutError(result.message || "Failed to place order.");
-      setIsPlacingOrder(false);
-      return;
-    }
-
-    setCheckoutMessage(result.message || "Order created successfully.");
-    clearCart();
-    setIsPlacingOrder(false);
-    router.push("/orders");
+  const handleToggleItemSelection = (itemId: string) => {
+    setSelectedItemIds((previousSelectedIds) =>
+      previousSelectedIds.includes(itemId)
+        ? previousSelectedIds.filter((id) => id !== itemId)
+        : [...previousSelectedIds, itemId],
+    );
   };
 
   return (
@@ -108,12 +94,35 @@ export default function CartPageContent() {
       ) : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="overflow-hidden rounded-2xl border bg-card">
+            <div className="flex items-center justify-between border-b px-5 py-3">
+              <label className="inline-flex items-center gap-2 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  checked={areAllItemsSelected}
+                  onChange={handleToggleSelectAll}
+                  className="accent-primary"
+                />
+                Select All
+              </label>
+              <p className="text-sm text-muted-foreground">
+                {selectedItems.length} of {items.length} selected
+              </p>
+            </div>
+
             {items.map((item) => (
               <article
                 key={item.id}
                 className="flex items-center justify-between gap-4 border-b p-5 last:border-b-0"
               >
                 <div className="flex min-w-0 items-center gap-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedItemIds.includes(item.id)}
+                    onChange={() => handleToggleItemSelection(item.id)}
+                    aria-label={`Select ${item.name}`}
+                    className="accent-primary"
+                  />
+
                   <div className="bg-muted flex h-18 w-18 shrink-0 items-center justify-center rounded-xl">
                     <Package className="text-muted-foreground h-8 w-8" />
                   </div>
@@ -192,25 +201,18 @@ export default function CartPageContent() {
               <span className="text-3xl font-bold">BDT {currencyFormatter.format(total)}</span>
             </div>
 
-            <div className="mt-5 space-y-2">
-              <p className="text-sm font-medium">Shipping Address</p>
-              <Input
-                value={shippingAddress}
-                onChange={(event) => setShippingAddress(event.target.value)}
-                placeholder="Piash Islam, 123 Main St, City, Country"
-              />
-            </div>
-
-            {checkoutError && <p className="text-destructive mt-3 text-sm">{checkoutError}</p>}
-            {checkoutMessage && <p className="text-primary mt-3 text-sm">{checkoutMessage}</p>}
-
-            <Button
-              className="mt-6 h-11 w-full text-base"
-              onClick={handlePlaceOrder}
-              disabled={isPlacingOrder}
-            >
-              {isPlacingOrder ? "Placing Order..." : "Proceed to Checkout"}
-            </Button>
+            {selectedItemIds.length > 0 ? (
+              <Button asChild className="mt-6 h-11 w-full text-base">
+                <Link href={checkoutHref}>Proceed to Checkout</Link>
+              </Button>
+            ) : (
+              <Button className="mt-6 h-11 w-full text-base" disabled>
+                Proceed to Checkout
+              </Button>
+            )}
+            {selectedItemIds.length === 0 && (
+              <p className="mt-2 text-sm text-destructive">Select at least one product to checkout.</p>
+            )}
             <Button asChild variant="outline" className="mt-3 h-11 w-full text-base">
               <Link href="/shop">Continue Shopping</Link>
             </Button>

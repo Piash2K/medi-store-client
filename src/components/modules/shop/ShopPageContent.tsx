@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
 
@@ -17,8 +18,9 @@ const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
 
 export default function ShopPageContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
   const [medicines, setMedicines] = React.useState<Medicine[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]);
 
@@ -242,6 +244,12 @@ export default function ShopPageContent() {
     return medicine._id || medicine.id || medicine.slug || getMedicineCartId(medicine);
   }, [getMedicineCartId]);
 
+  const getMedicineCheckoutId = React.useCallback((medicine: Medicine) => {
+    return medicine._id || medicine.id || "";
+  }, []);
+
+  const cartItemIdSet = React.useMemo(() => new Set(items.map((item) => item.id)), [items]);
+
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
       <h1 className="text-4xl font-bold tracking-tight">Shop All Medicines</h1>
@@ -392,6 +400,9 @@ export default function ShopPageContent() {
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {sortedMedicines.map((medicine, index) => {
                   const medicineReviewId = medicine._id || medicine.id || "";
+                  const medicineCheckoutId = getMedicineCheckoutId(medicine);
+                  const medicineCartId = getMedicineCartId(medicine);
+                  const isAlreadyInCart = cartItemIdSet.has(medicineCartId);
                   const reviewStats = reviewStatsByMedicineId.get(medicineReviewId);
                   const averageRating = reviewStats?.averageRating || 0;
                   const totalReviewsForMedicine = reviewStats?.totalReviews || 0;
@@ -401,42 +412,66 @@ export default function ShopPageContent() {
                       key={`${medicine._id}-${medicine.name}-${index}`}
                       className="overflow-hidden rounded-2xl border bg-card"
                     >
-                      <div className="bg-muted/50 relative flex h-52 items-center justify-center">
-                        <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
-                          <ShoppingCart className="h-8 w-8" />
+                      <Link
+                        href={`/shop/${getMedicinePathId(medicine)}`}
+                        className="block"
+                        aria-label={`View details for ${medicine.name}`}
+                      >
+                        <div className="bg-muted/50 relative flex h-52 items-center justify-center">
+                          <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
+                            <ShoppingCart className="h-8 w-8" />
+                          </div>
                         </div>
-                      </div>
+                      </Link>
 
                       <div className="space-y-1.5 p-4">
-                        <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
-                          {medicine.category?.name || "General"}
-                        </span>
-                        <h2 className="text-2xl leading-tight font-semibold tracking-tight">
-                          {medicine.name}
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                          by {medicine.manufacturer || "Unknown manufacturer"}
-                        </p>
+                        <Link
+                          href={`/shop/${getMedicinePathId(medicine)}`}
+                          className="block space-y-1.5"
+                          aria-label={`Open ${medicine.name} details`}
+                        >
+                          <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
+                            {medicine.category?.name || "General"}
+                          </span>
+                          <h2 className="text-2xl leading-tight font-semibold tracking-tight">
+                            {medicine.name}
+                          </h2>
+                          <p className="text-sm text-muted-foreground">
+                            by {medicine.manufacturer || "Unknown manufacturer"}
+                          </p>
 
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                          <span>{averageRating.toFixed(1)}</span>
-                          <span>({totalReviewsForMedicine})</span>
-                        </div>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                            <span>{averageRating.toFixed(1)}</span>
+                            <span>({totalReviewsForMedicine})</span>
+                          </div>
+                        </Link>
 
                         <div className="flex items-center justify-between pt-2">
                           <p className="text-2xl font-semibold">BDT {medicine.price}</p>
                           <div className="flex items-center gap-2">
-                            <Button asChild size="sm" variant="outline" className="h-8 px-3">
-                              <Link href={`/shop/${getMedicinePathId(medicine)}`}>View</Link>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className="h-8 px-3"
+                              disabled={!medicineCheckoutId}
+                              onClick={() => {
+                                router.push(
+                                  `/checkout?buyNow=${encodeURIComponent(medicineCheckoutId)}&qty=1`,
+                                );
+                              }}
+                            >
+                              Buy Now
                             </Button>
                             <Button
                               type="button"
                               size="sm"
                               className="h-8 px-4"
+                              disabled={isAlreadyInCart}
                               onClick={() =>
                                 addItem({
-                                  id: getMedicineCartId(medicine),
+                                  id: medicineCartId,
                                   name: medicine.name,
                                   price: medicine.price,
                                   manufacturer: medicine.manufacturer,
@@ -445,7 +480,7 @@ export default function ShopPageContent() {
                               }
                             >
                               <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-                              Add
+                              {isAlreadyInCart ? "Added" : "Add"}
                             </Button>
                           </div>
                         </div>
