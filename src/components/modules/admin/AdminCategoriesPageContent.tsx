@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { deleteCategory, updateCategory } from "@/services/category";
+import { createCategory, deleteCategory, updateCategory } from "@/services/category";
 
 type CategoryRow = {
   id: string;
@@ -34,6 +34,10 @@ const toSlug = (value: string) => {
 
 export default function AdminCategoriesPageContent({ initialCategories }: AdminCategoriesPageContentProps) {
   const [categories, setCategories] = useState(initialCategories);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState("");
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -45,6 +49,62 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
     setEditingCategoryId(category.id);
     setEditName(category.name);
     setEditDescription(category.description || "");
+  };
+
+  const handleOpenAddModal = () => {
+    setNewName("");
+    setNewDescription("");
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    if (isCreating) {
+      return;
+    }
+
+    setIsAddModalOpen(false);
+  };
+
+  const handleCreateCategory = async () => {
+    const name = newName.trim();
+
+    if (!name) {
+      toast.error("Category name is required", { position: "top-right" });
+      return;
+    }
+
+    setIsCreating(true);
+
+    const result = await createCategory({
+      name,
+      description: newDescription.trim() || undefined,
+    });
+
+    setIsCreating(false);
+
+    if (!result.success || !result.data) {
+      toast.error(result.message || "Failed to create category", { position: "top-right" });
+      return;
+    }
+
+    const createdCategory = result.data;
+
+    const apiId = createdCategory.id || createdCategory._id || "";
+
+    setCategories((previous) => {
+      const nextItem: CategoryRow = {
+        id: apiId || createdCategory.name,
+        apiId: apiId || undefined,
+        name: createdCategory.name,
+        description: createdCategory.description,
+        medicinesCount: 0,
+      };
+
+      return [nextItem, ...previous];
+    });
+
+    toast.success(result.message || "Category created successfully", { position: "top-right" });
+    setIsAddModalOpen(false);
   };
 
   const handleCancelEdit = () => {
@@ -144,7 +204,13 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
 
   return (
     <>
-      <h1 className="text-4xl font-semibold tracking-tight">Manage Categories</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-4xl font-semibold tracking-tight">Manage Categories</h1>
+        <Button className="gap-2" type="button" onClick={handleOpenAddModal}>
+          <Plus className="h-4 w-4" />
+          Add Category
+        </Button>
+      </div>
 
       <Card>
         <CardContent className="p-0">
@@ -245,6 +311,40 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
                 </Button>
                 <Button type="button" onClick={handleUpdateCategory} disabled={isSaving}>
                   {isSaving ? "Updating..." : "Update Category"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : null}
+
+      {isAddModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-xl">
+            <CardContent className="space-y-5 pt-6">
+              <div>
+                <h2 className="text-2xl font-semibold">Add Category</h2>
+                <p className="text-muted-foreground mt-1 text-sm">Create a new category.</p>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Name</label>
+                  <Input value={newName} onChange={(event) => setNewName(event.target.value)} />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Description</label>
+                  <Input value={newDescription} onChange={(event) => setNewDescription(event.target.value)} />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={handleCloseAddModal} disabled={isCreating}>
+                  Cancel
+                </Button>
+                <Button type="button" onClick={handleCreateCategory} disabled={isCreating}>
+                  {isCreating ? "Creating..." : "Add Category"}
                 </Button>
               </div>
             </CardContent>
