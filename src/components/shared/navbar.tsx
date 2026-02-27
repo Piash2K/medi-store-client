@@ -132,6 +132,7 @@ export function Navbar() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const { totalItems } = useCart();
+  const canShowCart = !user || isCustomerUser(user);
 
   const menu = isCustomerUser(user)
     ? [...baseMenu, { title: "Track Order", url: "/orders" }]
@@ -179,16 +180,18 @@ export function Navbar() {
             </NavigationMenu>
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
-              <Link href="/cart">
-                <ShoppingCart className="size-5" />
-                {totalItems > 0 && (
-                  <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
-            </Button>
+            {canShowCart ? (
+              <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
+                <Link href="/cart">
+                  <ShoppingCart className="size-5" />
+                  {totalItems > 0 && (
+                    <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              </Button>
+            ) : null}
             <UserMenu user={user} onLogout={handleLogout} />
           </div>
         </nav>
@@ -198,16 +201,18 @@ export function Navbar() {
             <Link href="/" className="text-lg font-semibold tracking-tight">
               MediStore 💊
             </Link>
-            <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
-              <Link href="/cart">
-                <ShoppingCart className="size-5" />
-                {totalItems > 0 && (
-                  <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
-            </Button>
+            {canShowCart ? (
+              <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
+                <Link href="/cart">
+                  <ShoppingCart className="size-5" />
+                  {totalItems > 0 && (
+                    <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              </Button>
+            ) : null}
           </div>
 
           <div className="flex items-center gap-1">

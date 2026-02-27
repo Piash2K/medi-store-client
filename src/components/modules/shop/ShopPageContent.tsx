@@ -5,10 +5,12 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
+import Swal from "sweetalert2";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
+import { getUser } from "@/services/auth";
 import { getCategories, getMedicines } from "@/services/medicine";
 import { getMedicineReviews } from "@/services/review";
 import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
@@ -250,6 +252,29 @@ export default function ShopPageContent() {
 
   const cartItemIdSet = React.useMemo(() => new Set(items.map((item) => item.id)), [items]);
 
+  const guardCustomerPurchaseAccess = React.useCallback(async () => {
+    const user = (await getUser()) as { role?: string } | null;
+    const role = user?.role?.toUpperCase();
+
+    if (role !== "SELLER" && role !== "ADMIN") {
+      return true;
+    }
+
+    const messageByRole: Record<"SELLER" | "ADMIN", string> = {
+      SELLER: "Seller accounts cannot buy medicines or add items to cart.",
+      ADMIN: "Admin accounts cannot buy medicines or add items to cart.",
+    };
+
+    await Swal.fire({
+      icon: "warning",
+      title: "Action not allowed",
+      text: messageByRole[role],
+      confirmButtonText: "OK",
+    });
+
+    return false;
+  }, []);
+
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
       <h1 className="text-4xl font-bold tracking-tight">Shop All Medicines</h1>
@@ -456,7 +481,13 @@ export default function ShopPageContent() {
                               variant="outline"
                               className="h-8 px-3"
                               disabled={!medicineCheckoutId}
-                              onClick={() => {
+                              onClick={async () => {
+                                const hasAccess = await guardCustomerPurchaseAccess();
+
+                                if (!hasAccess) {
+                                  return;
+                                }
+
                                 router.push(
                                   `/checkout?buyNow=${encodeURIComponent(medicineCheckoutId)}&qty=1`,
                                 );
@@ -469,15 +500,21 @@ export default function ShopPageContent() {
                               size="sm"
                               className="h-8 px-4"
                               disabled={isAlreadyInCart}
-                              onClick={() =>
+                              onClick={async () => {
+                                const hasAccess = await guardCustomerPurchaseAccess();
+
+                                if (!hasAccess) {
+                                  return;
+                                }
+
                                 addItem({
                                   id: medicineCartId,
                                   name: medicine.name,
                                   price: medicine.price,
                                   manufacturer: medicine.manufacturer,
                                   category: medicine.category?.name,
-                                })
-                              }
+                                });
+                              }}
                             >
                               <ShoppingCart className="mr-1 h-3.5 w-3.5" />
                               {isAlreadyInCart ? "Added" : "Add"}

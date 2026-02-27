@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
+import { getUser } from "@/services/auth";
 import { getMedicineById } from "@/services/medicine";
 import { getOrders } from "@/services/order";
 import { createReview, getMedicineReviews, MedicineReview } from "@/services/review";
@@ -263,6 +264,29 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
     }
   };
 
+  const guardCustomerPurchaseAccess = async () => {
+    const user = (await getUser()) as { role?: string } | null;
+    const role = user?.role?.toUpperCase();
+
+    if (role !== "SELLER" && role !== "ADMIN") {
+      return true;
+    }
+
+    const messageByRole: Record<"SELLER" | "ADMIN", string> = {
+      SELLER: "Seller accounts cannot buy medicines or add items to cart.",
+      ADMIN: "Admin accounts cannot buy medicines or add items to cart.",
+    };
+
+    await Swal.fire({
+      icon: "warning",
+      title: "Action not allowed",
+      text: messageByRole[role],
+      confirmButtonText: "OK",
+    });
+
+    return false;
+  };
+
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
       <Link href="/shop" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
@@ -332,7 +356,15 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
               type="button"
               className="h-10 min-w-55"
               disabled={!isInStock || isAlreadyInCart}
-              onClick={addCurrentMedicineToCart}
+              onClick={async () => {
+                const hasAccess = await guardCustomerPurchaseAccess();
+
+                if (!hasAccess) {
+                  return;
+                }
+
+                addCurrentMedicineToCart();
+              }}
             >
               <ShoppingCart className="mr-2 h-4 w-4" />
               {isAlreadyInCart ? "Added to Cart" : "Add to Cart"}
@@ -343,7 +375,13 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
               variant="outline"
               className="h-10 min-w-35"
               disabled={!isInStock || !medicineCheckoutId}
-              onClick={() => {
+              onClick={async () => {
+                const hasAccess = await guardCustomerPurchaseAccess();
+
+                if (!hasAccess) {
+                  return;
+                }
+
                 router.push(
                   `/checkout?buyNow=${encodeURIComponent(medicineCheckoutId)}&qty=${Math.max(quantity, 1)}`,
                 );

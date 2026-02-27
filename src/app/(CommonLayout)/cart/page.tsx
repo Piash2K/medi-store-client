@@ -1,5 +1,18 @@
-import CartPageContent from "@/components/modules/cart/CartPageContent";
+import { redirect } from "next/navigation";
 
-export default function CartPage() {
+import CartPageContent from "@/components/modules/cart/CartPageContent";
+import { getUser } from "@/services/auth";
+
+export default async function CartPage() {
+  const user = (await getUser()) as { role?: string } | null;
+
+  if (!user) {
+    return <CartPageContent />;
+  }
+
+  if (user.role?.toUpperCase() !== "CUSTOMER") {
+    redirect("/");
+  }
+
   return <CartPageContent />;
 }
