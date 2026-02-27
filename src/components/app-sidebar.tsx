@@ -35,7 +35,7 @@ const adminNavMain: NavMainItems = [
   },
   {
     title: "Orders",
-    url: "/dashboard",
+    url: "/admin/orders",
     icon: Package,
   },
   {

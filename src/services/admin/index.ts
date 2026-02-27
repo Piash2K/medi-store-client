@@ -30,11 +30,20 @@ export type AdminOrder = {
   id: string;
   customerId?: string;
   status?: string;
-  paymentMethod?: string;
-  shippingAddress?: string;
   totalAmount?: number;
   createdAt?: string;
-  updatedAt?: string;
+  customer?: {
+    name?: string;
+    email?: string;
+  };
+  items?: {
+    medicine?: {
+      seller?: {
+        name?: string;
+        email?: string;
+      };
+    };
+  }[];
 };
 
 export type AdminOrdersResponse = {
