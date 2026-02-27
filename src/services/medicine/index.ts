@@ -7,9 +7,31 @@ import {
 import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const PUBLIC_DATA_REVALIDATE_SECONDS = 300;
+
+type PublicFetchOptions = {
+  noStore?: boolean;
+  revalidate?: number;
+};
+
+const getPublicFetchConfig = (options?: PublicFetchOptions): RequestInit => {
+  if (options?.noStore) {
+    return {
+      cache: "no-store",
+    };
+  }
+
+  return {
+    cache: "force-cache",
+    next: {
+      revalidate: options?.revalidate ?? PUBLIC_DATA_REVALIDATE_SECONDS,
+    },
+  };
+};
 
 export const getMedicines = async (
   params: MedicinesQueryParams,
+  options?: PublicFetchOptions,
 ): Promise<MedicinesResponse> => {
   try {
     const queryParams = new URLSearchParams();
@@ -40,7 +62,7 @@ export const getMedicines = async (
       `${API_URL}/medicines?${queryParams.toString()}`,
       {
         method: "GET",
-        cache: "no-store",
+        ...getPublicFetchConfig(options),
       },
     );
 
@@ -63,11 +85,13 @@ export const getMedicines = async (
   }
 };
 
-export const getCategories = async (): Promise<Category[]> => {
+export const getCategories = async (options?: PublicFetchOptions): Promise<Category[]> => {
   try {
+    const fetchConfig = getPublicFetchConfig(options);
+
     const response = await fetch(`${API_URL}/categories`, {
       method: "GET",
-      cache: "no-store",
+      ...fetchConfig,
     });
     const result = await response.json();
     return result?.data ?? [];
@@ -79,11 +103,16 @@ export const getCategories = async (): Promise<Category[]> => {
   }
 };
 
-export const getMedicineById = async (medicineId: string): Promise<MedicineResponse> => {
+export const getMedicineById = async (
+  medicineId: string,
+  options?: PublicFetchOptions,
+): Promise<MedicineResponse> => {
   try {
+    const fetchConfig = getPublicFetchConfig(options);
+
     const response = await fetch(`${API_URL}/medicines/${medicineId}`, {
       method: "GET",
-      cache: "no-store",
+      ...fetchConfig,
     });
 
     const result = await response.json();

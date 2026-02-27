@@ -1,5 +1,7 @@
 import MedicineDetailsContent from "@/components/modules/shop/MedicineDetailsContent";
 
+export const dynamic = "force-dynamic";
+
 type MedicineDetailsPageProps = {
   params: Promise<{
     id: string;

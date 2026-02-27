@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import CheckoutPageContent from "@/components/modules/checkout/CheckoutPageContent";
 import { getUser } from "@/services/auth";
 
+export const dynamic = "force-dynamic";
+
 export default async function CheckoutPage() {
   const user = (await getUser()) as { role?: string } | null;
 

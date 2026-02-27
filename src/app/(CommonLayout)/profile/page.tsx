@@ -4,6 +4,8 @@ import ProfilePageContent from "@/components/modules/profile/ProfilePageContent"
 import { getMyProfile, getUser } from "@/services/auth";
 import { getOrders } from "@/services/order";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfilePage() {
   const user = await getUser();
 

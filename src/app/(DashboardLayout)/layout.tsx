@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getUser } from "@/services/auth";
 
+export const dynamic = "force-dynamic";
 
 export default async function Page({
   admin,

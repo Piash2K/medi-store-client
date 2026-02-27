@@ -2,6 +2,8 @@ import OrderDetailsPageContent from "@/components/modules/orders/OrderDetailsPag
 import { getUser } from "@/services/auth";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 type OrderDetailsPageProps = {
   params: Promise<{
     id: string;
