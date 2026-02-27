@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { CalendarDays, ChevronRight, Package } from "lucide-react";
-import { revalidatePath } from "next/cache";
 
-import { cancelCustomerOrder, getOrders } from "@/services/order";
+import CancelOrderButton from "@/components/modules/orders/CancelOrderButton";
+import { getOrders } from "@/services/order";
 
 const currencyFormatter = new Intl.NumberFormat("en-BD", {
   minimumFractionDigits: 2,
@@ -25,20 +25,6 @@ const isCustomerCancelableStatus = (status?: string) => {
 };
 
 export default async function OrdersPageContent() {
-  const cancelOrderAction = async (formData: FormData) => {
-    "use server";
-
-    const orderId = String(formData.get("orderId") || "").trim();
-
-    if (!orderId) {
-      return;
-    }
-
-    await cancelCustomerOrder(orderId);
-    revalidatePath("/orders");
-    revalidatePath(`/orders/${orderId}`);
-  };
-
   const result = await getOrders();
   const orders = result.success ? result.data : [];
 
@@ -106,15 +92,10 @@ export default async function OrdersPageContent() {
                   </p>
 
                   {isCustomerCancelableStatus(order.status) ? (
-                    <form action={cancelOrderAction}>
-                      <input type="hidden" name="orderId" value={order.id} />
-                      <button
-                        type="submit"
-                        className="rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
-                      >
-                        Cancel Order
-                      </button>
-                    </form>
+                    <CancelOrderButton
+                      orderId={order.id}
+                      className="rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
+                    />
                   ) : null}
                 </div>
 

@@ -3,7 +3,8 @@
 import * as React from "react";
 import { Mail, MapPin, PackageCheck, Phone, ShoppingBag, UserCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,7 +99,11 @@ export default function ProfilePageContent({
     const trimmedAddress = address.trim();
 
     if (!trimmedName || !trimmedEmail) {
-      toast.error("Name and email are required.", { position: "top-right" });
+      await Swal.fire({
+        icon: "warning",
+        title: "Missing required fields",
+        text: "Name and email are required.",
+      });
       return;
     }
 
@@ -117,8 +122,10 @@ export default function ProfilePageContent({
     setIsSaving(false);
 
     if (!result.success || !result.data) {
-      toast.error(result.message || "Failed to update profile", {
-        position: "top-right",
+      await Swal.fire({
+        icon: "error",
+        title: "Profile update failed",
+        text: result.message || "Failed to update profile",
       });
       return;
     }
@@ -132,9 +139,7 @@ export default function ProfilePageContent({
     setCityInput(nextAddressParts.city);
     setAddress(nextAddressParts.addressDetails);
 
-    toast.success(result.message || "Profile updated successfully", {
-      position: "top-right",
-    });
+    toast.success(result.message || "Profile updated successfully");
     router.refresh();
   };
 

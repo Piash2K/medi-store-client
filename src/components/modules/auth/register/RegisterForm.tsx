@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +34,10 @@ export default function RegisterForm() {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       if (data.password !== data.confirmPassword) {
-        toast.error("Passwords do not match", {
-          position: "top-right",
+        await Swal.fire({
+          icon: "warning",
+          title: "Password mismatch",
+          text: "Passwords do not match.",
         });
         return;
       }
@@ -49,21 +52,23 @@ export default function RegisterForm() {
       const result = await registerUser(payload);
 
       if (!result?.success) {
-        toast.error(result?.message || "Registration failed", {
-          position: "top-right",
+        await Swal.fire({
+          icon: "error",
+          title: "Registration failed",
+          text: result?.message || "Please try again.",
         });
         return;
       }
 
-      toast.success("Registration successful! Please login.", {
-        position: "top-right",
-      });
+      toast.success("Registration successful! Please login.");
 
       router.push("/login");
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong. Please try again.", {
-        position: "top-right",
+      await Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Please try again.",
       });
     }
   };

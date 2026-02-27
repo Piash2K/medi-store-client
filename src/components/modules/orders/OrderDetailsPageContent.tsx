@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { revalidatePath } from "next/cache";
 
-import { cancelCustomerOrder, getOrderById } from "@/services/order";
+import CancelOrderButton from "@/components/modules/orders/CancelOrderButton";
+import { getOrderById } from "@/services/order";
 
 const currencyFormatter = new Intl.NumberFormat("en-BD", {
   minimumFractionDigits: 2,
@@ -29,20 +29,6 @@ type OrderDetailsPageContentProps = {
 };
 
 export default async function OrderDetailsPageContent({ orderId }: OrderDetailsPageContentProps) {
-  const cancelOrderAction = async (formData: FormData) => {
-    "use server";
-
-    const nextOrderId = String(formData.get("orderId") || "").trim();
-
-    if (!nextOrderId) {
-      return;
-    }
-
-    await cancelCustomerOrder(nextOrderId);
-    revalidatePath("/orders");
-    revalidatePath(`/orders/${nextOrderId}`);
-  };
-
   const result = await getOrderById(orderId);
 
   if (!result.success || !result.data) {
@@ -82,15 +68,10 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
               {order.status}
             </span>
             {isCustomerCancelableStatus(order.status) ? (
-              <form action={cancelOrderAction}>
-                <input type="hidden" name="orderId" value={order.id} />
-                <button
-                  type="submit"
-                  className="rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
-                >
-                  Cancel Order
-                </button>
-              </form>
+              <CancelOrderButton
+                orderId={order.id}
+                className="rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
+              />
             ) : null}
           </div>
         </div>

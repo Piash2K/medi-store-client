@@ -3,6 +3,7 @@
 import Link from "next/link";
 import * as React from "react";
 import { Minus, Package, Plus, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
@@ -78,6 +79,11 @@ export default function CartPageContent() {
         ? previousSelectedIds.filter((id) => id !== itemId)
         : [...previousSelectedIds, itemId],
     );
+  };
+
+  const handleRemoveItem = (itemId: string) => {
+    removeItem(itemId);
+    toast.success("Item removed from cart");
   };
 
   return (
@@ -163,7 +169,7 @@ export default function CartPageContent() {
                     </p>
                     <button
                       type="button"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => handleRemoveItem(item.id)}
                       className="text-destructive mt-1 inline-flex items-center gap-1 text-sm"
                     >
                       <Trash2 className="h-4 w-4" />

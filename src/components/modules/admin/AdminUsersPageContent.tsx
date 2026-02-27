@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Ban, CheckCircle2, Search } from "lucide-react";
 import Swal from "sweetalert2";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,11 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
 
   const handleToggleUserStatus = async (user: AdminUser & { ordersCount: number }) => {
     if (!user.id) {
-      toast.error("Invalid user id", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Invalid user",
+        text: "Invalid user id",
+      });
       return;
     }
 
@@ -147,7 +151,11 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
     setUpdatingUserId("");
 
     if (!result.success) {
-      toast.error(result.message || "Failed to update user status", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Update failed",
+        text: result.message || "Failed to update user status",
+      });
       return;
     }
 
@@ -165,7 +173,7 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
       }),
     );
 
-    toast.success(result.message || "User status updated", { position: "top-right" });
+    toast.success(result.message || "User status updated");
   };
 
   return (

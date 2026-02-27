@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,22 +31,24 @@ export default function LoginForm() {
       const result = await loginUser(data);
 
       if (!result.success) {
-        toast.error(result.message || "Login failed", {
-          position: "top-right",
+        await Swal.fire({
+          icon: "error",
+          title: "Login failed",
+          text: result.message || "Please check your credentials and try again.",
         });
         return;
       }
 
-      toast.success("Login successful!", {
-        position: "top-right",
-      });
+      toast.success("Login successful!");
 
       const redirectPath = searchParams.get("redirect") || "/";
       router.push(redirectPath);
     } catch (error) {
-      console.log(error)
-      toast.error("Something went wrong. Please try again.", {
-        position: "top-right",
+      console.log(error);
+      await Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Please try again.",
       });
     }
   };

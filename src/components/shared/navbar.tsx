@@ -29,6 +29,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { getUser, logOut } from "@/services/auth";
 import { useCart } from "@/providers/cart-provider";
 
@@ -147,9 +149,18 @@ export function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    await logOut();
-    setUser(null);
-    router.refresh();
+    try {
+      await logOut();
+      setUser(null);
+      toast.success("Logged out successfully");
+      router.refresh();
+    } catch {
+      await Swal.fire({
+        icon: "error",
+        title: "Logout failed",
+        text: "Failed to logout. Please try again.",
+      });
+    }
   };
 
   return (

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -100,7 +100,11 @@ export default function SellerMedicinesPageContent({
     const parsedStock = Number(newStock);
 
     if (!newName.trim() || Number.isNaN(parsedPrice) || parsedPrice <= 0 || Number.isNaN(parsedStock) || parsedStock < 0 || !newCategoryId) {
-      toast.error("Name, category, valid price, and stock are required", { position: "top-right" });
+      await Swal.fire({
+        icon: "warning",
+        title: "Invalid input",
+        text: "Name, category, valid price, and stock are required",
+      });
       return;
     }
 
@@ -118,7 +122,11 @@ export default function SellerMedicinesPageContent({
     setIsSaving(false);
 
     if (!result.success || !result.data) {
-      toast.error(result.message || "Failed to create medicine", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Create failed",
+        text: result.message || "Failed to create medicine",
+      });
       return;
     }
 
@@ -135,7 +143,7 @@ export default function SellerMedicinesPageContent({
     };
 
     setMedicines((previous) => [createdMedicine, ...previous]);
-    toast.success(result.message || "Medicine added successfully", { position: "top-right" });
+    toast.success(result.message || "Medicine added successfully");
     setIsAddModalOpen(false);
   };
 
@@ -158,12 +166,20 @@ export default function SellerMedicinesPageContent({
     const parsedStock = Number(editStock);
 
     if (!medicineId) {
-      toast.error("Invalid medicine id", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Invalid medicine",
+        text: "Invalid medicine id",
+      });
       return;
     }
 
     if (!editName.trim() || Number.isNaN(parsedPrice) || parsedPrice <= 0 || Number.isNaN(parsedStock) || parsedStock < 0) {
-      toast.error("Name, valid price, and stock are required", { position: "top-right" });
+      await Swal.fire({
+        icon: "warning",
+        title: "Invalid input",
+        text: "Name, valid price, and stock are required",
+      });
       return;
     }
 
@@ -184,7 +200,11 @@ export default function SellerMedicinesPageContent({
     setIsSaving(false);
 
     if (!result.success) {
-      toast.error(result.message || "Failed to update medicine", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Update failed",
+        text: result.message || "Failed to update medicine",
+      });
       return;
     }
 
@@ -207,7 +227,7 @@ export default function SellerMedicinesPageContent({
       );
     }
 
-    toast.success(result.message || "Medicine updated successfully", { position: "top-right" });
+    toast.success(result.message || "Medicine updated successfully");
     handleCancelEdit();
   };
 
@@ -215,7 +235,11 @@ export default function SellerMedicinesPageContent({
     const medicineId = getMedicineId(medicine);
 
     if (!medicineId) {
-      toast.error("Invalid medicine id", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Invalid medicine",
+        text: "Invalid medicine id",
+      });
       return;
     }
 
@@ -240,12 +264,16 @@ export default function SellerMedicinesPageContent({
     setDeletingMedicineId("");
 
     if (!result.success) {
-      toast.error(result.message || "Failed to delete medicine", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Delete failed",
+        text: result.message || "Failed to delete medicine",
+      });
       return;
     }
 
     setMedicines((previous) => previous.filter((item) => getMedicineId(item) !== medicineId));
-    toast.success(result.message || "Medicine deleted successfully", { position: "top-right" });
+    toast.success(result.message || "Medicine deleted successfully");
   };
 
   return (

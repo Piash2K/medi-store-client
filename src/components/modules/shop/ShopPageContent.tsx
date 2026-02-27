@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -514,6 +515,8 @@ export default function ShopPageContent() {
                                   manufacturer: medicine.manufacturer,
                                   category: medicine.category?.name,
                                 });
+
+                                toast.success(`${medicine.name} added to cart`);
                               }}
                             >
                               <ShoppingCart className="mr-1 h-3.5 w-3.5" />

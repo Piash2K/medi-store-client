@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -121,7 +122,11 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
     setUpdatingOrderId("");
 
     if (!result.success) {
-      toast.error(result.message || "Failed to update order status", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Update failed",
+        text: result.message || "Failed to update order status",
+      });
       return;
     }
 
@@ -139,7 +144,7 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
       }),
     );
 
-    toast.success(result.message || "Order status updated", { position: "top-right" });
+    toast.success(result.message || "Order status updated");
   };
 
   return (

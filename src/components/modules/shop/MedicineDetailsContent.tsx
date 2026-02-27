@@ -5,6 +5,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Package, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
 import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
@@ -364,6 +365,9 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
                 }
 
                 addCurrentMedicineToCart();
+                toast.success(
+                  quantity > 1 ? `${quantity} items added to cart` : `${medicine.name} added to cart`,
+                );
               }}
             >
               <ShoppingCart className="mr-2 h-4 w-4" />

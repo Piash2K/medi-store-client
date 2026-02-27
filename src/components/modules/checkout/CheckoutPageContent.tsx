@@ -4,6 +4,8 @@ import Link from "next/link";
 import * as React from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -115,14 +117,18 @@ export default function CheckoutPageContent() {
     }
 
     if (!shippingAddress.trim()) {
-      setCheckoutError("Please provide your shipping address.");
+      const message = "Please provide your shipping address.";
+      setCheckoutError(message);
       setCheckoutMessage("");
+      await Swal.fire({ icon: "warning", title: "Missing address", text: message });
       return;
     }
 
     if (checkoutItems.length === 0) {
-      setCheckoutError(isSelectedCartMode ? "No selected products found for checkout." : "Your cart is empty.");
+      const message = isSelectedCartMode ? "No selected products found for checkout." : "Your cart is empty.";
+      setCheckoutError(message);
       setCheckoutMessage("");
+      await Swal.fire({ icon: "warning", title: "Checkout unavailable", text: message });
       return;
     }
 
@@ -136,8 +142,10 @@ export default function CheckoutPageContent() {
       (currentUser.sub as string | undefined);
 
     if (!customerId) {
-      setCheckoutError("Please login again to continue checkout.");
+      const message = "Please login again to continue checkout.";
+      setCheckoutError(message);
       setIsPlacingOrder(false);
+      await Swal.fire({ icon: "error", title: "Authentication required", text: message });
       router.push(`/login?redirect=${encodeURIComponent(checkoutPath)}`);
       return;
     }
@@ -157,11 +165,15 @@ export default function CheckoutPageContent() {
     setIsPlacingOrder(false);
 
     if (!result.success) {
-      setCheckoutError(result.message || "Failed to place order.");
+      const message = result.message || "Failed to place order.";
+      setCheckoutError(message);
+      await Swal.fire({ icon: "error", title: "Order failed", text: message });
       return;
     }
 
-    setCheckoutMessage(result.message || "Order created successfully.");
+    const successMessage = result.message || "Order created successfully.";
+    setCheckoutMessage(successMessage);
+    toast.success(successMessage);
     if (!isBuyNowMode) {
       if (isSelectedCartMode) {
         checkoutItems.forEach((item) => {

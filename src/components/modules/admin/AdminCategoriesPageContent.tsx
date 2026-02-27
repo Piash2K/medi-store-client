@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,7 +69,11 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
     const name = newName.trim();
 
     if (!name) {
-      toast.error("Category name is required", { position: "top-right" });
+      await Swal.fire({
+        icon: "warning",
+        title: "Name required",
+        text: "Category name is required",
+      });
       return;
     }
 
@@ -83,7 +87,11 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
     setIsCreating(false);
 
     if (!result.success || !result.data) {
-      toast.error(result.message || "Failed to create category", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Create failed",
+        text: result.message || "Failed to create category",
+      });
       return;
     }
 
@@ -103,7 +111,7 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
       return [nextItem, ...previous];
     });
 
-    toast.success(result.message || "Category created successfully", { position: "top-right" });
+    toast.success(result.message || "Category created successfully");
     setIsAddModalOpen(false);
   };
 
@@ -125,7 +133,11 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
     const nextName = editName.trim();
 
     if (!nextName) {
-      toast.error("Category name is required", { position: "top-right" });
+      await Swal.fire({
+        icon: "warning",
+        title: "Name required",
+        text: "Category name is required",
+      });
       return;
     }
 
@@ -139,7 +151,11 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
     setIsSaving(false);
 
     if (!result.success) {
-      toast.error(result.message || "Failed to update category", { position: "top-right" });
+      await Swal.fire({
+        icon: "error",
+        title: "Update failed",
+        text: result.message || "Failed to update category",
+      });
       return;
     }
 
@@ -157,7 +173,7 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
       }),
     );
 
-    toast.success(result.message || "Category updated successfully", { position: "top-right" });
+    toast.success(result.message || "Category updated successfully");
     handleCancelEdit();
   };
 
@@ -199,7 +215,7 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
     }
 
     setCategories((previous) => previous.filter((item) => item.id !== category.id));
-    toast.success(result.message || "Category deleted successfully", { position: "top-right" });
+    toast.success(result.message || "Category deleted successfully");
   };
 
   return (
