@@ -20,6 +20,12 @@ export type AdminUsersResponse = {
   data: AdminUser[];
 };
 
+export type UpdateAdminUserStatusResponse = {
+  success: boolean;
+  message?: string;
+  data?: AdminUser | null;
+};
+
 export type AdminOrder = {
   id: string;
   customerId?: string;
@@ -149,6 +155,49 @@ export const getAdminOrders = async (): Promise<AdminOrdersResponse> => {
       success: false,
       message: "Failed to fetch admin orders",
       data: [],
+    };
+  }
+};
+
+export const updateAdminUserStatus = async (
+  userId: string,
+  status: "BAN" | "UNBAN",
+): Promise<UpdateAdminUserStatusResponse> => {
+  try {
+    const storeCookie = await cookies();
+    const token = storeCookie.get("token")?.value;
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+        data: null,
+      };
+    }
+
+    const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: (result?.data as AdminUser) ?? null,
+    };
+  } catch (error) {
+    console.error("Update admin user status error:", error);
+    return {
+      success: false,
+      message: "Failed to update user status",
+      data: null,
     };
   }
 };

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { type LucideIcon } from "lucide-react"
 
 import {
@@ -22,6 +23,20 @@ export function NavMain({
     separatorBefore?: boolean
   }[]
 }) {
+  const pathname = usePathname()
+
+  const isItemActive = (url: string, fallbackActive?: boolean) => {
+    if (url === "/") {
+      return pathname === "/"
+    }
+
+    if (pathname === url || pathname.startsWith(`${url}/`)) {
+      return true
+    }
+
+    return Boolean(fallbackActive)
+  }
+
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -29,7 +44,7 @@ export function NavMain({
           <div key={item.title}>
             {item.separatorBefore && <SidebarSeparator className="my-2" />}
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title} isActive={item.isActive}>
+              <SidebarMenuButton asChild tooltip={item.title} isActive={isItemActive(item.url, item.isActive)}>
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
