@@ -52,6 +52,10 @@ export type MedicineResponse = {
 };
 
 export type Category = {
-  _id: string;
+  id?: string;
+  _id?: string;
   name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

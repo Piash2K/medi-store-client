@@ -40,7 +40,7 @@ const adminNavMain: NavMainItems = [
   },
   {
     title: "Categories",
-    url: "/dashboard",
+    url: "/admin/categories",
     icon: Tags,
   },
   {
