@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { revalidatePath } from "next/cache";
 
-import { getOrderById } from "@/services/order";
+import { cancelCustomerOrder, getOrderById } from "@/services/order";
 
 const currencyFormatter = new Intl.NumberFormat("en-BD", {
   minimumFractionDigits: 2,
@@ -19,11 +20,29 @@ const formatDate = (isoDate: string) => {
   });
 };
 
+const isCustomerCancelableStatus = (status?: string) => {
+  return (status || "").toUpperCase() === "PLACED";
+};
+
 type OrderDetailsPageContentProps = {
   orderId: string;
 };
 
 export default async function OrderDetailsPageContent({ orderId }: OrderDetailsPageContentProps) {
+  const cancelOrderAction = async (formData: FormData) => {
+    "use server";
+
+    const nextOrderId = String(formData.get("orderId") || "").trim();
+
+    if (!nextOrderId) {
+      return;
+    }
+
+    await cancelCustomerOrder(nextOrderId);
+    revalidatePath("/orders");
+    revalidatePath(`/orders/${nextOrderId}`);
+  };
+
   const result = await getOrderById(orderId);
 
   if (!result.success || !result.data) {
@@ -58,9 +77,22 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
             <p className="text-muted-foreground mt-1 text-sm">Order ID: {order.id}</p>
           </div>
 
-          <span className="bg-primary/10 text-primary inline-flex rounded-full px-3 py-1 text-xs font-semibold">
-            {order.status}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="bg-primary/10 text-primary inline-flex rounded-full px-3 py-1 text-xs font-semibold">
+              {order.status}
+            </span>
+            {isCustomerCancelableStatus(order.status) ? (
+              <form action={cancelOrderAction}>
+                <input type="hidden" name="orderId" value={order.id} />
+                <button
+                  type="submit"
+                  className="rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
+                >
+                  Cancel Order
+                </button>
+              </form>
+            ) : null}
+          </div>
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

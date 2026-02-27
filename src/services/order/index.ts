@@ -39,6 +39,16 @@ export type UpdateSellerOrderStatusResponse = {
   } | null;
 };
 
+export type CancelCustomerOrderResponse = {
+  success: boolean;
+  message?: string;
+  data?: {
+    id?: string;
+    status?: string;
+    updatedAt?: string;
+  } | null;
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const getToken = async () => {
@@ -255,6 +265,61 @@ export const getOrderById = async (orderId: string): Promise<OrderResponse> => {
     return {
       success: false,
       message: "Failed to fetch order",
+      data: null,
+    };
+  }
+};
+
+export const cancelCustomerOrder = async (
+  orderId: string,
+): Promise<CancelCustomerOrderResponse> => {
+  try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+        data: null,
+      };
+    }
+
+    let response = await fetch(`${API_URL}/orders/${orderId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: "CANCELLED" }),
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      response = await fetch(`${API_URL}/orders`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ orderId, status: "CANCELLED" }),
+        cache: "no-store",
+      });
+    }
+
+    const result = await response.json();
+
+    return {
+      success: result?.success ?? false,
+      message: result?.message,
+      data: result?.data ?? null,
+    };
+  } catch (error) {
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Cancel customer order error:", error);
+    }
+    return {
+      success: false,
+      message: "Failed to cancel order",
       data: null,
     };
   }

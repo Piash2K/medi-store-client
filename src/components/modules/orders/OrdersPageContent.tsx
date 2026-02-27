@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { CalendarDays, ChevronRight, Package } from "lucide-react";
+import { revalidatePath } from "next/cache";
 
-import { getOrders } from "@/services/order";
+import { cancelCustomerOrder, getOrders } from "@/services/order";
 
 const currencyFormatter = new Intl.NumberFormat("en-BD", {
   minimumFractionDigits: 2,
@@ -19,7 +20,25 @@ const formatDate = (isoDate: string) => {
   });
 };
 
+const isCustomerCancelableStatus = (status?: string) => {
+  return (status || "").toUpperCase() === "PLACED";
+};
+
 export default async function OrdersPageContent() {
+  const cancelOrderAction = async (formData: FormData) => {
+    "use server";
+
+    const orderId = String(formData.get("orderId") || "").trim();
+
+    if (!orderId) {
+      return;
+    }
+
+    await cancelCustomerOrder(orderId);
+    revalidatePath("/orders");
+    revalidatePath(`/orders/${orderId}`);
+  };
+
   const result = await getOrders();
   const orders = result.success ? result.data : [];
 
@@ -81,9 +100,23 @@ export default async function OrdersPageContent() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
-                <p className="text-sm text-muted-foreground">
-                  Payment: <span className="font-medium text-foreground">{order.paymentMethod}</span>
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm text-muted-foreground">
+                    Payment: <span className="font-medium text-foreground">{order.paymentMethod}</span>
+                  </p>
+
+                  {isCustomerCancelableStatus(order.status) ? (
+                    <form action={cancelOrderAction}>
+                      <input type="hidden" name="orderId" value={order.id} />
+                      <button
+                        type="submit"
+                        className="rounded-md border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10"
+                      >
+                        Cancel Order
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
 
                 <Link
                   href={`/orders/${order.id}`}
