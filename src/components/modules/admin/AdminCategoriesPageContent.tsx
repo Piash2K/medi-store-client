@@ -1,17 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { updateCategory } from "@/services/category";
+import { deleteCategory, updateCategory } from "@/services/category";
 
 type CategoryRow = {
   id: string;
+  apiId?: string;
   name: string;
   description?: string;
   medicinesCount: number;
@@ -36,6 +38,7 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingCategoryId, setDeletingCategoryId] = useState("");
   const editingCategory = categories.find((category) => category.id === editingCategoryId) || null;
 
   const handleEditClick = (category: CategoryRow) => {
@@ -98,6 +101,47 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
     handleCancelEdit();
   };
 
+  const handleDeleteCategory = async (category: CategoryRow) => {
+    if (!category.apiId) {
+      await Swal.fire({
+        icon: "error",
+        title: "Delete failed",
+        text: "Invalid category id. Could not send delete request.",
+      });
+      return;
+    }
+
+    const confirmation = await Swal.fire({
+      title: "Delete category?",
+      text: `This will permanently remove ${category.name}.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+      focusCancel: true,
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
+    setDeletingCategoryId(category.id);
+    const result = await deleteCategory(category.apiId);
+    setDeletingCategoryId("");
+
+    if (!result.success) {
+      await Swal.fire({
+        icon: "error",
+        title: "Delete failed",
+        text: result.message || "Failed to delete category",
+      });
+      return;
+    }
+
+    setCategories((previous) => previous.filter((item) => item.id !== category.id));
+    toast.success(result.message || "Category deleted successfully", { position: "top-right" });
+  };
+
   return (
     <>
       <h1 className="text-4xl font-semibold tracking-tight">Manage Categories</h1>
@@ -126,6 +170,7 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
                 ) : (
                   categories.map((category) => {
                     const isActive = category.medicinesCount > 0;
+                    const isDeleting = deletingCategoryId === category.id;
 
                     return (
                       <tr key={category.id} className="border-b last:border-0">
@@ -147,8 +192,19 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
                               type="button"
                               aria-label={`Edit ${category.name}`}
                               onClick={() => handleEditClick(category)}
+                              disabled={isDeleting}
                             >
                               <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              type="button"
+                              aria-label={`Delete ${category.name}`}
+                              onClick={() => handleDeleteCategory(category)}
+                              disabled={isDeleting}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
                             </Button>
                           </div>
                         </td>

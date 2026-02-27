@@ -8,6 +8,7 @@ import { getCategories, getMedicines } from "@/services/medicine";
 
 type CategoryRow = {
   id: string;
+  apiId?: string;
   name: string;
   description?: string;
   medicinesCount: number;
@@ -54,6 +55,7 @@ export default async function AdminCategoriesPage() {
 
       return {
         id: categoryKey || category.name,
+        apiId: category.id || category._id,
         name: category.name,
         description: category.description,
         medicinesCount,
