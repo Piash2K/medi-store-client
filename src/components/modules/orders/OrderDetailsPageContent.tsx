@@ -42,6 +42,7 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
   }
 
   const order = result.data;
+  const isDeliveredOrder = ["DELIVERED", "COMPLETED"].includes(order.status?.toUpperCase() || "");
 
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
@@ -94,6 +95,14 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
                   <p className="text-xs text-muted-foreground">
                     {item.medicine?.manufacturer || "Unknown manufacturer"}
                   </p>
+                  {isDeliveredOrder && (item.medicineId || item.medicine?.id) ? (
+                    <Link
+                      href={`/shop/${item.medicineId || item.medicine?.id}?review=1#review-section`}
+                      className="text-primary mt-1 inline-flex text-xs font-medium"
+                    >
+                      Leave review now
+                    </Link>
+                  ) : null}
                 </div>
 
                 <div className="text-right text-sm">

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
 import { getCategories, getMedicines } from "@/services/medicine";
+import { getMedicineReviews } from "@/services/review";
 import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
 
 const DEFAULT_PAGE = 1;
@@ -37,6 +38,9 @@ export default function ShopPageContent() {
   const [categoryCounts, setCategoryCounts] = React.useState<Map<string, number>>(new Map());
   const [manufacturerCounts, setManufacturerCounts] = React.useState<Map<string, number>>(new Map());
   const [manufacturers, setManufacturers] = React.useState<string[]>([]);
+  const [reviewStatsByMedicineId, setReviewStatsByMedicineId] = React.useState<
+    Map<string, { averageRating: number; totalReviews: number }>
+  >(new Map());
 
   const loadMedicines = React.useCallback(async () => {
     setIsLoading(true);
@@ -55,13 +59,46 @@ export default function ShopPageContent() {
     if (!result.success) {
       setErrorMessage(result.message || "Failed to load medicines");
       setMedicines([]);
+      setReviewStatsByMedicineId(new Map());
       setTotalPage(1);
       setTotalMedicines(0);
       setIsLoading(false);
       return;
     }
 
+    const medicineIds = Array.from(
+      new Set(
+        result.data
+          .map((medicine) => medicine._id || medicine.id)
+          .filter((medicineId): medicineId is string => Boolean(medicineId)),
+      ),
+    );
+
+    const nextReviewStatsMap = new Map<string, { averageRating: number; totalReviews: number }>();
+
+    if (medicineIds.length > 0) {
+      const reviewResults = await Promise.all(
+        medicineIds.map(async (id) => {
+          const reviewResult = await getMedicineReviews(id);
+
+          return {
+            id,
+            averageRating: reviewResult.success && reviewResult.data ? reviewResult.data.averageRating : 0,
+            totalReviews: reviewResult.success && reviewResult.data ? reviewResult.data.totalReviews : 0,
+          };
+        }),
+      );
+
+      reviewResults.forEach((reviewItem) => {
+        nextReviewStatsMap.set(reviewItem.id, {
+          averageRating: reviewItem.averageRating,
+          totalReviews: reviewItem.totalReviews,
+        });
+      });
+    }
+
     setMedicines(result.data);
+    setReviewStatsByMedicineId(nextReviewStatsMap);
     setTotalPage(result.meta?.totalPage || 1);
     setTotalMedicines(result.meta?.total || result.data.length);
     setIsLoading(false);
@@ -354,6 +391,11 @@ export default function ShopPageContent() {
             {!isLoading && !errorMessage && sortedMedicines.length > 0 && (
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {sortedMedicines.map((medicine, index) => {
+                  const medicineReviewId = medicine._id || medicine.id || "";
+                  const reviewStats = reviewStatsByMedicineId.get(medicineReviewId);
+                  const averageRating = reviewStats?.averageRating || 0;
+                  const totalReviewsForMedicine = reviewStats?.totalReviews || 0;
+
                   return (
                     <article
                       key={`${medicine._id}-${medicine.name}-${index}`}
@@ -378,8 +420,8 @@ export default function ShopPageContent() {
 
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                          <span>4.{index % 6 + 3}</span>
-                          <span>({(index + 1) * 29})</span>
+                          <span>{averageRating.toFixed(1)}</span>
+                          <span>({totalReviewsForMedicine})</span>
                         </div>
 
                         <div className="flex items-center justify-between pt-2">

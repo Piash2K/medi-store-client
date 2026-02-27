@@ -3,13 +3,42 @@
 import Link from "next/link";
 import * as React from "react";
 import { ArrowLeft, Loader2, Package, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
+import Swal from "sweetalert2";
 
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart-provider";
 import { getMedicineById } from "@/services/medicine";
+import { getOrders } from "@/services/order";
+import { createReview, getMedicineReviews, MedicineReview } from "@/services/review";
 import { Medicine } from "@/types/medicine";
 
 const formatPrice = (value: number) => `BDT ${value.toFixed(2)}`;
+
+const formatReviewDate = (value?: string) => {
+  if (!value) {
+    return "N/A";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "N/A";
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+const getStarClassName = (starIndex: number, averageRating: number) => {
+  if (averageRating >= starIndex) {
+    return "h-4 w-4 fill-amber-400 text-amber-400";
+  }
+
+  return "h-4 w-4 text-amber-400";
+};
 
 type MedicineDetailsContentProps = {
   medicineId: string;
@@ -21,27 +50,177 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   const [quantity, setQuantity] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(true);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const [rating, setRating] = React.useState(5);
+  const [reviewComment, setReviewComment] = React.useState("");
+  const [canReview, setCanReview] = React.useState(false);
+  const [reviewStatusMessage, setReviewStatusMessage] = React.useState("Checking review eligibility...");
+  const [isSubmittingReview, setIsSubmittingReview] = React.useState(false);
+  const [reviews, setReviews] = React.useState<MedicineReview[]>([]);
+  const [totalReviews, setTotalReviews] = React.useState(0);
+  const [averageRating, setAverageRating] = React.useState(0);
+  const [isLoadingReviews, setIsLoadingReviews] = React.useState(true);
+
+  const loadReviews = React.useCallback(async (medicineReviewId: string) => {
+    setIsLoadingReviews(true);
+
+    const reviewsResult = await getMedicineReviews(medicineReviewId);
+
+    setIsLoadingReviews(false);
+
+    if (!reviewsResult.success || !reviewsResult.data) {
+      setReviews([]);
+      setTotalReviews(0);
+      setAverageRating(0);
+      return;
+    }
+
+    setReviews(reviewsResult.data.reviews || []);
+    setTotalReviews(reviewsResult.data.totalReviews || 0);
+    setAverageRating(reviewsResult.data.averageRating || 0);
+  }, []);
 
   React.useEffect(() => {
     const loadMedicine = async () => {
       setIsLoading(true);
       setErrorMessage("");
+      setIsLoadingReviews(true);
 
       const result = await getMedicineById(medicineId);
 
       if (!result.success || !result.data) {
         setErrorMessage(result.message || "Medicine not found.");
         setMedicine(null);
+        setReviews([]);
+        setTotalReviews(0);
+        setAverageRating(0);
+        setIsLoadingReviews(false);
         setIsLoading(false);
         return;
       }
 
       setMedicine(result.data);
+
+      const medicineReviewId = result.data._id || result.data.id;
+
+      if (medicineReviewId) {
+        await loadReviews(medicineReviewId);
+      } else {
+        setReviews([]);
+        setTotalReviews(0);
+        setAverageRating(0);
+        setIsLoadingReviews(false);
+      }
+
       setIsLoading(false);
     };
 
     loadMedicine();
-  }, [medicineId]);
+  }, [medicineId, loadReviews]);
+
+  React.useEffect(() => {
+    const loadReviewEligibility = async () => {
+      if (!medicine) {
+        return;
+      }
+
+      setCanReview(false);
+      setReviewStatusMessage("Checking review eligibility...");
+
+      const ordersResult = await getOrders();
+
+      if (!ordersResult.success) {
+        setReviewStatusMessage("Please login and purchase this medicine to leave a review.");
+        return;
+      }
+
+      const medicineIds = new Set<string>([
+        medicine._id,
+        medicine.id || "",
+        medicineId,
+      ].filter(Boolean));
+
+      const purchasedMedicine = ordersResult.data.some((order) =>
+        order.items.some((item) => {
+          const itemMedicineId = item.medicineId || item.medicine?.id || "";
+          return medicineIds.has(itemMedicineId);
+        }),
+      );
+
+      if (!purchasedMedicine) {
+        setReviewStatusMessage("You can leave a review after purchasing this medicine.");
+        return;
+      }
+
+      setCanReview(true);
+      setReviewStatusMessage("You can leave a review for this medicine.");
+    };
+
+    loadReviewEligibility();
+  }, [medicine, medicineId]);
+
+  const handleSubmitReview = async () => {
+    if (!medicine) {
+      return;
+    }
+
+    if (!canReview) {
+      await Swal.fire({
+        icon: "error",
+        title: "Review not allowed",
+        text: "You are not eligible to review this medicine yet.",
+      });
+      return;
+    }
+
+    const trimmedComment = reviewComment.trim();
+
+    if (!trimmedComment) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Comment required",
+        text: "Please write your review comment.",
+      });
+      return;
+    }
+
+    const medicineReviewId = medicine._id || medicine.id;
+
+    if (!medicineReviewId) {
+      await Swal.fire({
+        icon: "error",
+        title: "Invalid medicine",
+        text: "Medicine id is missing.",
+      });
+      return;
+    }
+
+    setIsSubmittingReview(true);
+
+    const result = await createReview({
+      medicineId: medicineReviewId,
+      rating,
+      comment: trimmedComment,
+    });
+
+    setIsSubmittingReview(false);
+
+    if (!result.success) {
+      await Swal.fire({
+        icon: "error",
+        title: "Review failed",
+        text: result.message || "Failed to submit review.",
+      });
+      return;
+    }
+
+    setReviewComment("");
+    await loadReviews(medicineReviewId);
+    await Swal.fire({
+      icon: "success",
+      title: "Review submitted",
+      text: result.message || "Review submitted successfully.",
+    });
+  };
 
   if (isLoading) {
     return (
@@ -91,12 +270,12 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           <p className="text-muted-foreground mt-1 text-base">by {medicine.manufacturer || "Unknown"}</p>
 
           <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <Star className="h-4 w-4 text-amber-400" />
-            <span className="ml-2">4.8 (234 reviews)</span>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <Star key={index} className={getStarClassName(index + 1, averageRating)} />
+            ))}
+            <span className="ml-2">
+              {averageRating.toFixed(1)} ({totalReviews} review{totalReviews === 1 ? "" : "s"})
+            </span>
           </div>
 
           <div className="mt-3 flex items-baseline gap-2">
@@ -181,6 +360,82 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
           {medicine.description || "No additional details available."}
         </p>
+      </div>
+
+      <div className="mt-6 rounded-2xl border bg-card p-6">
+        <h2 className="text-lg font-semibold">Customer Reviews</h2>
+
+        <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-1">
+            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+            {averageRating.toFixed(1)}
+          </span>
+          <span>({totalReviews} review{totalReviews === 1 ? "" : "s"})</span>
+        </div>
+
+        {isLoadingReviews ? (
+          <p className="text-muted-foreground mt-4 text-sm">Loading reviews...</p>
+        ) : reviews.length === 0 ? (
+          <p className="text-muted-foreground mt-4 text-sm">No reviews yet.</p>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {reviews.map((review) => (
+              <article key={review.id} className="rounded-xl border p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold">{review.customer?.name || "Customer"}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-1">
+                      <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                      {review.rating || 0}
+                    </span>
+                    <span>{formatReviewDate(review.createdAt)}</span>
+                  </div>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{review.comment || "No comment"}</p>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div id="review-section" className="mt-6 rounded-2xl border bg-card p-6">
+        <h2 className="text-lg font-semibold">Leave a Review</h2>
+        <p className="text-muted-foreground mt-2 text-sm">{reviewStatusMessage}</p>
+
+        <div className="mt-4 grid gap-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Rating</label>
+            <select
+              value={rating}
+              onChange={(event) => setRating(Number(event.target.value))}
+              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+              disabled={!canReview || isSubmittingReview}
+            >
+              <option value={5}>5 - Excellent</option>
+              <option value={4}>4 - Very Good</option>
+              <option value={3}>3 - Good</option>
+              <option value={2}>2 - Fair</option>
+              <option value={1}>1 - Poor</option>
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Comment</label>
+            <textarea
+              value={reviewComment}
+              onChange={(event) => setReviewComment(event.target.value)}
+              placeholder="Share your experience with this medicine..."
+              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-28 w-full rounded-md border px-3 py-2 text-sm shadow-xs focus-visible:ring-1 focus-visible:outline-none"
+              disabled={!canReview || isSubmittingReview}
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <Button type="button" onClick={handleSubmitReview} disabled={!canReview || isSubmittingReview}>
+              {isSubmittingReview ? "Submitting..." : "Submit Review"}
+            </Button>
+          </div>
+        </div>
       </div>
     </section>
   );
