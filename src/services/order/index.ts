@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { OrderResponse, OrdersResponse } from "@/types/order";
+import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 export type CreateOrderPayload = {
   customerId?: string;
@@ -73,7 +74,9 @@ export const createOrder = async (payload: CreateOrderPayload): Promise<CreateOr
       data: result?.data,
     };
   } catch (error) {
-    console.error("Create order error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Create order error:", error);
+    }
     return {
       success: false,
       message: "Failed to create order",
@@ -109,7 +112,9 @@ export const getOrders = async (): Promise<OrdersResponse> => {
       data: result?.data ?? [],
     };
   } catch (error) {
-    console.error("Get orders error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get orders error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch orders",
@@ -146,7 +151,9 @@ export const getSellerOrders = async (): Promise<OrdersResponse> => {
       data: result?.data ?? [],
     };
   } catch (error) {
-    console.error("Get seller orders error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get seller orders error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch seller orders",
@@ -203,7 +210,9 @@ export const updateSellerOrderStatus = async (
       data: result?.data ?? null,
     };
   } catch (error) {
-    console.error("Update seller order status error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Update seller order status error:", error);
+    }
     return {
       success: false,
       message: "Failed to update order status",
@@ -240,7 +249,9 @@ export const getOrderById = async (orderId: string): Promise<OrderResponse> => {
       data: result?.data ?? null,
     };
   } catch (error) {
-    console.error("Get order by id error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get order by id error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch order",

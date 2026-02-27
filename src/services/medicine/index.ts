@@ -4,6 +4,7 @@ import {
   MedicinesQueryParams,
   MedicinesResponse,
 } from "@/types/medicine";
+import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -51,7 +52,9 @@ export const getMedicines = async (
       meta: result?.meta,
     };
   } catch (error) {
-    console.error("Get medicines error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get medicines error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch medicines",
@@ -69,7 +72,9 @@ export const getCategories = async (): Promise<Category[]> => {
     const result = await response.json();
     return result?.data ?? [];
   } catch (error) {
-    console.error("Get categories error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get categories error:", error);
+    }
     return [];
   }
 };
@@ -89,7 +94,9 @@ export const getMedicineById = async (medicineId: string): Promise<MedicineRespo
       data: result?.data ?? null,
     };
   } catch (error) {
-    console.error("Get medicine by id error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get medicine by id error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch medicine",

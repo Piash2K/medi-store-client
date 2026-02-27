@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 import { jwtDecode } from "jwt-decode";
+import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 export type UserProfile = {
   id: string;
@@ -49,7 +50,9 @@ export const loginUser = async (userData: FieldValues) => {
       return result;
     }
   } catch (error) {
-    console.error("Login error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Login error:", error);
+    }
     return { success: false, message: "An error occurred" };
   }
 };
@@ -70,7 +73,9 @@ export const registerUser = async (userData: FieldValues) => {
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error("Register error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Register error:", error);
+    }
     return { success: false, message: "An error occurred" };
   }
 };
@@ -121,7 +126,9 @@ export const getMyProfile = async (): Promise<UserProfileResponse> => {
       data: result?.data ?? null,
     };
   } catch (error) {
-    console.error("Get profile error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get profile error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch profile",
@@ -163,7 +170,9 @@ export const updateMyProfile = async (
       data: result?.data ?? null,
     };
   } catch (error) {
-    console.error("Update profile error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Update profile error:", error);
+    }
     return {
       success: false,
       message: "Failed to update profile",

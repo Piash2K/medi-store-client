@@ -3,33 +3,22 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { loginUser } from "@/services/auth";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .max(50, "Password must be at most 50 characters"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = {
+  email: string;
+  password: string;
+};
 
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -79,6 +68,13 @@ export default function LoginForm() {
           <Controller
             name="email"
             control={form.control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^\S+@\S+\.\S+$/,
+                message: "Please enter a valid email address",
+              },
+            }}
             render={({ field, fieldState }) => (
               <div className="space-y-2">
                 <label htmlFor="login-email" className="text-sm font-medium">
@@ -107,6 +103,17 @@ export default function LoginForm() {
           <Controller
             name="password"
             control={form.control}
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters",
+              },
+              maxLength: {
+                value: 50,
+                message: "Password must be at most 50 characters",
+              },
+            }}
             render={({ field, fieldState }) => (
               <div className="space-y-2">
                 <label htmlFor="login-password" className="text-sm font-medium">

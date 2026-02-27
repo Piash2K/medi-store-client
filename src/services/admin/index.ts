@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { Medicine } from "@/types/medicine";
+import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -169,7 +170,9 @@ export const getAdminUsers = async (): Promise<AdminUsersResponse> => {
       data: parseUsers(result?.data),
     };
   } catch (error) {
-    console.error("Get admin users error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get admin users error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch admin users",
@@ -207,7 +210,9 @@ export const getAdminOrders = async (): Promise<AdminOrdersResponse> => {
       data: parseOrders(result?.data),
     };
   } catch (error) {
-    console.error("Get admin orders error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get admin orders error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch admin orders",
@@ -250,7 +255,9 @@ export const updateAdminUserStatus = async (
       data: (result?.data as AdminUser) ?? null,
     };
   } catch (error) {
-    console.error("Update admin user status error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Update admin user status error:", error);
+    }
     return {
       success: false,
       message: "Failed to update user status",
@@ -288,7 +295,9 @@ export const getAdminMedicines = async (): Promise<AdminMedicinesResponse> => {
       data: parseMedicines(result?.data),
     };
   } catch (error) {
-    console.error("Get admin medicines error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Get admin medicines error:", error);
+    }
     return {
       success: false,
       message: "Failed to fetch admin medicines",
@@ -331,7 +340,9 @@ export const updateAdminMedicine = async (
       data: (result?.data as Medicine) ?? null,
     };
   } catch (error) {
-    console.error("Update admin medicine error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Update admin medicine error:", error);
+    }
     return {
       success: false,
       message: "Failed to update medicine",
@@ -371,7 +382,9 @@ export const deleteAdminMedicine = async (
       data: (result?.data as Medicine) ?? null,
     };
   } catch (error) {
-    console.error("Delete admin medicine error:", error);
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Delete admin medicine error:", error);
+    }
     return {
       success: false,
       message: "Failed to delete medicine",
