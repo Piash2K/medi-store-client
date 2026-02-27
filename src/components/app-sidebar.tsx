@@ -44,6 +44,11 @@ const adminNavMain: NavMainItems = [
     icon: Tags,
   },
   {
+    title: "Medicines",
+    url: "/admin/medicines",
+    icon: Pill,
+  },
+  {
     title: "Home",
     url: "/",
     icon: House,
