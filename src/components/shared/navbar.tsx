@@ -118,7 +118,7 @@ function UserMenu({ user, onLogout }: { user: unknown; onLogout: () => void }) {
         <DropdownMenuLabel className="truncate">{userName}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/profile">Profile</Link>
+          <Link href="/profile" prefetch={true}>Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard">Dashboard</Link>
@@ -147,6 +147,18 @@ export function Navbar() {
     };
     getCurrentUser();
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    router.prefetch("/profile");
+
+    if (isCustomerUser(user)) {
+      router.prefetch("/orders");
+    }
+  }, [user, router]);
 
   const handleLogout = async () => {
     try {
@@ -252,6 +264,7 @@ export function Navbar() {
                     <Link
                       key={item.title}
                       href={item.url}
+                      prefetch={true}
                       className="text-base font-semibold"
                     >
                       {item.title}

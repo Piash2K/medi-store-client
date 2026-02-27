@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -19,6 +20,9 @@ export default async function Page({
   customer: React.ReactNode;
 }) {
   const user = await getUser();
+  const dashboardContent =
+    user.role === "ADMIN" ? admin : user.role === "SELLER" ? seller : customer;
+
   return (
     <SidebarProvider>
       <AppSidebar UserRole={user.role} />
@@ -34,9 +38,18 @@ export default async function Page({
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {user.role === "ADMIN" && admin}
-          {user.role === "SELLER" && seller}
-          {user.role === "CUSTOMER" && customer}
+          <Suspense
+            fallback={
+              <div className="flex min-h-[45vh] items-center justify-center">
+                <div className="flex items-center gap-3 rounded-lg border bg-card px-4 py-3">
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  <span className="text-sm text-muted-foreground">Loading dashboard data...</span>
+                </div>
+              </div>
+            }
+          >
+            {dashboardContent}
+          </Suspense>
         </div>
       </SidebarInset>
     </SidebarProvider>

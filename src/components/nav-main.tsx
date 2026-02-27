@@ -45,7 +45,7 @@ export function NavMain({
             {item.separatorBefore && <SidebarSeparator className="my-2" />}
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title} isActive={isItemActive(item.url, item.isActive)}>
-                <Link href={item.url}>
+                <Link href={item.url} prefetch={true}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>
