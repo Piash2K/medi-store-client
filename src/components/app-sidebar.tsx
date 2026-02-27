@@ -5,8 +5,10 @@ import {
   House,
   LayoutDashboard,
   Package,
+  Tags,
   Pill,
   User,
+  Users,
   ShoppingBag,
   ShoppingCart,
 } from "lucide-react"
@@ -28,9 +30,19 @@ const adminNavMain: NavMainItems = [
     isActive: true,
   },
   {
+    title: "Users",
+    url: "/dashboard",
+    icon: Users,
+  },
+  {
     title: "Orders",
-    url: "/admin/orders",
+    url: "/dashboard",
     icon: Package,
+  },
+  {
+    title: "Categories",
+    url: "/dashboard",
+    icon: Tags,
   },
   {
     title: "Home",
@@ -116,6 +128,11 @@ export function AppSidebar({ UserRole, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
+        {UserRole === "ADMIN" ? (
+          <div className="text-muted-foreground px-4 pb-2 pt-4 text-xs font-semibold tracking-wider">
+            ADMIN PANEL
+          </div>
+        ) : null}
         <NavMain items={navItems} />
       </SidebarContent>
       <SidebarRail />
