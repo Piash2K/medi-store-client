@@ -23,12 +23,12 @@ type NavMainItems = React.ComponentProps<typeof NavMain>["items"]
 const adminNavMain: NavMainItems = [
   {
     title: "Dashboard",
-    url: "/admin",
+    url: "/dashboard",
     icon: LayoutDashboard,
   },
   {
     title: "Users",
-    url: "/admin/users",
+    url: "/users",
     icon: Users,
   },
   {
@@ -57,13 +57,12 @@ const adminNavMain: NavMainItems = [
 const sellerNavMain: NavMainItems = [
   {
     title: "Dashboard",
-    url: "/seller/dashboard",
+    url: "/dashboard",
     icon: ShoppingBag,
-    isActive: true,
   },
   {
     title: "Medicines",
-    url: "/seller/medicines",
+    url: "/medicines",
     icon: Pill,
   },
   {
@@ -84,11 +83,10 @@ const customerNavMain: NavMainItems = [
     title: "Dashboard",
     url: "/dashboard",
     icon: LayoutDashboard,
-    isActive: true,
   },
   {
-    title: "Orders",
-    url: "/orders",
+    title: "Order Status",
+    url: "/orders-status",
     icon: Package,
   },
   {
