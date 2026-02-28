@@ -230,15 +230,15 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
 
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-150 w-full border-collapse text-left text-sm sm:text-base">
               <thead>
                 <tr className="border-b">
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Name</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Slug</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Medicines</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="px-4 py-4 text-right text-sm font-medium text-muted-foreground">Actions</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Name</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Slug</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Medicines</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Status</th>
+                  <th className="px-4 py-4 text-right font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
 
@@ -256,10 +256,10 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
 
                     return (
                       <tr key={category.id} className="border-b last:border-0">
-                        <td className="px-4 py-4 text-base font-medium">{category.name}</td>
-                        <td className="px-4 py-4 text-base text-muted-foreground">{toSlug(category.name)}</td>
-                        <td className="px-4 py-4 text-base">{category.medicinesCount}</td>
-                        <td className="px-4 py-4 text-base">
+                        <td className="px-4 py-4 font-medium whitespace-normal">{category.name}</td>
+                        <td className="px-4 py-4 text-muted-foreground whitespace-normal">{toSlug(category.name)}</td>
+                        <td className="px-4 py-4">{category.medicinesCount}</td>
+                        <td className="px-4 py-4">
                           {isActive ? (
                             <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Active</Badge>
                           ) : (

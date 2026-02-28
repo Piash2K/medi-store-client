@@ -109,14 +109,14 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
 
                     return (
                       <tr key={medicineId} className="border-b last:border-0">
-                        <td className="px-4 py-4 text-base font-medium">{medicine.name}</td>
-                        <td className="px-4 py-4 text-base text-muted-foreground">
+                        <td className="px-4 py-4 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-40">{medicine.name}</td>
+                        <td className="px-4 py-4 text-base text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis max-w-40">
                           {medicine.seller?.name || medicine.seller?.email || "N/A"}
                         </td>
                         <td className="px-4 py-4">
                           <Badge variant="secondary">{medicine.category?.name || "Uncategorized"}</Badge>
                         </td>
-                        <td className="px-4 py-4 text-base">{`BDT ${Number(medicine.price || 0).toFixed(2)}`}</td>
+                        <td className="px-4 py-4 text-base whitespace-nowrap overflow-hidden text-ellipsis max-w-32">{`BDT ${Number(medicine.price || 0).toFixed(2)}`}</td>
                         <td className="px-4 py-4 text-base">{stock}</td>
                         <td className="px-4 py-4">
                           {isInStock ? (
