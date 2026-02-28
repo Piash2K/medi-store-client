@@ -197,23 +197,23 @@ export default async function DashboardPage() {
     .slice(0, 5);
 
   return (
-    <section className="space-y-6 p-1">
+    <section className="space-y-5 p-1 sm:space-y-6">
       <div className="space-y-2">
         <Link href="/" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
           <ArrowLeft className="h-4 w-4" />
           Back to Store
         </Link>
-        <h1 className="text-3xl font-semibold tracking-tight">Admin Dashboard</h1>
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Admin Dashboard</h1>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold">{users.length}</p>
+            <p className="text-3xl font-semibold sm:text-4xl">{users.length}</p>
             <p className="mt-1 text-sm text-primary">{formatDelta(userDelta)} this month</p>
           </CardContent>
         </Card>
@@ -224,7 +224,7 @@ export default async function DashboardPage() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold">{orders.length}</p>
+            <p className="text-3xl font-semibold sm:text-4xl">{orders.length}</p>
             <p className="mt-1 text-sm text-primary">{formatDelta(orderDelta)} this month</p>
           </CardContent>
         </Card>
@@ -235,7 +235,7 @@ export default async function DashboardPage() {
             <Pill className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold">{activeMedicines.length}</p>
+            <p className="text-3xl font-semibold sm:text-4xl">{activeMedicines.length}</p>
             <p className="mt-1 text-sm text-primary">{formatDelta(medicineDelta)} this month</p>
           </CardContent>
         </Card>
@@ -246,13 +246,13 @@ export default async function DashboardPage() {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold">BDT {currencyFormatter.format(totalRevenue)}</p>
+            <p className="text-2xl font-semibold sm:text-3xl xl:text-4xl">BDT {currencyFormatter.format(totalRevenue)}</p>
             <p className="mt-1 text-sm text-primary">{formatRevenueDelta(revenueDelta)} this month</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Customer</CardTitle>
@@ -294,35 +294,35 @@ export default async function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Recent Users</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl">Recent Users</CardTitle>
         </CardHeader>
         <CardContent>
           {recentUsers.length === 0 ? (
             <p className="text-sm text-muted-foreground">No users found.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
+              <table className="min-w-170 w-full border-collapse text-left">
                 <thead>
                   <tr className="border-b">
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Name</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Email</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Role</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Status</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Joined</th>
+                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Name</th>
+                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Email</th>
+                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Role</th>
+                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Status</th>
+                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Joined</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentUsers.map((user, index) => (
                     <tr key={`${user.id || user.email || "user"}-${index}`} className="border-b last:border-0">
-                      <td className="px-3 py-3 font-medium">{getDisplayName(user)}</td>
-                      <td className="px-3 py-3 text-muted-foreground">{user.email || "N/A"}</td>
+                      <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:text-base">{getDisplayName(user)}</td>
+                      <td className="px-3 py-3 text-sm text-muted-foreground whitespace-nowrap sm:text-base">{user.email || "N/A"}</td>
                       <td className="px-3 py-3">
                         <Badge variant="secondary">{normalizeText(user.role)}</Badge>
                       </td>
                       <td className="px-3 py-3">
                         <Badge variant={getStatusVariant(user.status)}>{normalizeText(user.status)}</Badge>
                       </td>
-                      <td className="px-3 py-3 text-muted-foreground">{formatDate(user.createdAt)}</td>
+                      <td className="px-3 py-3 text-sm text-muted-foreground whitespace-nowrap sm:text-base">{formatDate(user.createdAt)}</td>
                     </tr>
                   ))}
                 </tbody>
