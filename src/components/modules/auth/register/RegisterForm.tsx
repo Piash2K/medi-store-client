@@ -52,11 +52,7 @@ export default function RegisterForm() {
       const result = await registerUser(payload);
 
       if (!result?.success) {
-        await Swal.fire({
-          icon: "error",
-          title: "Registration failed",
-          text: result?.message || "Please try again.",
-        });
+        toast.error(result?.message || "Registration failed. Please try again.");
         return;
       }
 
