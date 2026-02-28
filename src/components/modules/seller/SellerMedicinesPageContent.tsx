@@ -325,20 +325,20 @@ export default function SellerMedicinesPageContent({
 
                     return (
                       <tr key={medicineId} className="border-b last:border-0">
-                        <td className="px-4 py-4 text-base font-medium">{medicine.name}</td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-4 text-base font-medium whitespace-nowrap max-w-40 truncate">{medicine.name}</td>
+                        <td className="px-4 py-4 whitespace-nowrap max-w-32 truncate">
                           <Badge variant="secondary">{medicine.category?.name || "Uncategorized"}</Badge>
                         </td>
-                        <td className="px-4 py-4 text-base">{`BDT ${Number(medicine.price || 0).toFixed(2)}`}</td>
-                        <td className="px-4 py-4 text-base">{stock}</td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-4 text-base whitespace-nowrap">{`BDT ${Number(medicine.price || 0).toFixed(2)}`}</td>
+                        <td className="px-4 py-4 text-base whitespace-nowrap">{stock}</td>
+                        <td className="px-4 py-4 whitespace-nowrap">
                           {isInStock ? (
                             <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Active</Badge>
                           ) : (
                             <Badge variant="destructive">Out of Stock</Badge>
                           )}
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-4 whitespace-nowrap">
                           <div className="flex justify-end gap-1">
                             <Button
                               variant="ghost"

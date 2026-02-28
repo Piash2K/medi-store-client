@@ -228,15 +228,11 @@ export default async function DashboardPage() {
                 <tbody>
                   {recentOrders.map((order, index) => (
                     <tr key={order.id} className={index === recentOrders.length - 1 ? "" : "border-b"}>
-                      <td className="px-3 py-3 text-base font-medium">{getOrderCode(index)}</td>
-                      <td className="px-3 py-3 text-base">{getCustomerName(order)}</td>
-                      <td className="px-3 py-3 text-base">{getOrderItemsLabel(order)}</td>
-                      <td className="px-3 py-3 text-base font-medium">
-                        BDT {currencyFormatter.format(order.totalAmount)}
-                      </td>
-                      <td className="px-3 py-3">
-                        <Badge variant={getStatusVariant(order.status)}>{order.status}</Badge>
-                      </td>
+                      <td className="px-3 py-3 text-base font-medium whitespace-nowrap">{getOrderCode(index)}</td>
+                      <td className="px-3 py-3 text-base whitespace-nowrap max-w-40 truncate">{getCustomerName(order)}</td>
+                      <td className="px-3 py-3 text-base max-w-56 truncate whitespace-nowrap md:whitespace-normal md:max-w-xs">{getOrderItemsLabel(order)}</td>
+                      <td className="px-3 py-3 text-base font-medium whitespace-nowrap">BDT {currencyFormatter.format(order.totalAmount)}</td>
+                      <td className="px-3 py-3 whitespace-nowrap"><Badge variant={getStatusVariant(order.status)}>{order.status}</Badge></td>
                     </tr>
                   ))}
                 </tbody>

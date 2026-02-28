@@ -17,7 +17,7 @@ import { getMedicineReviews } from "@/services/review";
 import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
 
 const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 9;
+const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
 
 export default function ShopPageContent() {
@@ -474,40 +474,40 @@ export default function ShopPageContent() {
                         </div>
                       </Link>
 
-                      <div className="space-y-1.5 p-4">
-                        <Link
-                          href={`/shop/${getMedicinePathId(medicine)}`}
-                          className="block space-y-1.5"
-                          aria-label={`Open ${medicine.name} details`}
-                        >
-                          <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
-                            {medicine.category?.name || "General"}
-                          </span>
-                          <h2 className="text-xl leading-tight font-semibold tracking-tight sm:text-2xl">
-                            {medicine.name}
-                          </h2>
-                          <p className="text-sm text-muted-foreground">
-                            by {medicine.manufacturer || "Unknown manufacturer"}
-                          </p>
+                        <div className="space-y-1.5 p-4">
+                          <Link
+                            href={`/shop/${getMedicinePathId(medicine)}`}
+                            className="block space-y-1.5"
+                            aria-label={`Open ${medicine.name} details`}
+                          >
+                            <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
+                              {medicine.category?.name || "General"}
+                            </span>
+                            <h2 className="text-xl leading-tight font-semibold tracking-tight sm:text-2xl">
+                              {medicine.name}
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                              by {medicine.manufacturer || "Unknown manufacturer"}
+                            </p>
+                            <div className="flex items-center justify-between mt-1">
+                              <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                                <span>{averageRating.toFixed(1)}</span>
+                                <span>({totalReviewsForMedicine})</span>
+                              </div>
+                              <span className="text-xs sm:text-sm ml-2">
+                                {isInStock ? (
+                                  <span className="text-primary">In stock ({medicine.stock})</span>
+                                ) : (
+                                  <span className="text-destructive font-medium">Stock out</span>
+                                )}
+                              </span>
+                            </div>
+                          </Link>
 
-                          <p className="text-sm">
-                            {isInStock ? (
-                              <span className="text-primary">In stock ({medicine.stock})</span>
-                            ) : (
-                              <span className="text-destructive font-medium">Stock out</span>
-                            )}
-                          </p>
-
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                            <span>{averageRating.toFixed(1)}</span>
-                            <span>({totalReviewsForMedicine})</span>
-                          </div>
-                        </Link>
-
-                        <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="text-xl font-semibold sm:text-2xl">BDT {medicine.price}</p>
-                          <div className="flex w-full items-center gap-2 sm:w-auto">
+                          <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-base font-semibold sm:text-lg">BDT {medicine.price}</p>
+                            <div className="flex w-full items-center gap-2 sm:w-auto">
                             <Button
                               type="button"
                               size="sm"

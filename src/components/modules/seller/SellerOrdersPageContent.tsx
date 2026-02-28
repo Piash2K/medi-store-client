@@ -92,6 +92,15 @@ const getItemsSummary = (order: Order) => {
   return `${itemNames[0]}, ...`;
 };
 
+// Allowed transitions for seller
+const allowedSellerTransitions: Record<OrderStatus, OrderStatus[]> = {
+  PLACED: ["PROCESSING"],
+  PROCESSING: ["SHIPPED"],
+  SHIPPED: ["DELIVERED"],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
 export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersPageContentProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
@@ -107,8 +116,20 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
 
   const handleStatusChange = async (order: Order, nextStatus: string) => {
     const normalizedStatus = nextStatus.toUpperCase() as OrderStatus;
+    const currentStatus = (order.status?.toUpperCase() || "PLACED") as OrderStatus;
 
-    if (order.status?.toUpperCase() === normalizedStatus) {
+    if (currentStatus === normalizedStatus) {
+      return;
+    }
+
+    // Only allow valid transitions for seller
+    const allowed = allowedSellerTransitions[currentStatus] || [];
+    if (!allowed.includes(normalizedStatus)) {
+      await Swal.fire({
+        icon: "error",
+        title: "Invalid status transition",
+        text: `You cannot change status from ${currentStatus} to ${normalizedStatus}.`,
+      });
       return;
     }
 
@@ -199,9 +220,9 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
                     return (
                       <tr key={order.id} className={index === filteredOrders.length - 1 ? "" : "border-b"}>
                         <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">ORD-{String(index + 1).padStart(3, "0")}</td>
-                        <td className="px-3 py-3 text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">{getCustomerName(order)}</td>
+                        <td className="px-3 py-3 text-sm whitespace-nowrap max-w-40 truncate sm:px-4 sm:py-4 sm:text-base">{getCustomerName(order)}</td>
                         <td className="px-3 py-3 text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">{formatDate(order.createdAt)}</td>
-                        <td className="max-w-60 truncate px-3 py-3 text-sm sm:px-4 sm:py-4 sm:text-base">{getItemsSummary(order)}</td>
+                        <td className="max-w-60 truncate px-3 py-3 text-sm whitespace-nowrap md:whitespace-normal md:max-w-xs sm:px-4 sm:py-4 sm:text-base">{getItemsSummary(order)}</td>
                         <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">BDT {currencyFormatter.format(order.totalAmount)}</td>
                         <td className="px-3 py-3 whitespace-nowrap sm:px-4 sm:py-4">
                           <Badge className={getStatusBadgeClassName(statusValue)}>{formatStatusLabel(statusValue)}</Badge>
