@@ -89,7 +89,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
       setErrorMessage("");
       setIsLoadingReviews(true);
 
-      const result = await getMedicineById(medicineId);
+      const result = await getMedicineById(medicineId, { noStore: true });
 
       if (!result.success || !result.data) {
         setErrorMessage(result.message || "Medicine not found.");

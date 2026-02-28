@@ -153,7 +153,7 @@ export default async function DashboardPage() {
   return (
     <section className="space-y-5 p-1">
       <div className="space-y-2">
-        <Link href="/" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
+        <Link href="/shop" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
           <ArrowLeft className="h-4 w-4" />
           Back to Store
         </Link>

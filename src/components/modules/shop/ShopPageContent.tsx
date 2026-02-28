@@ -61,7 +61,7 @@ export default function ShopPageContent() {
       inStock: inStockOnly ? true : false,
       page,
       limit: DEFAULT_LIMIT,
-    });
+    }, { noStore: true });
 
     if (!result.success) {
       setErrorMessage(result.message || "Failed to load medicines");
@@ -116,7 +116,7 @@ export default function ShopPageContent() {
       inStock: false,
       page: 1,
       limit: STATS_LIMIT,
-    });
+    }, { noStore: true });
 
     if (!firstPage.success) {
       setCategoryCounts(new Map());
@@ -137,7 +137,7 @@ export default function ShopPageContent() {
             inStock: false,
             page: currentPage,
             limit: STATS_LIMIT,
-          }),
+          }, { noStore: true }),
         );
       }
 
