@@ -177,16 +177,16 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
 
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-175 w-full border-collapse text-left text-sm sm:text-base">
               <thead>
                 <tr className="border-b">
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Order ID</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Customer</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Seller</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Date</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Total</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Status</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Order ID</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Customer</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Seller</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Date</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Total</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Status</th>
                 </tr>
               </thead>
 
@@ -203,12 +203,12 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
 
                     return (
                       <tr key={order.id} className={index === filteredOrders.length - 1 ? "" : "border-b"}>
-                        <td className="px-4 py-4 text-base font-medium">ORD-{String(index + 1).padStart(3, "0")}</td>
-                        <td className="px-4 py-4 text-base">{getCustomerText(order)}</td>
-                        <td className="px-4 py-4 text-base text-muted-foreground">{getSellerText(order)}</td>
-                        <td className="px-4 py-4 text-base text-muted-foreground">{formatDate(order.createdAt)}</td>
-                        <td className="px-4 py-4 text-base font-medium">BDT {currencyFormatter.format(order.totalAmount || 0)}</td>
-                        <td className="px-4 py-4 text-base">
+                        <td className="px-4 py-4 font-medium break-all max-w-32">ORD-{String(index + 1).padStart(3, "0")}</td>
+                        <td className="px-4 py-4 break-all max-w-40">{getCustomerText(order)}</td>
+                        <td className="px-4 py-4 text-muted-foreground break-all max-w-40">{getSellerText(order)}</td>
+                        <td className="px-4 py-4 text-muted-foreground">{formatDate(order.createdAt)}</td>
+                        <td className="px-4 py-4 font-medium">BDT {currencyFormatter.format(order.totalAmount || 0)}</td>
+                        <td className="px-4 py-4">
                           <Badge className={statusMeta[normalizedStatus].className}>{statusMeta[normalizedStatus].label}</Badge>
                         </td>
                       </tr>
