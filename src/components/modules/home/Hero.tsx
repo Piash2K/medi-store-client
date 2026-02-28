@@ -55,7 +55,7 @@ export default function Hero() {
 	return (
 		<section className="w-full">
 			<div className="relative w-full overflow-hidden">
-				<div className="relative h-[calc(100vh-4rem)] min-h-[560px] w-full">
+				<div className="relative h-[calc(100vh-4rem)] min-h-115 w-full sm:min-h-130 lg:min-h-140">
 					<Image
 						src={activeSlide.image}
 						alt={activeSlide.title}
@@ -63,26 +63,26 @@ export default function Hero() {
 						priority
 						className="object-cover"
 					/>
-					<div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20" />
+					<div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/45 to-black/20" />
 
-					<div className="absolute inset-0 flex items-center px-6 sm:px-10 lg:px-16">
+					<div className="absolute inset-0 flex items-center px-4 sm:px-8 lg:px-16">
 						<div className="max-w-2xl text-left text-white">
-							<p className="mb-3 inline-block rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-medium tracking-wide uppercase">
+							<p className="mb-3 inline-block rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[10px] font-medium tracking-wide uppercase sm:text-xs">
 								Trusted Care Platform
 							</p>
-							<h1 className="text-3xl leading-tight font-bold tracking-tight sm:text-5xl lg:text-6xl">
+							<h1 className="text-2xl leading-tight font-bold tracking-tight sm:text-4xl lg:text-6xl">
 							{activeSlide.title}
 							</h1>
-							<p className="mt-4 max-w-xl text-base text-white/90 sm:text-lg">
+							<p className="mt-3 max-w-xl text-sm text-white/90 sm:mt-4 sm:text-lg">
 								{activeSlide.description}
 							</p>
-							<div className="mt-7 flex flex-wrap items-center gap-3">
-								<Link href="/shop" className={buttonVariants({ size: "lg" })}>
+							<div className="mt-6 flex flex-col gap-2 sm:mt-7 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+								<Link href="/shop" className={`${buttonVariants({ size: "lg" })} w-full sm:w-auto`}>
 									Shop Medicines
 								</Link>
 								<Link
 									href="/register"
-									className={`${buttonVariants({ variant: "outline", size: "lg" })} border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white`}
+									className={`${buttonVariants({ variant: "outline", size: "lg" })} w-full border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white sm:w-auto`}
 								>
 									Create Account
 								</Link>
@@ -93,7 +93,7 @@ export default function Hero() {
 					<button
 						type="button"
 						onClick={prevSlide}
-						className="absolute left-5 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-sm transition hover:bg-black/55"
+						className="absolute left-2 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-sm transition hover:bg-black/55 sm:inline-flex sm:h-10 sm:w-10 lg:left-5"
 						aria-label="Previous slide"
 					>
 						<ChevronLeft className="h-5 w-5" />
@@ -101,14 +101,14 @@ export default function Hero() {
 					<button
 						type="button"
 						onClick={nextSlide}
-						className="absolute right-5 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-sm transition hover:bg-black/55"
+						className="absolute right-2 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/40 text-white backdrop-blur-sm transition hover:bg-black/55 sm:inline-flex sm:h-10 sm:w-10 lg:right-5"
 						aria-label="Next slide"
 					>
 						<ChevronRight className="h-5 w-5" />
 					</button>
 				</div>
 
-				<div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2">
+				<div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 sm:bottom-5">
 					{slides.map((slide, index) => (
 						<button
 							key={slide.title}

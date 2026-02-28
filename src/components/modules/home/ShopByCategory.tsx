@@ -72,14 +72,16 @@ export default async function ShopByCategory() {
   }
 
   return (
-    <section className="bg-muted/40 px-6 py-16 sm:px-10 lg:px-16">
+    <section className="bg-muted/40 px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
       <div className="mx-auto max-w-7xl">
         <div className="text-center">
-          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">Shop by Category</h2>
-          <p className="text-muted-foreground mt-3 text-lg">Find the right medicine for your needs</p>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Shop by Category</h2>
+          <p className="text-muted-foreground mt-3 text-sm sm:text-base lg:text-lg">
+            Find the right medicine for your needs
+          </p>
         </div>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3">
           {homeCategories.map((category, index) => {
             const Icon = getCategoryIcon(category.name);
 
@@ -87,13 +89,13 @@ export default async function ShopByCategory() {
               <Link
                 key={getCategoryKey(category, index)}
                 href={`/shop?category=${encodeURIComponent(category.name)}`}
-                className="group rounded-2xl border bg-card p-6 text-center transition hover:border-primary/40 hover:shadow-sm"
+                className="group rounded-2xl border bg-card p-5 text-center transition hover:border-primary/40 hover:shadow-sm sm:p-6"
               >
                 <div className="bg-primary/10 text-primary mx-auto flex h-14 w-14 items-center justify-center rounded-full">
                   <Icon className="h-7 w-7" />
                 </div>
-                <h3 className="mt-5 text-2xl font-semibold tracking-tight">{category.name}</h3>
-                <p className="text-muted-foreground mt-2 text-base leading-6">
+                <h3 className="mt-4 text-xl font-semibold tracking-tight sm:mt-5 sm:text-2xl">{category.name}</h3>
+                <p className="text-muted-foreground mt-2 text-sm leading-6 sm:text-base">
                   {getCategoryDescription(category.name)}
                 </p>
               </Link>
