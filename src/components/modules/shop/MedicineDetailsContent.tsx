@@ -228,7 +228,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
 
   if (isLoading) {
     return (
-      <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="flex h-60 items-center justify-center">
           <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
@@ -238,7 +238,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
 
   if (errorMessage || !medicine) {
     return (
-      <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <Link href="/shop" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
           <ArrowLeft className="h-4 w-4" />
           Back to Shop
@@ -289,14 +289,14 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   };
 
   return (
-    <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+    <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <Link href="/shop" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
         <ArrowLeft className="h-4 w-4" />
         Back to Shop
       </Link>
 
-      <div className="mt-5 grid items-start gap-6 lg:grid-cols-[1fr_1fr]">
-        <div className="bg-muted/60 relative flex min-h-130 items-center justify-center rounded-2xl border">
+      <div className="mt-5 grid items-start gap-6 lg:grid-cols-2">
+        <div className="bg-muted/60 relative flex min-h-80 items-center justify-center rounded-2xl border sm:min-h-96 lg:min-h-130">
           <div className="bg-primary/15 text-primary flex h-18 w-18 items-center justify-center rounded-full">
             <Package className="h-9 w-9" />
           </div>
@@ -307,7 +307,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
             {medicine.category?.name || "General"}
           </span>
 
-          <h1 className="mt-3 text-4xl font-bold tracking-tight">{medicine.name}</h1>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">{medicine.name}</h1>
           <p className="text-muted-foreground mt-1 text-base">by {medicine.manufacturer || "Unknown"}</p>
 
           <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
@@ -320,7 +320,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           </div>
 
           <div className="mt-3 flex items-baseline gap-2">
-            <p className="text-4xl font-semibold">{formatPrice(medicine.price)}</p>
+            <p className="text-2xl font-semibold sm:text-3xl lg:text-4xl">{formatPrice(medicine.price)}</p>
           </div>
 
           <p className="text-muted-foreground mt-4 border-b pb-4 text-base leading-relaxed">
@@ -334,7 +334,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
               : "Out of stock"}
           </p>
 
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <div className="flex items-center rounded-md border">
               <button
                 type="button"
@@ -355,7 +355,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
 
             <Button
               type="button"
-              className="h-10 min-w-55"
+              className="h-10 w-full sm:min-w-55 sm:w-auto"
               disabled={!isInStock || isAlreadyInCart}
               onClick={async () => {
                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -377,7 +377,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
             <Button
               type="button"
               variant="outline"
-              className="h-10 min-w-35"
+              className="h-10 w-full sm:min-w-35 sm:w-auto"
               disabled={!isInStock || !medicineCheckoutId}
               onClick={async () => {
                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -417,14 +417,14 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         </div>
       </div>
 
-      <div className="mt-8 rounded-2xl border bg-card p-6">
+      <div className="mt-8 rounded-2xl border bg-card p-4 sm:p-6">
         <h2 className="text-lg font-semibold">Details</h2>
         <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
           {medicine.description || "No additional details available."}
         </p>
       </div>
 
-      <div className="mt-6 rounded-2xl border bg-card p-6">
+      <div className="mt-6 rounded-2xl border bg-card p-4 sm:p-6">
         <h2 className="text-lg font-semibold">Customer Reviews</h2>
 
         <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
@@ -443,7 +443,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           <div className="mt-4 space-y-3">
             {reviews.map((review) => (
               <article key={review.id} className="rounded-xl border p-4">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                   <p className="text-sm font-semibold">{review.customer?.name || "Customer"}</p>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1">
@@ -460,7 +460,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         )}
       </div>
 
-      <div id="review-section" className="mt-6 rounded-2xl border bg-card p-6">
+      <div id="review-section" className="mt-6 rounded-2xl border bg-card p-4 sm:p-6">
         <h2 className="text-lg font-semibold">Leave a Review</h2>
         <p className="text-muted-foreground mt-2 text-sm">{reviewStatusMessage}</p>
 
@@ -493,7 +493,12 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           </div>
 
           <div className="flex justify-end">
-            <Button type="button" onClick={handleSubmitReview} disabled={!canReview || isSubmittingReview}>
+            <Button
+              type="button"
+              className="w-full sm:w-auto"
+              onClick={handleSubmitReview}
+              disabled={!canReview || isSubmittingReview}
+            >
               {isSubmittingReview ? "Submitting..." : "Submit Review"}
             </Button>
           </div>
