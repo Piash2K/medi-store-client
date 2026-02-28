@@ -148,11 +148,11 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
   };
 
   return (
-    <section className="space-y-6 p-1">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Manage Orders</h1>
+    <section className="space-y-5 p-1 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Manage Orders</h1>
 
-        <div className="ml-auto w-48">
+        <div className="w-full sm:ml-auto sm:w-48">
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="All Orders" />
@@ -172,16 +172,16 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+            <table className="min-w-190 w-full border-collapse text-left">
               <thead>
                 <tr className="border-b">
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Order ID</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Customer</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Date</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Items</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Total</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="px-4 py-4 text-right text-sm font-medium text-muted-foreground">Actions</th>
+                  <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Order ID</th>
+                  <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Customer</th>
+                  <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Date</th>
+                  <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Items</th>
+                  <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Total</th>
+                  <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Status</th>
+                  <th className="px-3 py-3 text-right text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -198,24 +198,24 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
 
                     return (
                       <tr key={order.id} className={index === filteredOrders.length - 1 ? "" : "border-b"}>
-                        <td className="px-4 py-4 text-base font-medium">ORD-{String(index + 1).padStart(3, "0")}</td>
-                        <td className="px-4 py-4 text-base">{getCustomerName(order)}</td>
-                        <td className="px-4 py-4 text-base">{formatDate(order.createdAt)}</td>
-                        <td className="max-w-60 truncate px-4 py-4 text-base">{getItemsSummary(order)}</td>
-                        <td className="px-4 py-4 text-base font-medium">BDT {currencyFormatter.format(order.totalAmount)}</td>
-                        <td className="px-4 py-4">
+                        <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">ORD-{String(index + 1).padStart(3, "0")}</td>
+                        <td className="px-3 py-3 text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">{getCustomerName(order)}</td>
+                        <td className="px-3 py-3 text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">{formatDate(order.createdAt)}</td>
+                        <td className="max-w-60 truncate px-3 py-3 text-sm sm:px-4 sm:py-4 sm:text-base">{getItemsSummary(order)}</td>
+                        <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">BDT {currencyFormatter.format(order.totalAmount)}</td>
+                        <td className="px-3 py-3 whitespace-nowrap sm:px-4 sm:py-4">
                           <Badge className={getStatusBadgeClassName(statusValue)}>{formatStatusLabel(statusValue)}</Badge>
                         </td>
-                        <td className="px-4 py-4 text-right">
+                        <td className="px-3 py-3 text-right sm:px-4 sm:py-4">
                           <Select
                             value={statusValue}
                             onValueChange={(nextStatus) => handleStatusChange(order, nextStatus)}
                             disabled={isUpdating}
                           >
-                            <SelectTrigger className="ml-auto w-37.5">
+                            <SelectTrigger className="ml-auto h-8 w-28 text-xs sm:h-9 sm:w-37.5 sm:text-sm">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent align="end">
+                            <SelectContent align="end" position="popper">
                               {statusOptions.map((option) => (
                                 <SelectItem key={option.value} value={option.value}>
                                   {option.label}
