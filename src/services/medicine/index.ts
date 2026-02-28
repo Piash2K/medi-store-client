@@ -7,7 +7,7 @@ import {
 import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const PUBLIC_DATA_REVALIDATE_SECONDS = 300;
+const PUBLIC_DATA_REVALIDATE_SECONDS = 20;
 const loggedWarnings = new Set<string>();
 
 type PublicFetchOptions = {

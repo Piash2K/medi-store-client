@@ -3,7 +3,7 @@ import FeaturedMedicines from "@/components/modules/home/FeaturedMedicines";
 import ShopByCategory from "@/components/modules/home/ShopByCategory";
 import WhyChooseMediStore from "@/components/modules/home/WhyChooseMediStore";
 
-export const revalidate = 300;
+export const revalidate = 20;
 
 export default function Home() {
   return (

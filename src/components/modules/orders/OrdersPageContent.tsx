@@ -58,37 +58,37 @@ export default async function OrdersPageContent() {
         <div className="mt-8 space-y-4">
           {orders.map((order) => (
             <article key={order.id} className="rounded-2xl border bg-card p-5">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
+              <div className="flex flex-col sm:flex-row flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-muted-foreground">Order ID</p>
-                  <p className="mt-1 text-sm font-semibold">{order.id}</p>
+                  <p className="mt-1 text-sm font-semibold max-w-xs sm:max-w-md truncate break-all" title={order.id}>{order.id}</p>
 
                   <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 whitespace-nowrap">
                       <CalendarDays className="h-4 w-4" />
                       {formatDate(order.createdAt)}
                     </span>
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 whitespace-nowrap">
                       <Package className="h-4 w-4" />
                       {order.items.length} item(s)
                     </span>
                   </div>
                 </div>
 
-                <div className="text-right">
+                <div className="sm:text-right mt-4 sm:mt-0 min-w-40">
                   <p className="text-xs font-medium text-muted-foreground">Status</p>
-                  <span className="bg-primary/10 text-primary mt-1 inline-flex rounded-full px-3 py-1 text-xs font-semibold">
+                  <span className="bg-primary/10 text-primary mt-1 inline-flex rounded-full px-3 py-1 text-xs font-semibold max-w-full truncate">
                     {order.status}
                   </span>
                   <p className="mt-3 text-sm text-muted-foreground">Total</p>
-                  <p className="text-xl font-semibold">BDT {currencyFormatter.format(order.totalAmount)}</p>
+                  <p className="text-xl font-semibold whitespace-nowrap">BDT {currencyFormatter.format(order.totalAmount)}</p>
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm text-muted-foreground">
-                    Payment: <span className="font-medium text-foreground">{order.paymentMethod}</span>
+              <div className="mt-4 flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3 border-t pt-4">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  <p className="text-sm text-muted-foreground truncate">
+                    Payment: <span className="font-medium text-foreground whitespace-nowrap">{order.paymentMethod}</span>
                   </p>
 
                   {isCustomerCancelableStatus(order.status) ? (
@@ -101,7 +101,7 @@ export default async function OrdersPageContent() {
 
                 <Link
                   href={`/orders/${order.id}`}
-                  className="text-primary inline-flex items-center gap-1 text-sm font-medium"
+                  className="text-primary inline-flex items-center gap-1 text-sm font-medium whitespace-nowrap"
                 >
                   View details
                   <ChevronRight className="h-4 w-4" />
