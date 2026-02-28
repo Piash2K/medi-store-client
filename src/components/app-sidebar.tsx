@@ -109,17 +109,21 @@ export function AppSidebar({ UserRole, ...props }: AppSidebarProps) {
     SELLER: sellerNavMain,
     CUSTOMER: customerNavMain,
   }
+  const panelLabelByRole: Record<AppSidebarProps["UserRole"], string> = {
+    ADMIN: "ADMIN PANEL",
+    SELLER: "SELLER PANEL",
+    CUSTOMER: "CUSTOMER PANEL",
+  }
 
   const navItems = navItemsByRole[UserRole]
+  const panelLabel = panelLabelByRole[UserRole]
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
-        {UserRole === "ADMIN" ? (
-          <div className="text-muted-foreground px-4 pb-2 pt-4 text-xs font-semibold tracking-wider">
-            ADMIN PANEL
-          </div>
-        ) : null}
+        <div className="text-muted-foreground px-4 pb-2 pt-4 text-xs font-semibold tracking-wider">
+          {panelLabel}
+        </div>
         <NavMain items={navItems} />
       </SidebarContent>
       <SidebarRail />
