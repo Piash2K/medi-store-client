@@ -25,7 +25,7 @@ const reasons = [
 
 export default function WhyChooseMediStore() {
   return (
-    <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
+    <section id="why-choose-medistore" className="px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl">
           <h2 className="text-2xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Why Choose MediStore</h2>

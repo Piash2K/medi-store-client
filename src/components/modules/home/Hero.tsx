@@ -81,10 +81,10 @@ export default function Hero() {
 									Shop Medicines
 								</Link>
 								<Link
-									href="/register"
+									href="#why-choose-medistore"
 									className={`${buttonVariants({ variant: "outline", size: "lg" })} w-full border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white sm:w-auto`}
 								>
-									Create Account
+									Learn More
 								</Link>
 							</div>
 						</div>
