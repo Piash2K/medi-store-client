@@ -17,7 +17,7 @@ import { getMedicineReviews } from "@/services/review";
 import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
 
 const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 8;
+const DEFAULT_LIMIT = 9;
 const STATS_LIMIT = 100;
 
 export default function ShopPageContent() {
@@ -286,13 +286,15 @@ export default function ShopPageContent() {
   }, []);
 
   return (
-    <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-      <h1 className="text-4xl font-bold tracking-tight">Shop All Medicines</h1>
-      <p className="mt-2 text-base text-muted-foreground">Browse our collection of quality OTC medicines</p>
+    <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">Shop All Medicines</h1>
+      <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+        Browse our collection of quality OTC medicines
+      </p>
 
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="sticky top-20 h-fit rounded-2xl border bg-card p-5">
-          <h2 className="text-2xl font-semibold">Filters</h2>
+      <div className="mt-6 grid items-start gap-6 lg:mt-8 lg:grid-cols-[260px_1fr]">
+        <aside className="h-fit rounded-2xl border bg-card p-4 sm:p-5 lg:sticky lg:top-20">
+          <h2 className="text-xl font-semibold sm:text-2xl">Filters</h2>
 
           <div className="mt-5 space-y-7">
             <div className="relative">
@@ -306,7 +308,7 @@ export default function ShopPageContent() {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold">Categories</h3>
+              <h3 className="text-lg font-semibold sm:text-xl">Categories</h3>
               <div className="mt-3 space-y-2.5">
                 {categories.map((item, index) => (
                   <label
@@ -333,7 +335,7 @@ export default function ShopPageContent() {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold">Price Range</h3>
+              <h3 className="text-lg font-semibold sm:text-xl">Price Range</h3>
               <div className="mt-4">
                 <input
                   type="range"
@@ -354,7 +356,7 @@ export default function ShopPageContent() {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold">Manufacturer</h3>
+              <h3 className="text-lg font-semibold sm:text-xl">Manufacturer</h3>
               <div className="mt-3 space-y-2.5">
                 {manufacturers.length > 0 ? (
                   manufacturers.map((item, index) => (
@@ -398,7 +400,7 @@ export default function ShopPageContent() {
               <span>In Stock Only</span>
             </label>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Button type="button" onClick={handleApplyFilters} className="flex-1">
                 Apply
               </Button>
@@ -410,14 +412,14 @@ export default function ShopPageContent() {
         </aside>
 
         <div className="flex min-w-0 flex-col">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <p className="text-lg text-muted-foreground">
+          <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+            <p className="text-sm text-muted-foreground sm:text-base lg:text-lg">
               {totalMedicines > 0 ? "Available medicines" : "No medicines found"}
             </p>
             <select
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value)}
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring h-9 rounded-md border px-3 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none sm:w-auto"
             >
               <option value="relevance">Sort by: Relevance</option>
               <option value="price-low-high">Sort by: Price Low to High</option>
@@ -439,7 +441,7 @@ export default function ShopPageContent() {
             )}
 
             {!isLoading && !errorMessage && sortedMedicines.length > 0 && (
-              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {sortedMedicines.map((medicine, index) => {
                   const medicineReviewId = medicine._id || medicine.id || "";
                   const medicineCheckoutId = getMedicineCheckoutId(medicine);
@@ -481,7 +483,7 @@ export default function ShopPageContent() {
                           <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
                             {medicine.category?.name || "General"}
                           </span>
-                          <h2 className="text-2xl leading-tight font-semibold tracking-tight">
+                          <h2 className="text-xl leading-tight font-semibold tracking-tight sm:text-2xl">
                             {medicine.name}
                           </h2>
                           <p className="text-sm text-muted-foreground">
@@ -503,14 +505,14 @@ export default function ShopPageContent() {
                           </div>
                         </Link>
 
-                        <div className="flex items-center justify-between pt-2">
-                          <p className="text-2xl font-semibold">BDT {medicine.price}</p>
-                          <div className="flex items-center gap-2">
+                        <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-xl font-semibold sm:text-2xl">BDT {medicine.price}</p>
+                          <div className="flex w-full items-center gap-2 sm:w-auto">
                             <Button
                               type="button"
                               size="sm"
                               variant="outline"
-                              className="h-8 px-3"
+                              className="h-8 flex-1 px-3 sm:flex-none"
                               disabled={!medicineCheckoutId || !isInStock}
                               onClick={async () => {
                                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -529,7 +531,7 @@ export default function ShopPageContent() {
                             <Button
                               type="button"
                               size="sm"
-                              className="h-8 px-4"
+                              className="h-8 flex-1 px-4 sm:flex-none"
                               disabled={isAlreadyInCart}
                               onClick={async () => {
                                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -562,15 +564,16 @@ export default function ShopPageContent() {
             )}
           </div>
 
-          <div className="mt-6 flex items-center justify-between rounded-xl border bg-card p-3">
-            <p className="px-2 text-sm text-muted-foreground">
+          <div className="mt-6 flex flex-col items-start justify-between gap-3 rounded-xl border bg-card p-3 sm:flex-row sm:items-center">
+            <p className="px-1 text-sm text-muted-foreground sm:px-2">
               Page {page} of {totalPage}
             </p>
 
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:w-auto">
             <Button
               type="button"
               variant="outline"
+              className="flex-1 sm:flex-none"
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={page <= 1}
             >
@@ -579,6 +582,7 @@ export default function ShopPageContent() {
             <Button
               type="button"
               variant="outline"
+              className="flex-1 sm:flex-none"
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPage))}
               disabled={page >= totalPage}
             >

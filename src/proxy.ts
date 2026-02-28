@@ -5,7 +5,7 @@ import { getUser } from "./services/auth";
 const ALLOWED_ROLES = ["ADMIN", "SELLER", "CUSTOMER"];
 const PUBLIC_ROUTES = ["/login", "/register", "/"];
 
-const CUSTOMER_ONLY_PREFIXES = ["/cart", "/checkout", "/orders", "/profile"];
+const CUSTOMER_ONLY_PREFIXES = ["/cart", "/checkout", "/orders"];
 const SELLER_ONLY_PREFIXES = ["/seller", "/medicines"];
 const ADMIN_ONLY_PREFIXES = ["/admin", "/users"];
 
