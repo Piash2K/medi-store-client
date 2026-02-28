@@ -180,8 +180,8 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
     <section className="space-y-6 p-1">
       <h1 className="text-3xl font-semibold tracking-tight">Manage Users</h1>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative w-full max-w-xl">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="relative w-full sm:max-w-xl">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             value={searchTerm}
@@ -205,17 +205,17 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
 
       <Card>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-175 w-full border-collapse text-left text-sm sm:text-base">
               <thead>
                 <tr className="border-b">
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Name</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Email</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Role</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Orders</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Joined</th>
-                  <th className="px-4 py-4 text-right text-sm font-medium text-muted-foreground">Actions</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Name</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Email</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Role</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Orders</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Status</th>
+                  <th className="px-4 py-4 font-medium text-muted-foreground">Joined</th>
+                  <th className="px-4 py-4 text-right font-medium text-muted-foreground">Actions</th>
                 </tr>
               </thead>
 
@@ -233,16 +233,16 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
 
                     return (
                       <tr key={user.id || user.email} className="border-b last:border-0">
-                        <td className="px-4 py-4 text-base font-medium">{getDisplayName(user)}</td>
-                        <td className="px-4 py-4 text-base text-muted-foreground">{user.email || "N/A"}</td>
+                        <td className="px-4 py-4 font-medium break-all max-w-40">{getDisplayName(user)}</td>
+                        <td className="px-4 py-4 text-muted-foreground break-all max-w-50">{user.email || "N/A"}</td>
                         <td className="px-4 py-4">
                           <Badge variant="secondary">{normalizeText(user.role)}</Badge>
                         </td>
-                        <td className="px-4 py-4 text-base">{user.ordersCount || 0}</td>
+                        <td className="px-4 py-4">{user.ordersCount || 0}</td>
                         <td className="px-4 py-4">
                           <Badge variant={getStatusVariant(user.status)}>{getStatusLabel(user.status)}</Badge>
                         </td>
-                        <td className="px-4 py-4 text-base text-muted-foreground">{formatDate(user.createdAt)}</td>
+                        <td className="px-4 py-4 text-muted-foreground">{formatDate(user.createdAt)}</td>
                         <td className="px-4 py-4 text-right">
                           <Button
                             variant="ghost"
@@ -254,12 +254,12 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
                             {isBanned ? (
                               <>
                                 <CheckCircle2 className="h-4 w-4" />
-                                Unban
+                                <span className="hidden xs:inline">Unban</span>
                               </>
                             ) : (
                               <>
                                 <Ban className="h-4 w-4" />
-                                Ban
+                                <span className="hidden xs:inline">Ban</span>
                               </>
                             )}
                           </Button>
