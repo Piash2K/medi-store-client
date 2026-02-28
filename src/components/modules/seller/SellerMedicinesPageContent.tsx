@@ -373,11 +373,11 @@ export default function SellerMedicinesPageContent({
       </Card>
 
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-xl">
-            <CardContent className="space-y-5 pt-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
+          <Card className="max-h-[90vh] w-full max-w-xl overflow-y-auto">
+            <CardContent className="space-y-4 pt-5 sm:space-y-5 sm:pt-6">
               <div>
-                <h2 className="text-2xl font-semibold">Add Medicine</h2>
+                <h2 className="text-xl font-semibold sm:text-2xl">Add Medicine</h2>
                 <p className="text-muted-foreground mt-1 text-sm">Fill out the fields to add a new medicine.</p>
               </div>
 
@@ -441,11 +441,22 @@ export default function SellerMedicinesPageContent({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={handleCloseAddModal} disabled={isSaving}>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={handleCloseAddModal}
+                  disabled={isSaving}
+                >
                   Cancel
                 </Button>
-                <Button type="button" onClick={handleCreateMedicine} disabled={isSaving}>
+                <Button
+                  type="button"
+                  className="w-full sm:w-auto"
+                  onClick={handleCreateMedicine}
+                  disabled={isSaving}
+                >
                   {isSaving ? "Saving..." : "Add Medicine"}
                 </Button>
               </div>
@@ -455,11 +466,11 @@ export default function SellerMedicinesPageContent({
       )}
 
       {editingMedicine && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-xl">
-            <CardContent className="space-y-5 pt-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
+          <Card className="max-h-[90vh] w-full max-w-xl overflow-y-auto">
+            <CardContent className="space-y-4 pt-5 sm:space-y-5 sm:pt-6">
               <div>
-                <h2 className="text-2xl font-semibold">Update Medicine</h2>
+                <h2 className="text-xl font-semibold sm:text-2xl">Update Medicine</h2>
                 <p className="text-muted-foreground mt-1 text-sm">Edit medicine information and save changes.</p>
               </div>
 
@@ -507,11 +518,22 @@ export default function SellerMedicinesPageContent({
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={handleCancelEdit} disabled={isSaving}>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                >
                   Cancel
                 </Button>
-                <Button type="button" onClick={handleSaveEdit} disabled={isSaving}>
+                <Button
+                  type="button"
+                  className="w-full sm:w-auto"
+                  onClick={handleSaveEdit}
+                  disabled={isSaving}
+                >
                   {isSaving ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
