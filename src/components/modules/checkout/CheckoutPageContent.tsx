@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PaymentMethodSelector from "@/components/modules/checkout/PaymentMethodSelector";
 import { useCart } from "@/providers/cart-provider";
 import { getUser } from "@/services/auth";
 import { getMedicineById } from "@/services/medicine";
@@ -40,6 +41,7 @@ export default function CheckoutPageContent() {
   const [checkoutError, setCheckoutError] = React.useState("");
   const [buyNowItem, setBuyNowItem] = React.useState<CheckoutItem | null>(null);
   const [isLoadingBuyNow, setIsLoadingBuyNow] = React.useState(false);
+  const [paymentMethod, setPaymentMethod] = React.useState<"COD" | "SSLCOMMERZ">("COD");
 
   const buyNowMedicineId = searchParams.get("buyNow")?.trim() || "";
   const selectedCartItemIds = searchParams
@@ -174,16 +176,20 @@ export default function CheckoutPageContent() {
     const successMessage = result.message || "Order created successfully.";
     setCheckoutMessage(successMessage);
     toast.success(successMessage);
-    if (!isBuyNowMode) {
-      if (isSelectedCartMode) {
-        checkoutItems.forEach((item) => {
-          removeItem(item.id);
-        });
-      } else {
-        clearCart();
+
+    if (paymentMethod === "COD") {
+      if (!isBuyNowMode) {
+        if (isSelectedCartMode) {
+          checkoutItems.forEach((item) => {
+            removeItem(item.id);
+          });
+        } else {
+          clearCart();
+        }
       }
+      router.push("/orders");
     }
-    router.push("/orders");
+    // Note: SSLCommerz payment is handled separately by PaymentMethodSelector
   };
 
   if (isBuyNowMode && isLoadingBuyNow) {
@@ -223,24 +229,72 @@ export default function CheckoutPageContent() {
       <h1 className="text-4xl font-bold tracking-tight">Checkout</h1>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="rounded-2xl border bg-card p-6">
-          <h2 className="text-2xl font-semibold tracking-tight">Shipping Information</h2>
+        <div className="space-y-6">
+          {/* Shipping Information */}
+          <div className="rounded-2xl border bg-card p-6">
+            <h2 className="text-2xl font-semibold tracking-tight">Shipping Information</h2>
 
-          <div className="mt-5 space-y-2">
-            <p className="text-sm font-medium">Shipping Address</p>
-            <Input
-              value={shippingAddress}
-              onChange={(event) => setShippingAddress(event.target.value)}
-              placeholder="Piash Islam, 123 Main St, City, Country"
+            <div className="mt-5 space-y-2">
+              <p className="text-sm font-medium">Shipping Address</p>
+              <Input
+                value={shippingAddress}
+                onChange={(event) => setShippingAddress(event.target.value)}
+                placeholder="Piash Islam, 123 Main St, City, Country"
+              />
+            </div>
+          </div>
+
+          {/* Payment Method Selection */}
+          <div className="rounded-2xl border bg-card p-6">
+            <PaymentMethodSelector
+              isLoading={isPlacingOrder}
+              subtotal={subtotal}
+              shipping={shipping}
+              total={total}
+              shippingAddress={shippingAddress}
+              items={checkoutItems.map((item) => ({
+                medicineId: item.id,
+                quantity: item.quantity,
+                price: item.price,
+              }))}
+              onPaymentMethodChange={(method) => setPaymentMethod(method)}
             />
           </div>
 
-          <div className="mt-6 flex items-center justify-between border-t pt-4 text-sm text-muted-foreground">
-            <span>Payment Method</span>
-            <span className="font-medium text-foreground">Cash on Delivery (COD)</span>
-          </div>
+          {/* COD Place Order Button */}
+          {paymentMethod === "COD" && (
+            <div className="rounded-2xl border bg-card p-6">
+              {checkoutError && (
+                <p className="text-destructive mb-2 rounded-lg bg-destructive/10 p-3 text-sm">
+                  {checkoutError}
+                </p>
+              )}
+              {checkoutMessage && (
+                <p className="text-primary mb-2 rounded-lg bg-primary/10 p-3 text-sm">
+                  {checkoutMessage}
+                </p>
+              )}
+              <Button
+                className="h-11 w-full text-base"
+                onClick={handlePlaceOrder}
+                disabled={isPlacingOrder || (isBuyNowMode && !buyNowItem)}
+              >
+                {isPlacingOrder ? "Placing Order..." : "Place Order with COD"}
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="mt-3 h-11 w-full text-base"
+              >
+                <Link href={isBuyNowMode ? "/shop" : "/cart"}>
+                  {isBuyNowMode ? "Back to Shop" : "Back to Cart"}
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
 
+        {/* Order Summary Sidebar */}
         <aside className="h-fit rounded-2xl border bg-card p-6">
           <h2 className="text-2xl font-semibold tracking-tight">Order Summary</h2>
 
@@ -252,7 +306,7 @@ export default function CheckoutPageContent() {
                   <p className="text-muted-foreground">Qty: {item.quantity}</p>
                 </div>
                 <p className="font-medium text-foreground">
-                  BDT {currencyFormatter.format(item.price * item.quantity)}
+                  ৳{currencyFormatter.format(item.price * item.quantity)}
                 </p>
               </div>
             ))}
@@ -261,11 +315,13 @@ export default function CheckoutPageContent() {
           <div className="mt-5 space-y-2 text-lg">
             <div className="flex items-center justify-between text-muted-foreground">
               <span>Subtotal ({itemsCount} items)</span>
-              <span className="text-foreground">BDT {currencyFormatter.format(subtotal)}</span>
+              <span className="text-foreground">৳{currencyFormatter.format(subtotal)}</span>
             </div>
             <div className="flex items-center justify-between text-muted-foreground">
               <span>Shipping</span>
-              <span className="text-foreground">BDT {currencyFormatter.format(shipping)}</span>
+              <span className="text-foreground">
+                {shipping === 0 ? "FREE" : `৳${currencyFormatter.format(shipping)}`}
+              </span>
             </div>
           </div>
 
@@ -273,22 +329,8 @@ export default function CheckoutPageContent() {
 
           <div className="flex items-center justify-between">
             <span className="text-2xl font-semibold">Total</span>
-            <span className="text-3xl font-bold">BDT {currencyFormatter.format(total)}</span>
+            <span className="text-3xl font-bold">৳{currencyFormatter.format(total)}</span>
           </div>
-
-          {checkoutError && <p className="text-destructive mt-3 text-sm">{checkoutError}</p>}
-          {checkoutMessage && <p className="text-primary mt-3 text-sm">{checkoutMessage}</p>}
-
-          <Button
-            className="mt-6 h-11 w-full text-base"
-            onClick={handlePlaceOrder}
-            disabled={isPlacingOrder || (isBuyNowMode && !buyNowItem)}
-          >
-            {isPlacingOrder ? "Placing Order..." : "Place Order"}
-          </Button>
-          <Button asChild variant="outline" className="mt-3 h-11 w-full text-base">
-            <Link href={isBuyNowMode ? "/shop" : "/cart"}>{isBuyNowMode ? "Back to Shop" : "Back to Cart"}</Link>
-          </Button>
         </aside>
       </div>
     </section>

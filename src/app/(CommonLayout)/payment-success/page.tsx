@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { getPaymentStatus } from "@/services/payment";
-import { getUser } from "@/services/auth";
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
@@ -34,14 +33,7 @@ export default function PaymentSuccessPage() {
       }
 
       try {
-        const user = (await getUser()) as Record<string, unknown> | null;
-        if (!user || typeof user.token !== "string") {
-          setVerificationError("Authentication required. Please login and try again.");
-          setIsVerifying(false);
-          return;
-        }
-
-        const result = await getPaymentStatus(orderId, user.token as string);
+        const result = await getPaymentStatus(orderId);
 
         if (!result.success || !result.data) {
           setVerificationError(

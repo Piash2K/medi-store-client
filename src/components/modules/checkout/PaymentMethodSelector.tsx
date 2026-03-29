@@ -19,7 +19,6 @@ export type PaymentMethodSelectorProps = {
     quantity: number;
     price: number;
   }[];
-  token: string;
   onPaymentMethodChange?: (method: "COD" | "SSLCOMMERZ") => void;
 };
 
@@ -32,7 +31,6 @@ export default function PaymentMethodSelector({
   total,
   shippingAddress,
   items,
-  token,
   onPaymentMethodChange,
 }: PaymentMethodSelectorProps) {
   const [selectedMethod, setSelectedMethod] = React.useState<PaymentMethod>("COD");
@@ -62,8 +60,7 @@ export default function PaymentMethodSelector({
           shippingAddress: shippingAddress.trim(),
           paymentMethod: "SSLCOMMERZ",
           items,
-        },
-        token
+        }
       );
 
       if (!result.success || !result.data?.gatewayPageURL) {
@@ -95,7 +92,7 @@ export default function PaymentMethodSelector({
 
       <div className="space-y-3">
         {/* COD Option */}
-        <label className="flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+        <label className="has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all hover:bg-muted/50">
           <input
             type="radio"
             name="paymentMethod"
@@ -114,7 +111,7 @@ export default function PaymentMethodSelector({
         </label>
 
         {/* SSLCommerz Option */}
-        <label className="flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all hover:bg-muted/50 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+        <label className="has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all hover:bg-muted/50">
           <input
             type="radio"
             name="paymentMethod"

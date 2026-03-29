@@ -1,8 +1,14 @@
-"use client";
+"use server";
 
+import { cookies } from "next/headers";
 import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const getToken = async () => {
+  const storeCookie = await cookies();
+  return storeCookie.get("token")?.value;
+};
 
 export type InitializePaymentPayload = {
   shippingAddress: string;
@@ -85,10 +91,18 @@ export type AdminPaymentListResponse = {
  * Initialize SSLCommerz payment session
  */
 export const initializeSSLCommerzPayment = async (
-  payload: InitializePaymentPayload,
-  token: string
+  payload: InitializePaymentPayload
 ): Promise<InitializePaymentResponse> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const response = await fetch(`${API_URL}/orders/sslcommerz/init`, {
       method: "POST",
       headers: {
@@ -120,10 +134,18 @@ export const initializeSSLCommerzPayment = async (
  * Get payment status for an order
  */
 export const getPaymentStatus = async (
-  orderId: string,
-  token: string
+  orderId: string
 ): Promise<PaymentStatusResponse> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const response = await fetch(`${API_URL}/orders/${orderId}`, {
       method: "GET",
       headers: {
@@ -155,10 +177,18 @@ export const getPaymentStatus = async (
  */
 export const requestRefund = async (
   orderId: string,
-  payload: RefundRequestPayload,
-  token: string
+  payload: RefundRequestPayload
 ): Promise<RefundResponse> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const response = await fetch(`${API_URL}/orders/${orderId}/refund`, {
       method: "POST",
       headers: {
@@ -190,10 +220,18 @@ export const requestRefund = async (
  * Get refund status for an order
  */
 export const getRefundStatus = async (
-  orderId: string,
-  token: string
+  orderId: string
 ): Promise<PaymentStatusResponse> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const response = await fetch(`${API_URL}/orders/${orderId}/refund-status`, {
       method: "GET",
       headers: {
@@ -224,11 +262,19 @@ export const getRefundStatus = async (
  * Get admin payment statistics
  */
 export const getAdminPaymentStatistics = async (
-  token: string,
   startDate?: string,
   endDate?: string
 ): Promise<{ success: boolean; data?: AdminPaymentStatistics; message?: string }> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const params = new URLSearchParams();
     if (startDate) params.append("startDate", startDate);
     if (endDate) params.append("endDate", endDate);
@@ -266,7 +312,6 @@ export const getAdminPaymentStatistics = async (
  * Get admin payment transactions with filters
  */
 export const getAdminPaymentTransactions = async (
-  token: string,
   filters?: {
     page?: number;
     limit?: number;
@@ -279,6 +324,15 @@ export const getAdminPaymentTransactions = async (
   }
 ): Promise<AdminPaymentListResponse> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const params = new URLSearchParams();
     if (filters?.page) params.append("page", filters.page.toString());
     if (filters?.limit) params.append("limit", filters.limit.toString());
@@ -322,11 +376,19 @@ export const getAdminPaymentTransactions = async (
  * Get admin failed transactions
  */
 export const getAdminFailedTransactions = async (
-  token: string,
   page?: number,
   limit?: number
 ): Promise<AdminPaymentListResponse> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const params = new URLSearchParams();
     if (page) params.append("page", page.toString());
     if (limit) params.append("limit", limit.toString());
@@ -364,11 +426,19 @@ export const getAdminFailedTransactions = async (
  * Get admin refunded transactions
  */
 export const getAdminRefundedTransactions = async (
-  token: string,
   page?: number,
   limit?: number
 ): Promise<AdminPaymentListResponse> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const params = new URLSearchParams();
     if (page) params.append("page", page.toString());
     if (limit) params.append("limit", limit.toString());
@@ -406,10 +476,18 @@ export const getAdminRefundedTransactions = async (
  * Get transaction details
  */
 export const getTransactionDetails = async (
-  orderId: string,
-  token: string
+  orderId: string
 ): Promise<{ success: boolean; data?: AdminPaymentTransaction; message?: string }> => {
   try {
+    const token = await getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized. Please login first.",
+      };
+    }
+
     const response = await fetch(`${API_URL}/admin/payments/${orderId}`, {
       method: "GET",
       headers: {
