@@ -9,6 +9,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/payment/success",
+        destination: "/payment-success",
+      },
+      {
+        source: "/payment/fail",
+        destination: "/payment-failed",
+      },
+      {
+        source: "/payment/failed",
+        destination: "/payment-failed",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
