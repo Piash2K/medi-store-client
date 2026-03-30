@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import * as React from "react";
 import { Minus, Package, Plus, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
@@ -189,8 +190,18 @@ export default function CartPageContent() {
                     className="accent-primary"
                   />
 
-                  <div className="bg-muted flex h-14 w-14 shrink-0 items-center justify-center rounded-xl sm:h-18 sm:w-18">
-                    <Package className="text-muted-foreground h-8 w-8" />
+                  <div className="bg-muted relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-18 sm:w-18">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        sizes="72px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <Package className="text-muted-foreground h-8 w-8" />
+                    )}
                   </div>
 
                   <div className="min-w-0">

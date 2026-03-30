@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import * as React from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
@@ -468,9 +469,19 @@ export default function ShopPageContent() {
                               Out of Stock
                             </span>
                           )}
-                          <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
-                            <ShoppingCart className="h-8 w-8" />
-                          </div>
+                          {medicine.image ? (
+                            <Image
+                              src={medicine.image}
+                              alt={medicine.name}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 33vw"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
+                              <ShoppingCart className="h-8 w-8" />
+                            </div>
+                          )}
                         </div>
                       </Link>
 
@@ -546,6 +557,7 @@ export default function ShopPageContent() {
                                   price: medicine.price,
                                   manufacturer: medicine.manufacturer,
                                   category: medicine.category?.name,
+                                  image: medicine.image,
                                 });
 
                                 toast.success(`${medicine.name} added to cart`);

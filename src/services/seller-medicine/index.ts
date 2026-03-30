@@ -13,6 +13,7 @@ export type UpdateSellerMedicinePayload = {
   manufacturer?: string;
   description?: string;
   categoryId?: string;
+  image?: File;
 };
 
 export type CreateSellerMedicinePayload = {
@@ -22,6 +23,7 @@ export type CreateSellerMedicinePayload = {
   manufacturer?: string;
   description?: string;
   categoryId?: string;
+  image?: File;
 };
 
 export type CreateSellerMedicineResponse = {
@@ -47,6 +49,24 @@ const getToken = async () => {
   return storeCookie.get("token")?.value;
 };
 
+const buildMedicineFormData = (
+  payload: CreateSellerMedicinePayload | UpdateSellerMedicinePayload,
+) => {
+  const { image, ...data } = payload;
+  const formData = new FormData();
+
+  formData.append("name", data.name);
+  formData.append("price", String(data.price));
+  formData.append("stock", String(data.stock));
+  if (data.manufacturer) formData.append("manufacturer", data.manufacturer);
+  if (data.description) formData.append("description", data.description);
+  if (data.categoryId) formData.append("categoryId", data.categoryId);
+
+  if (image) formData.append("image", image);
+
+  return formData;
+};
+
 export const createSellerMedicine = async (
   payload: CreateSellerMedicinePayload,
 ): Promise<CreateSellerMedicineResponse> => {
@@ -60,13 +80,14 @@ export const createSellerMedicine = async (
       };
     }
 
+    const formData = buildMedicineFormData(payload);
+
     const response = await fetch(`${API_URL}/seller/medicines`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(payload),
+      body: formData,
       cache: "no-store",
     });
 
@@ -101,13 +122,14 @@ export const updateSellerMedicine = async (
       };
     }
 
+    const formData = buildMedicineFormData(payload);
+
     const response = await fetch(`${API_URL}/seller/medicines/${medicineId}`, {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(payload),
+      body: formData,
       cache: "no-store",
     });
 

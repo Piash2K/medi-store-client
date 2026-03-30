@@ -51,6 +51,9 @@ export default function SellerMedicinesPageContent({
   const [newManufacturer, setNewManufacturer] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newCategoryId, setNewCategoryId] = useState("");
+  const [newImage, setNewImage] = useState<File | null>(null);
+  const [editImage, setEditImage] = useState<File | null>(null);
+  const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
 
   const filteredMedicines = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -76,6 +79,8 @@ export default function SellerMedicinesPageContent({
     setEditStock(String(medicine.stock ?? 0));
     setEditManufacturer(medicine.manufacturer || "");
     setEditDescription(medicine.description || "");
+    setEditImage(null);
+    setEditImagePreview(null);
   };
 
   const handleOpenAddModal = () => {
@@ -85,6 +90,7 @@ export default function SellerMedicinesPageContent({
     setNewManufacturer("");
     setNewDescription("");
     setNewCategoryId("");
+    setNewImage(null);
     setIsAddModalOpen(true);
   };
 
@@ -93,6 +99,32 @@ export default function SellerMedicinesPageContent({
       return;
     }
     setIsAddModalOpen(false);
+  };
+
+  const handleNewImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setNewImage(file);
+      return;
+    }
+
+    setNewImage(null);
+  };
+
+  const handleEditImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setEditImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    setEditImage(null);
+    setEditImagePreview(null);
   };
 
   const handleCreateMedicine = async () => {
@@ -117,6 +149,7 @@ export default function SellerMedicinesPageContent({
       manufacturer: newManufacturer.trim() || undefined,
       description: newDescription.trim() || undefined,
       categoryId: newCategoryId,
+      image: newImage || undefined,
     });
 
     setIsSaving(false);
@@ -154,6 +187,8 @@ export default function SellerMedicinesPageContent({
     setEditStock("");
     setEditManufacturer("");
     setEditDescription("");
+    setEditImage(null);
+    setEditImagePreview(null);
   };
 
   const handleSaveEdit = async () => {
@@ -195,6 +230,7 @@ export default function SellerMedicinesPageContent({
         editingMedicine.categoryId ||
         editingMedicine.category?.id ||
         editingMedicine.category?._id,
+      image: editImage || undefined,
     });
 
     setIsSaving(false);
@@ -439,6 +475,17 @@ export default function SellerMedicinesPageContent({
                     onChange={(event) => setNewDescription(event.target.value)}
                   />
                 </div>
+
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-sm font-medium">Image</label>
+                  <input
+                    accept="image/*"
+                    className="border-input file:bg-muted file:text-foreground w-full cursor-pointer rounded-md border bg-transparent text-sm file:mr-3 file:cursor-pointer file:rounded-sm file:border-0 file:px-3 file:py-2"
+                    onChange={handleNewImageChange}
+                    type="file"
+                  />
+                  <p className="text-xs text-muted-foreground">JPG, PNG, GIF max 5MB</p>
+                </div>
               </div>
 
               <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
@@ -515,6 +562,27 @@ export default function SellerMedicinesPageContent({
                     value={editDescription}
                     onChange={(event) => setEditDescription(event.target.value)}
                   />
+                </div>
+
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-sm font-medium">Image</label>
+                  {editImagePreview && (
+                    <div className="mb-2 h-32 w-32 overflow-hidden rounded-lg border">
+                      <img alt="Preview" className="h-full w-full object-cover" src={editImagePreview} />
+                    </div>
+                  )}
+                  {editingMedicine?.image && !editImagePreview && (
+                    <div className="mb-2 h-32 w-32 overflow-hidden rounded-lg border">
+                      <img alt="Current" className="h-full w-full object-cover" src={editingMedicine.image} />
+                    </div>
+                  )}
+                  <input
+                    accept="image/*"
+                    className="border-input file:bg-muted file:text-foreground w-full cursor-pointer rounded-md border bg-transparent text-sm file:mr-3 file:cursor-pointer file:rounded-sm file:border-0 file:px-3 file:py-2"
+                    onChange={handleEditImageChange}
+                    type="file"
+                  />
+                  <p className="text-xs text-muted-foreground">JPG, PNG, GIF max 5MB (optional, leave empty to keep current image)</p>
                 </div>
               </div>
 

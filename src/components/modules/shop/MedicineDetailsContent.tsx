@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import * as React from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Package, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
 import Swal from "sweetalert2";
@@ -261,6 +262,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         price: medicine.price,
         manufacturer: medicine.manufacturer,
         category: medicine.category?.name,
+        image: medicine.image,
       });
     }
   };
@@ -297,9 +299,19 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
 
       <div className="mt-5 grid items-start gap-6 lg:grid-cols-2">
         <div className="bg-muted/60 relative flex min-h-80 items-center justify-center rounded-2xl border sm:min-h-96 lg:min-h-130">
-          <div className="bg-primary/15 text-primary flex h-18 w-18 items-center justify-center rounded-full">
-            <Package className="h-9 w-9" />
-          </div>
+          {medicine.image ? (
+            <Image
+              src={medicine.image}
+              alt={medicine.name}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="rounded-2xl object-cover"
+            />
+          ) : (
+            <div className="bg-primary/15 text-primary flex h-18 w-18 items-center justify-center rounded-full">
+              <Package className="h-9 w-9" />
+            </div>
+          )}
         </div>
 
         <div>
