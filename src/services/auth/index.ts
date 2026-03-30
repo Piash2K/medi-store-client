@@ -9,6 +9,7 @@ export type UserProfile = {
   id: string;
   name: string;
   email: string;
+  profileImage?: string | null;
   phone: string | null;
   address: string | null;
   role: string;
@@ -28,6 +29,12 @@ export type UpdateProfilePayload = {
   email: string;
   phone?: string | null;
   address?: string | null;
+};
+
+export type UpdateProfilePhotoResponse = {
+  success: boolean;
+  message?: string;
+  data: UserProfile | null;
 };
 
 export const loginUser = async (userData: FieldValues) => {
@@ -181,6 +188,70 @@ export const updateMyProfile = async (
     return {
       success: false,
       message: "Failed to update profile",
+      data: null,
+    };
+  }
+};
+
+export const updateMyProfilePhoto = async (
+  payload: FormData,
+): Promise<UpdateProfilePhotoResponse> => {
+  try {
+    const storeCookie = await cookies();
+    const token = storeCookie.get("token")?.value;
+
+    if (!token) {
+      return {
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      };
+    }
+
+    const attempts: Array<{ method: "PATCH" | "PUT"; path: string }> = [
+      { method: "PATCH", path: "/user/profile/photo" },
+      { method: "PUT", path: "/user/profile/photo" },
+      { method: "PATCH", path: "/user/profile" },
+      { method: "PUT", path: "/user/profile" },
+    ];
+
+    let message = "Failed to update profile photo";
+
+    for (const attempt of attempts) {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${attempt.path}`, {
+        method: attempt.method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: payload,
+        cache: "no-store",
+      });
+
+      const result = await response.json();
+
+      if (result?.success) {
+        return {
+          success: true,
+          message: result?.message,
+          data: result?.data ?? null,
+        };
+      }
+
+      message = result?.message || message;
+    }
+
+    return {
+      success: false,
+      message,
+      data: null,
+    };
+  } catch (error) {
+    if (!isDynamicServerUsageError(error)) {
+      console.error("Update profile photo error:", error);
+    }
+    return {
+      success: false,
+      message: "Failed to update profile photo",
       data: null,
     };
   }

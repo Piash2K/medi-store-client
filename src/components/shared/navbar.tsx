@@ -31,7 +31,7 @@ import {
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import { getUser, logOut } from "@/services/auth";
+import { getMyProfile, getUser, logOut } from "@/services/auth";
 import { useCart } from "@/providers/cart-provider";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 
@@ -143,7 +143,16 @@ export function Navbar() {
 
   useEffect(() => {
     const getCurrentUser = async () => {
-      const userData = await getUser();
+      const [userData, profileResult] = await Promise.all([getUser(), getMyProfile()]);
+
+      if (profileResult.success && profileResult.data) {
+        setUser({
+          ...(userData as Record<string, unknown> | null),
+          profileImage: profileResult.data.profileImage || "",
+        } as never);
+        return;
+      }
+
       setUser(userData);
     };
     getCurrentUser();
