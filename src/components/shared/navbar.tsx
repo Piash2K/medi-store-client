@@ -33,6 +33,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { getUser, logOut } from "@/services/auth";
 import { useCart } from "@/providers/cart-provider";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 interface MenuItem {
   title: string;
@@ -216,6 +217,7 @@ export function Navbar() {
               </Button>
             ) : null}
             <UserMenu user={user} onLogout={handleLogout} />
+            <ThemeToggle />
           </div>
         </nav>
 
@@ -240,6 +242,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-1">
             <UserMenu user={user} onLogout={handleLogout} />
+            <ThemeToggle />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="Open menu">

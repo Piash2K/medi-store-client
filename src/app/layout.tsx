@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from "react-toastify";
+import { ThemeProvider } from "@/providers/theme-provider";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
@@ -25,13 +26,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div>{children}</div>
-        <ToastContainer position="top-right" autoClose={2500} newestOnTop closeOnClick pauseOnHover theme="colored" />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div>{children}</div>
+          <ToastContainer position="top-right" autoClose={2500} newestOnTop closeOnClick pauseOnHover theme="colored" />
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+
