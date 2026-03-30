@@ -113,7 +113,7 @@ export default function RegisterForm() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_10%_18%,_#3b82f655,_transparent_34%),radial-gradient(circle_at_90%_16%,_#2563eb66,_transparent_30%),linear-gradient(140deg,#1d4ed8_0%,#1e40af_52%,#1d4ed8_100%)] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_10%_18%,#3b82f655,transparent_34%),radial-gradient(circle_at_90%_16%,#2563eb66,transparent_30%),linear-gradient(140deg,#1d4ed8_0%,#1e40af_52%,#1d4ed8_100%)] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[7%] top-[15%] h-12 w-12 rounded-full border border-white/30" />
         <div className="absolute left-[22%] top-[36%] h-6 w-6 rounded-full border border-white/35" />
