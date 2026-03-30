@@ -2,14 +2,16 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { registerUser } from "@/services/auth";
+
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
 type RegisterFormData = {
   name: string;
@@ -17,6 +19,7 @@ type RegisterFormData = {
   password: string;
   confirmPassword: string;
   role: "CUSTOMER" | "SELLER";
+  profileImage?: FileList;
 };
 
 export default function RegisterForm() {
@@ -31,6 +34,24 @@ export default function RegisterForm() {
     },
   });
 
+  const selectedProfileImage = useWatch({ control: form.control, name: "profileImage" });
+  const selectedImage = selectedProfileImage?.[0];
+  const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!selectedImage) {
+      setImagePreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(selectedImage);
+    setImagePreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [selectedImage]);
+
   const onSubmit = async (data: RegisterFormData) => {
     try {
       if (data.password !== data.confirmPassword) {
@@ -42,16 +63,50 @@ export default function RegisterForm() {
         return;
       }
 
-      const payload = {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        role: data.role,
-      };
+      const imageFile = data.profileImage?.[0];
+      if (imageFile) {
+        if (!imageFile.type.startsWith("image/")) {
+          await Swal.fire({
+            icon: "warning",
+            title: "Invalid image",
+            text: "Please upload a valid image file.",
+          });
+          return;
+        }
 
-      const result = await registerUser(payload);
+        if (imageFile.size > MAX_IMAGE_SIZE_BYTES) {
+          await Swal.fire({
+            icon: "warning",
+            title: "Image too large",
+            text: "Image size must be 5MB or less.",
+          });
+          return;
+        }
+      }
 
-      if (!result?.success) {
+      const payload = new FormData();
+      payload.append("name", data.name);
+      payload.append("email", data.email);
+      payload.append("password", data.password);
+      payload.append("role", data.role);
+
+      if (imageFile) {
+        payload.append("profileImage", imageFile);
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        method: "POST",
+        body: payload,
+      });
+
+      let result: { success?: boolean; message?: string } | null = null;
+      try {
+        result = (await response.json()) as { success?: boolean; message?: string };
+      } catch {
+        result = null;
+      }
+
+      if (!response.ok || !result?.success) {
         toast.error(result?.message || "Registration failed. Please try again.");
         return;
       }
@@ -212,6 +267,38 @@ export default function RegisterForm() {
                   <option value="CUSTOMER">Customer</option>
                   <option value="SELLER">Seller</option>
                 </select>
+              </div>
+            )}
+          />
+
+          <Controller
+            name="profileImage"
+            control={form.control}
+            render={({ field }) => (
+              <div className="space-y-2">
+                <label htmlFor="register-profile-image" className="text-sm font-medium">
+                  Profile image (optional)
+                </label>
+                <Input
+                  ref={field.ref}
+                  id="register-profile-image"
+                  type="file"
+                  accept="image/*"
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  onChange={(event) => field.onChange(event.target.files)}
+                />
+                <p className="text-xs text-muted-foreground">Accepted image files up to 5MB.</p>
+                {imagePreviewUrl ? (
+                  <Image
+                    src={imagePreviewUrl}
+                    alt="Selected profile preview"
+                    width={80}
+                    height={80}
+                    unoptimized
+                    className="h-20 w-20 rounded-full border object-cover"
+                  />
+                ) : null}
               </div>
             )}
           />

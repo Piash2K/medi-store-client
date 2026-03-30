@@ -59,14 +59,19 @@ export const loginUser = async (userData: FieldValues) => {
 
 export const registerUser = async (userData: FieldValues) => {
   try {
+    const isFormDataPayload = userData instanceof FormData;
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+        ...(isFormDataPayload
+          ? { body: userData }
+          : {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(userData),
+            }),
       },
     );
 
