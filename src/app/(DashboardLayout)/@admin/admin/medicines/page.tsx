@@ -31,6 +31,8 @@ export default async function AdminMedicinesPage() {
       ? fallbackMedicinesResult.data
       : [];
 
+  const activeMedicines = medicines.filter((medicine) => !medicine.isDeleted);
+
   return (
     <section className="space-y-6 p-1">
       <div className="space-y-2">
@@ -39,7 +41,7 @@ export default async function AdminMedicinesPage() {
           Back to Store
         </Link>
 
-        <AdminMedicinesPageContent initialMedicines={medicines} />
+        <AdminMedicinesPageContent initialMedicines={activeMedicines} />
       </div>
     </section>
   );

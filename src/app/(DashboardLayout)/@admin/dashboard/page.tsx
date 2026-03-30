@@ -172,7 +172,9 @@ export default async function DashboardPage() {
     isBetweenDates(getDateValue(order.createdAt), previousMonthStart, currentMonthStart),
   );
 
-  const activeMedicines = medicines.filter((medicine) => (medicine.stock ?? 0) > 0);
+  const activeMedicines = medicines.filter(
+    (medicine) => !medicine.isDeleted && (medicine.stock ?? 0) > 0,
+  );
   const currentMonthMedicines = activeMedicines.filter((medicine) =>
     isBetweenDates(getDateValue(medicine.createdAt), currentMonthStart),
   );

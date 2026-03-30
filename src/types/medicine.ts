@@ -6,6 +6,7 @@ export type Medicine = {
   description?: string;
   price: number;
   stock?: number;
+  isDeleted?: boolean;
   categoryId?: string;
   sellerId?: string;
   manufacturer?: string;

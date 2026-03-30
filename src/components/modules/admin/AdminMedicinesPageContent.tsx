@@ -23,6 +23,10 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
     const query = searchTerm.trim().toLowerCase();
 
     return medicines.filter((medicine) => {
+      if (medicine.isDeleted) {
+        return false;
+      }
+
       const stock = medicine.stock ?? 0;
       const matchesStock =
         stockFilter === "all" ||

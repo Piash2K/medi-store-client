@@ -38,6 +38,10 @@ export default async function AdminCategoriesPage() {
   const medicineCountByCategoryKey = new Map<string, number>();
 
   medicines.forEach((medicine) => {
+    if (medicine.isDeleted) {
+      return;
+    }
+
     const categoryKey =
       medicine.categoryId || medicine.category?.id || medicine.category?._id || medicine.category?.name || "";
 
