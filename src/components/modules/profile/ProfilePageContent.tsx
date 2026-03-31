@@ -224,7 +224,7 @@ export default function ProfilePageContent({
 
   return (
     <section className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-emerald-700">My Profile</h1>
 
       <div className="mt-5 grid items-start gap-5 lg:grid-cols-[300px_1fr]">
         <aside className="rounded-2xl border bg-card p-5">
@@ -256,9 +256,9 @@ export default function ProfilePageContent({
                 disabled={isUploadingImage}
               />
             </div>
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight">{profileState.name || "User"}</h2>
-            <p className="text-muted-foreground mt-1 text-sm">{profileState.email || "N/A"}</p>
-            <Badge className="mt-2">{role}</Badge>
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-emerald-700">{profileState.name || "User"}</h2>
+            <p className="text-teal-600 mt-1 text-sm font-medium">{profileState.email || "N/A"}</p>
+            <Badge className="mt-2 bg-emerald-600 text-white">{role}</Badge>
             {isUploadingImage ? (
               <p className="text-muted-foreground mt-2 text-xs">Uploading image...</p>
             ) : null}
@@ -299,19 +299,19 @@ export default function ProfilePageContent({
 
         <div className="space-y-5">
           <div className="rounded-2xl border bg-card p-5">
-            <h3 className="text-2xl font-semibold tracking-tight">Edit Profile</h3>
+            <h3 className="text-2xl font-bold tracking-tight text-emerald-700">Edit Profile</h3>
 
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Full Name</label>
+                <label className="text-sm font-semibold text-emerald-700">Full Name</label>
                 <Input value={name} onChange={(event) => setName(event.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Email</label>
-                <Input value={email} onChange={(event) => setEmail(event.target.value)} />
+                <label className="text-sm font-semibold text-emerald-700">Email</label>
+                <Input value={email} disabled className="bg-muted cursor-not-allowed" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">Phone</label>
+                <label className="text-sm font-semibold text-emerald-700">Phone</label>
                 <Input
                   value={phone}
                   placeholder="Phone number"
@@ -319,7 +319,7 @@ export default function ProfilePageContent({
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">City</label>
+                <label className="text-sm font-semibold text-emerald-700">City</label>
                 <Input
                   value={cityInput}
                   placeholder="City"
@@ -327,7 +327,7 @@ export default function ProfilePageContent({
                 />
               </div>
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-sm font-medium">Address</label>
+                <label className="text-sm font-semibold text-emerald-700">Address</label>
                 <Input
                   value={address}
                   placeholder="Address"
@@ -336,38 +336,8 @@ export default function ProfilePageContent({
               </div>
             </div>
 
-            <Button className="mt-4 text-sm" type="button" onClick={handleSaveChanges} disabled={isSaving}>
+            <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold" type="button" onClick={handleSaveChanges} disabled={isSaving}>
               {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-
-          <div className="rounded-2xl border bg-card p-5">
-            <h3 className="text-2xl font-semibold tracking-tight">Change Password</h3>
-
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <div className="space-y-1.5 md:col-span-2">
-                <label className="text-sm font-medium">Current Password</label>
-                <Input
-                  type="password"
-                  name="current-password-manual"
-                  placeholder="Enter your current password"
-                  autoComplete="off"
-                  data-lpignore="true"
-                  data-1p-ignore="true"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">New Password</label>
-                <Input type="password" placeholder="Enter your new password" autoComplete="new-password" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium">Confirm New Password</label>
-                <Input type="password" placeholder="Confirm your new password" autoComplete="new-password" />
-              </div>
-            </div>
-
-            <Button variant="outline" className="mt-4 text-sm" type="button">
-              Update Password
             </Button>
           </div>
         </div>
