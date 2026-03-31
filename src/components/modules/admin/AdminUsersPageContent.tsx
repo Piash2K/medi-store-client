@@ -177,22 +177,22 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
   };
 
   return (
-    <section className="space-y-6 p-1">
-      <h1 className="text-3xl font-semibold tracking-tight">Manage Users</h1>
+    <section className="space-y-6 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
+      <h1 className="text-3xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300">Manage Users</h1>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <div className="relative w-full sm:max-w-xl">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-600 dark:text-emerald-300" />
           <Input
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             placeholder="Search users..."
-            className="pl-9"
+            className="border-emerald-200/80 bg-emerald-50/60 pl-9 text-emerald-900 placeholder:text-emerald-700/70 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:placeholder:text-emerald-300/70"
           />
         </div>
 
         <Select value={roleFilter} onValueChange={(value) => setRoleFilter(value as RoleFilter)}>
-          <SelectTrigger className="w-full sm:w-40">
+          <SelectTrigger className="w-full border-emerald-200/80 bg-emerald-50/60 text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 sm:w-40">
             <SelectValue placeholder="All Roles" />
           </SelectTrigger>
           <SelectContent>
@@ -203,12 +203,12 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
         </Select>
       </div>
 
-      <Card>
+      <Card className="border border-border/70 bg-card shadow-sm">
         <CardContent className="p-0">
           <div className="w-full overflow-x-auto">
             <table className="min-w-175 w-full border-collapse text-left text-sm sm:text-base">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b bg-emerald-50/60 dark:bg-emerald-950/20">
                   <th className="px-4 py-4 font-medium text-muted-foreground">Name</th>
                   <th className="px-4 py-4 font-medium text-muted-foreground">Email</th>
                   <th className="px-4 py-4 font-medium text-muted-foreground">Role</th>
@@ -232,11 +232,11 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
                     const isUpdating = updatingUserId === user.id;
 
                     return (
-                      <tr key={user.id || user.email} className="border-b last:border-0">
+                      <tr key={user.id || user.email} className="border-b last:border-0 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10">
                         <td className="px-4 py-4 font-medium break-all max-w-40">{getDisplayName(user)}</td>
                         <td className="px-4 py-4 text-muted-foreground break-all max-w-50">{user.email || "N/A"}</td>
                         <td className="px-4 py-4">
-                          <Badge variant="secondary">{normalizeText(user.role)}</Badge>
+                          <Badge className="bg-slate-100 text-slate-800 hover:bg-slate-100 dark:bg-slate-500/25 dark:text-slate-200 dark:hover:bg-slate-500/25">{normalizeText(user.role)}</Badge>
                         </td>
                         <td className="px-4 py-4">{user.ordersCount || 0}</td>
                         <td className="px-4 py-4">
@@ -247,7 +247,11 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
                           <Button
                             variant="ghost"
                             size="sm"
-                            className={isBanned ? "text-emerald-600 hover:text-emerald-700" : "text-red-600 hover:text-red-700"}
+                            className={
+                              isBanned
+                                ? "text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-200"
+                                : "text-rose-700 hover:bg-rose-100 hover:text-rose-800 dark:text-rose-300 dark:hover:bg-rose-900/35 dark:hover:text-rose-200"
+                            }
                             onClick={() => handleToggleUserStatus(user)}
                             disabled={isUpdating || !user.id}
                           >
