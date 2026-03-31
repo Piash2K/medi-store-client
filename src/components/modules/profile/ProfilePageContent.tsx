@@ -284,15 +284,15 @@ export default function ProfilePageContent({
           <div className="my-4 border-t" />
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-muted rounded-xl p-4 text-center">
-              <ShoppingBag className="text-primary mx-auto h-5 w-5" />
-              <p className="mt-2 text-2xl font-semibold">{totalOrders}</p>
-              <p className="text-muted-foreground text-sm">Orders</p>
+            <div className="bg-linear-to-br from-emerald-500 to-emerald-600 rounded-xl p-4 text-center text-white shadow-md hover:shadow-lg transition-shadow">
+              <ShoppingBag className="text-white mx-auto h-5 w-5" />
+              <p className="mt-2 text-2xl font-bold">{totalOrders}</p>
+              <p className="text-emerald-100 text-sm font-medium">Orders</p>
             </div>
-            <div className="bg-muted rounded-xl p-4 text-center">
-              <PackageCheck className="text-primary mx-auto h-5 w-5" />
-              <p className="mt-2 text-2xl font-semibold">{deliveredOrders}</p>
-              <p className="text-muted-foreground text-sm">Delivered</p>
+            <div className="bg-linear-to-br from-teal-500 to-teal-600 rounded-xl p-4 text-center text-white shadow-md hover:shadow-lg transition-shadow">
+              <PackageCheck className="text-white mx-auto h-5 w-5" />
+              <p className="mt-2 text-2xl font-bold">{deliveredOrders}</p>
+              <p className="text-teal-100 text-sm font-medium">Delivered</p>
             </div>
           </div>
         </aside>
