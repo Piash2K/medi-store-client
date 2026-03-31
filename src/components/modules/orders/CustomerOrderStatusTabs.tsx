@@ -186,7 +186,7 @@ export default function CustomerOrderStatusTabs({
               )}
 
               {!isError && panelOrders.length === 0 && (
-                <div className="rounded-xl border-2 border-dashed border-emerald-200 bg-white p-4 text-center sm:p-6">
+                <div className="rounded-xl border-2 border-dashed border-emerald-200 bg-white p-4 text-center dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
                   <p className="font-medium text-emerald-800 dark:text-emerald-200">No orders found for this status</p>
                   <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">Try another tab or place a new order.</p>
                   <Button asChild size="sm" className="mt-4 bg-emerald-600 text-white hover:bg-emerald-700">
@@ -204,7 +204,7 @@ export default function CustomerOrderStatusTabs({
                       </CardHeader>
                       <CardContent className="space-y-2.5 sm:space-y-3">
                         <div className="flex flex-wrap items-start justify-between gap-2 text-sm sm:items-center sm:gap-3">
-                          <span className="inline-flex items-center gap-1 text-emerald-600">
+                          <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
                             <Package className="h-4 w-4" />
                             {order.items.length} item(s)
                           </span>

@@ -33,8 +33,8 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
 
   if (!result.success || !result.data) {
     return (
-      <section className="w-full bg-linear-to-b from-emerald-50/30 to-white px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800">
+      <section className="w-full bg-linear-to-b from-emerald-50/30 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200">
           <ArrowLeft className="h-4 w-4" />
           Back to Orders
         </Link>
@@ -50,21 +50,21 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
   const isDeliveredOrder = ["DELIVERED", "COMPLETED"].includes(order.status?.toUpperCase() || "");
 
   return (
-    <section className="w-full bg-linear-to-b from-emerald-50/30 to-white px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-      <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800">
+    <section className="w-full bg-linear-to-b from-emerald-50/30 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200">
         <ArrowLeft className="h-4 w-4" />
         Back to Orders
       </Link>
 
-      <div className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-6 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-emerald-700">Order Details</h1>
-            <p className="mt-1 text-sm text-emerald-600">Order ID: {order.id}</p>
+            <h1 className="text-3xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">Order Details</h1>
+            <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">Order ID: {order.id}</p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/45 dark:text-emerald-300">
               {order.status}
             </span>
             {isCustomerCancelableStatus(order.status) ? (
@@ -77,41 +77,41 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
         </div>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3">
-            <p className="text-xs text-emerald-600">Created At</p>
-            <p className="mt-1 text-sm font-medium text-emerald-900">{formatDate(order.createdAt)}</p>
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 dark:border-emerald-800/60 dark:bg-emerald-950/25">
+            <p className="text-xs text-emerald-600 dark:text-emerald-400">Created At</p>
+            <p className="mt-1 text-sm font-medium text-emerald-900 dark:text-emerald-200">{formatDate(order.createdAt)}</p>
           </div>
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3">
-            <p className="text-xs text-emerald-600">Payment Method</p>
-            <p className="mt-1 text-sm font-medium text-emerald-900">{order.paymentMethod}</p>
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 dark:border-emerald-800/60 dark:bg-emerald-950/25">
+            <p className="text-xs text-emerald-600 dark:text-emerald-400">Payment Method</p>
+            <p className="mt-1 text-sm font-medium text-emerald-900 dark:text-emerald-200">{order.paymentMethod}</p>
           </div>
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3">
-            <p className="text-xs text-emerald-600">Shipping Address</p>
-            <p className="mt-1 text-sm font-medium text-emerald-900">{order.shippingAddress}</p>
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 dark:border-emerald-800/60 dark:bg-emerald-950/25">
+            <p className="text-xs text-emerald-600 dark:text-emerald-400">Shipping Address</p>
+            <p className="mt-1 text-sm font-medium text-emerald-900 dark:text-emerald-200">{order.shippingAddress}</p>
           </div>
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3">
-            <p className="text-xs text-emerald-600">Total Amount</p>
-            <p className="mt-1 text-sm font-semibold text-emerald-700">BDT {currencyFormatter.format(order.totalAmount)}</p>
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 dark:border-emerald-800/60 dark:bg-emerald-950/25">
+            <p className="text-xs text-emerald-600 dark:text-emerald-400">Total Amount</p>
+            <p className="mt-1 text-sm font-semibold text-emerald-700 dark:text-emerald-300">BDT {currencyFormatter.format(order.totalAmount)}</p>
           </div>
         </div>
 
-        <div className="mt-6 rounded-xl border border-emerald-200 bg-white">
-          <div className="border-b border-emerald-100 p-4">
-            <h2 className="text-base font-semibold text-emerald-700">Ordered Medicines</h2>
+        <div className="mt-6 rounded-xl border border-emerald-200 bg-white dark:border-emerald-800/60 dark:bg-emerald-950/20">
+          <div className="border-b border-emerald-100 p-4 dark:border-emerald-800/60">
+            <h2 className="text-base font-semibold text-emerald-700 dark:text-emerald-300">Ordered Medicines</h2>
           </div>
 
-          <div className="divide-y divide-emerald-100">
+          <div className="divide-y divide-emerald-100 dark:divide-emerald-800/60">
             {order.items.map((item) => (
               <div key={item.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
                 <div>
-                  <p className="text-sm font-semibold text-emerald-900">{item.medicine?.name || "Medicine"}</p>
-                  <p className="text-xs text-emerald-600">
+                  <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">{item.medicine?.name || "Medicine"}</p>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
                     {item.medicine?.manufacturer || "Unknown manufacturer"}
                   </p>
                   {isDeliveredOrder && (item.medicineId || item.medicine?.id) ? (
                     <Link
                       href={`/shop/${item.medicineId || item.medicine?.id}?review=1#review-section`}
-                      className="mt-1 inline-flex text-xs font-medium text-emerald-700 hover:text-emerald-800"
+                      className="mt-1 inline-flex text-xs font-medium text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
                     >
                       Leave review now
                     </Link>
@@ -119,8 +119,8 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
                 </div>
 
                 <div className="text-right text-sm">
-                  <p className="text-emerald-600">Qty: {item.quantity}</p>
-                  <p className="font-semibold text-emerald-700">BDT {currencyFormatter.format(item.price * item.quantity)}</p>
+                  <p className="text-emerald-600 dark:text-emerald-400">Qty: {item.quantity}</p>
+                  <p className="font-semibold text-emerald-700 dark:text-emerald-300">BDT {currencyFormatter.format(item.price * item.quantity)}</p>
                 </div>
               </div>
             ))}
