@@ -60,18 +60,18 @@ const getStatusBadgeClassName = (status: string) => {
   const normalized = status.toUpperCase();
 
   if (normalized === "DELIVERED" || normalized === "SHIPPED") {
-    return "bg-emerald-600 text-white hover:bg-emerald-600";
+    return "bg-emerald-600 text-white hover:bg-emerald-600 dark:bg-emerald-500 dark:hover:bg-emerald-500";
   }
 
   if (normalized === "CANCELLED") {
-    return "bg-red-600 text-white hover:bg-red-600";
+    return "bg-rose-600 text-white hover:bg-rose-600 dark:bg-rose-500 dark:hover:bg-rose-500";
   }
 
   if (normalized === "PLACED") {
-    return "bg-muted text-foreground hover:bg-muted";
+    return "bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-500/25 dark:text-amber-200 dark:hover:bg-amber-500/25";
   }
 
-  return "bg-muted text-foreground hover:bg-muted";
+  return "bg-slate-100 text-slate-800 hover:bg-slate-100 dark:bg-slate-500/25 dark:text-slate-200 dark:hover:bg-slate-500/25";
 };
 
 const getCustomerName = (order: Order) => {
@@ -169,13 +169,13 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
   };
 
   return (
-    <section className="space-y-5 p-1 sm:space-y-6">
+    <section className="space-y-5 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10 sm:space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Manage Orders</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-3xl">Manage Orders</h1>
 
         <div className="w-full sm:ml-auto sm:w-48">
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full border-emerald-200/80 bg-emerald-50/60 text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100">
               <SelectValue placeholder="All Orders" />
             </SelectTrigger>
             <SelectContent align="end" position="popper">
@@ -190,12 +190,12 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
         </div>
       </div>
 
-      <Card>
+      <Card className="border border-border/70 bg-card shadow-sm">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="min-w-190 w-full border-collapse text-left">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b bg-emerald-50/60 dark:bg-emerald-950/20">
                   <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Order ID</th>
                   <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Customer</th>
                   <th className="px-3 py-3 text-xs font-medium whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-sm">Date</th>
@@ -218,11 +218,11 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
                     const isUpdating = updatingOrderId === order.id;
 
                     return (
-                      <tr key={order.id} className={index === filteredOrders.length - 1 ? "" : "border-b"}>
+                      <tr key={order.id} className={index === filteredOrders.length - 1 ? "hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10" : "border-b hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10"}>
                         <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">ORD-{String(index + 1).padStart(3, "0")}</td>
                         <td className="px-3 py-3 text-sm whitespace-nowrap max-w-40 truncate sm:px-4 sm:py-4 sm:text-base">{getCustomerName(order)}</td>
-                        <td className="px-3 py-3 text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">{formatDate(order.createdAt)}</td>
-                        <td className="max-w-60 truncate px-3 py-3 text-sm whitespace-nowrap md:whitespace-normal md:max-w-xs sm:px-4 sm:py-4 sm:text-base">{getItemsSummary(order)}</td>
+                        <td className="px-3 py-3 text-sm whitespace-nowrap text-muted-foreground sm:px-4 sm:py-4 sm:text-base">{formatDate(order.createdAt)}</td>
+                        <td className="max-w-60 truncate px-3 py-3 text-sm whitespace-nowrap text-muted-foreground md:whitespace-normal md:max-w-xs sm:px-4 sm:py-4 sm:text-base">{getItemsSummary(order)}</td>
                         <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">BDT {currencyFormatter.format(order.totalAmount)}</td>
                         <td className="px-3 py-3 whitespace-nowrap sm:px-4 sm:py-4">
                           <Badge className={getStatusBadgeClassName(statusValue)}>{formatStatusLabel(statusValue)}</Badge>
@@ -233,7 +233,7 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
                             onValueChange={(nextStatus) => handleStatusChange(order, nextStatus)}
                             disabled={isUpdating}
                           >
-                            <SelectTrigger className="ml-auto h-8 w-28 text-xs sm:h-9 sm:w-37.5 sm:text-sm">
+                            <SelectTrigger className="ml-auto h-8 w-28 border-emerald-200/80 bg-emerald-50/60 text-xs text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 sm:h-9 sm:w-37.5 sm:text-sm">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent align="end" position="popper">
