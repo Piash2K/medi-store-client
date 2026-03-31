@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getMedicineById } from "@/services/medicine";
 import { useCart } from "@/providers/cart-provider";
 
-const SHIPPING_COST = 120;
-const FREE_SHIPPING_THRESHOLD = 1000;
+const SHIPPING_COST = 60;
 
 const currencyFormatter = new Intl.NumberFormat("en-BD", {
   minimumFractionDigits: 2,
@@ -116,11 +115,9 @@ export default function CartPageContent() {
   const hasCheckoutStockIssue = hasSelectedOutOfStock || hasSelectedOverQuantity;
 
   const subtotal = selectedItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-  const shipping = selectedItems.length > 0 && !hasFreeShipping ? SHIPPING_COST : 0;
+  const shipping = selectedItems.length > 0 ? SHIPPING_COST : 0;
   const total = subtotal + shipping;
   const itemsCount = selectedItems.reduce((totalQty, item) => totalQty + item.quantity, 0);
-  const leftForFreeShipping = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
   const areAllItemsSelected = items.length > 0 && selectedItemIds.length === items.length;
 
@@ -280,11 +277,6 @@ export default function CartPageContent() {
                 <span>Shipping</span>
                 <span className="text-foreground">BDT {currencyFormatter.format(shipping)}</span>
               </div>
-              {!hasFreeShipping && (
-                <p className="text-primary text-sm">
-                  Add BDT {currencyFormatter.format(leftForFreeShipping)} more for free shipping
-                </p>
-              )}
             </div>
 
             <div className="my-5 border-t" />
