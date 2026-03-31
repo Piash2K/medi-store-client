@@ -29,9 +29,9 @@ export default async function OrdersPageContent() {
   const orders = result.success ? result.data : [];
 
   return (
-    <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-      <h1 className="text-4xl font-bold tracking-tight">Track Orders</h1>
-      <p className="text-muted-foreground mt-2 text-base">
+    <section className="w-full bg-linear-to-b from-emerald-50/30 to-white px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <h1 className="text-4xl font-bold tracking-tight text-emerald-700">Track Orders</h1>
+      <p className="mt-2 text-base text-emerald-600">
         Track your placed orders and view medicine details.
       </p>
 
@@ -42,12 +42,12 @@ export default async function OrdersPageContent() {
       )}
 
       {result.success && orders.length === 0 && (
-        <div className="mt-8 rounded-2xl border bg-card p-8 text-center">
-          <p className="text-lg font-medium">No orders found</p>
-          <p className="text-muted-foreground mt-1 text-sm">Place an order from shop to track it here.</p>
+        <div className="mt-8 rounded-2xl border-2 border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-8 text-center shadow-sm">
+          <p className="text-lg font-semibold text-emerald-800">No orders found</p>
+          <p className="mt-1 text-sm text-emerald-600">Place an order from shop to track it here.</p>
           <Link
             href="/shop"
-            className="bg-primary text-primary-foreground mt-4 inline-flex rounded-md px-4 py-2 text-sm font-medium"
+            className="mt-4 inline-flex rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
           >
             Browse Medicines
           </Link>
@@ -57,13 +57,13 @@ export default async function OrdersPageContent() {
       {orders.length > 0 && (
         <div className="mt-8 space-y-4">
           {orders.map((order) => (
-            <article key={order.id} className="rounded-2xl border bg-card p-5">
+            <article key={order.id} className="rounded-2xl border-2 border-emerald-200 bg-white p-5 shadow-sm transition hover:shadow-md">
               <div className="flex flex-col sm:flex-row flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-muted-foreground">Order ID</p>
-                  <p className="mt-1 text-sm font-semibold max-w-xs sm:max-w-md truncate break-all" title={order.id}>{order.id}</p>
+                  <p className="text-sm font-medium text-emerald-600">Order ID</p>
+                  <p className="mt-1 max-w-xs truncate break-all text-sm font-semibold text-emerald-900 sm:max-w-md" title={order.id}>{order.id}</p>
 
-                  <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                  <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-emerald-700">
                     <span className="inline-flex items-center gap-1 whitespace-nowrap">
                       <CalendarDays className="h-4 w-4" />
                       {formatDate(order.createdAt)}
@@ -75,20 +75,20 @@ export default async function OrdersPageContent() {
                   </div>
                 </div>
 
-                <div className="sm:text-right mt-4 sm:mt-0 min-w-40">
-                  <p className="text-xs font-medium text-muted-foreground">Status</p>
-                  <span className="bg-primary/10 text-primary mt-1 inline-flex rounded-full px-3 py-1 text-xs font-semibold max-w-full truncate">
+                <div className="mt-4 min-w-40 sm:mt-0 sm:text-right">
+                  <p className="text-xs font-medium text-emerald-600">Status</p>
+                  <span className="mt-1 inline-flex max-w-full truncate rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
                     {order.status}
                   </span>
-                  <p className="mt-3 text-sm text-muted-foreground">Total</p>
-                  <p className="text-xl font-semibold whitespace-nowrap">BDT {currencyFormatter.format(order.totalAmount)}</p>
+                  <p className="mt-3 text-sm text-emerald-600">Total</p>
+                  <p className="text-xl font-bold whitespace-nowrap text-emerald-700">BDT {currencyFormatter.format(order.totalAmount)}</p>
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3 border-t pt-4">
+              <div className="mt-4 flex flex-col sm:flex-row flex-wrap items-center justify-between gap-3 border-t border-emerald-100 pt-4">
                 <div className="flex flex-wrap items-center gap-2 min-w-0">
-                  <p className="text-sm text-muted-foreground truncate">
-                    Payment: <span className="font-medium text-foreground whitespace-nowrap">{order.paymentMethod}</span>
+                  <p className="text-sm text-emerald-700 truncate">
+                    Payment: <span className="font-medium text-emerald-900 whitespace-nowrap">{order.paymentMethod}</span>
                   </p>
 
                   {isCustomerCancelableStatus(order.status) ? (
@@ -101,7 +101,7 @@ export default async function OrdersPageContent() {
 
                 <Link
                   href={`/orders/${order.id}`}
-                  className="text-primary inline-flex items-center gap-1 text-sm font-medium whitespace-nowrap"
+                  className="inline-flex items-center gap-1 whitespace-nowrap text-sm font-medium text-emerald-700 hover:text-emerald-800"
                 >
                   View details
                   <ChevronRight className="h-4 w-4" />
