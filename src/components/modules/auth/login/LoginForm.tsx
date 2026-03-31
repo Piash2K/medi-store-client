@@ -55,7 +55,7 @@ export default function LoginForm() {
   };
 
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden bg-[radial-gradient(circle_at_10%_18%,#3b82f655,transparent_34%),radial-gradient(circle_at_90%_16%,#2563eb66,transparent_30%),linear-gradient(140deg,#1d4ed8_0%,#1e40af_52%,#1d4ed8_100%)] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <section className="relative flex min-h-screen items-center overflow-hidden bg-[radial-gradient(circle_at_10%_18%,#10b98155,transparent_34%),radial-gradient(circle_at_90%_16%,#14b8a666,transparent_30%),linear-gradient(140deg,#047857_0%,#065f46_52%,#0f766e_100%)] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[7%] top-[15%] h-12 w-12 rounded-full border border-white/30" />
         <div className="absolute left-[22%] top-[36%] h-6 w-6 rounded-full border border-white/35" />
@@ -67,7 +67,7 @@ export default function LoginForm() {
 
       <div className="relative mx-auto max-w-6xl rounded-sm border border-white/20 bg-transparent shadow-2xl">
         <div className="grid lg:grid-cols-2">
-          <aside className="bg-[linear-gradient(145deg,#1456d8_0%,#1149c9_62%,#1042be_100%)] px-8 py-10 text-white sm:px-12 lg:py-14">
+          <aside className="bg-[linear-gradient(145deg,#047857_0%,#0f766e_62%,#115e59_100%)] px-8 py-10 text-white sm:px-12 lg:py-14">
             <div className="space-y-5 border-b border-white/25 pb-7">
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Welcome back to MediStore</h2>
               <p className="max-w-md text-white/85">
@@ -108,10 +108,10 @@ export default function LoginForm() {
             </div>
           </aside>
 
-          <div className="bg-slate-50 p-6 text-slate-900 sm:p-8 dark:bg-slate-950 dark:text-slate-100">
+          <div className="bg-emerald-50 p-6 text-slate-900 sm:p-8 dark:bg-slate-950 dark:text-slate-100">
             <div className="space-y-2">
               <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Sign in to your account</h1>
-              <p className="text-slate-600 dark:text-slate-300">
+              <p className="text-emerald-700 dark:text-slate-300">
                 Use your credentials to continue to MediStore.
               </p>
             </div>
@@ -193,16 +193,16 @@ export default function LoginForm() {
 
               <Button
                 type="submit"
-                className="mt-2 h-11 w-full bg-[linear-gradient(90deg,#2563eb_0%,#3b82f6_100%)] text-sm font-semibold text-white shadow-lg shadow-blue-500/30 hover:opacity-95"
+                className="mt-2 h-11 w-full bg-[linear-gradient(90deg,#059669_0%,#10b981_100%)] text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 hover:opacity-95"
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
               </Button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-300">
+            <p className="mt-6 text-center text-sm text-emerald-700 dark:text-slate-300">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="font-semibold text-blue-700 underline-offset-4 hover:underline dark:text-blue-300">
+              <Link href="/register" className="font-semibold text-emerald-700 underline-offset-4 hover:underline dark:text-emerald-300">
                 Create account
               </Link>
             </p>
