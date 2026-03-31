@@ -221,19 +221,19 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-4xl font-semibold tracking-tight">Manage Categories</h1>
-        <Button className="gap-2" type="button" onClick={handleOpenAddModal}>
+        <h1 className="text-4xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300">Manage Categories</h1>
+        <Button className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600" type="button" onClick={handleOpenAddModal}>
           <Plus className="h-4 w-4" />
           Add Category
         </Button>
       </div>
 
-      <Card>
+      <Card className="border border-border/70 bg-card shadow-sm">
         <CardContent className="p-0">
           <div className="w-full overflow-x-auto">
             <table className="min-w-150 w-full border-collapse text-left text-sm sm:text-base">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b bg-emerald-50/60 dark:bg-emerald-950/20">
                   <th className="px-4 py-4 font-medium text-muted-foreground">Name</th>
                   <th className="px-4 py-4 font-medium text-muted-foreground">Slug</th>
                   <th className="px-4 py-4 font-medium text-muted-foreground">Medicines</th>
@@ -255,15 +255,15 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
                     const isDeleting = deletingCategoryId === category.id;
 
                     return (
-                      <tr key={category.id} className="border-b last:border-0">
+                      <tr key={category.id} className="border-b last:border-0 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10">
                         <td className="px-4 py-4 font-medium whitespace-normal">{category.name}</td>
                         <td className="px-4 py-4 text-muted-foreground whitespace-normal">{toSlug(category.name)}</td>
-                        <td className="px-4 py-4">{category.medicinesCount}</td>
+                        <td className="px-4 py-4 text-muted-foreground">{category.medicinesCount}</td>
                         <td className="px-4 py-4">
                           {isActive ? (
-                            <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Active</Badge>
+                            <Badge className="bg-emerald-600 text-white hover:bg-emerald-600 dark:bg-emerald-500 dark:hover:bg-emerald-500">Active</Badge>
                           ) : (
-                            <Badge variant="secondary">Inactive</Badge>
+                            <Badge className="bg-slate-100 text-slate-800 hover:bg-slate-100 dark:bg-slate-500/25 dark:text-slate-200 dark:hover:bg-slate-500/25">Inactive</Badge>
                           )}
                         </td>
                         <td className="px-4 py-4">
@@ -275,6 +275,7 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
                               aria-label={`Edit ${category.name}`}
                               onClick={() => handleEditClick(category)}
                               disabled={isDeleting}
+                              className="text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-200"
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -285,8 +286,9 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
                               aria-label={`Delete ${category.name}`}
                               onClick={() => handleDeleteCategory(category)}
                               disabled={isDeleting}
+                              className="text-rose-700 hover:bg-rose-100 hover:text-rose-800 dark:text-rose-300 dark:hover:bg-rose-900/35 dark:hover:text-rose-200"
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </td>
@@ -302,10 +304,10 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
 
       {editingCategory ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-xl">
+          <Card className="w-full max-w-xl border border-border/70 bg-card shadow-xl">
             <CardContent className="space-y-5 pt-6">
               <div>
-                <h2 className="text-2xl font-semibold">Edit Category</h2>
+                <h2 className="text-2xl font-semibold text-emerald-700 dark:text-emerald-300">Edit Category</h2>
                 <p className="text-muted-foreground mt-1 text-sm">Update category name and description.</p>
               </div>
 
@@ -336,10 +338,10 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
 
       {isAddModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Card className="w-full max-w-xl">
+          <Card className="w-full max-w-xl border border-border/70 bg-card shadow-xl">
             <CardContent className="space-y-5 pt-6">
               <div>
-                <h2 className="text-2xl font-semibold">Add Category</h2>
+                <h2 className="text-2xl font-semibold text-emerald-700 dark:text-emerald-300">Add Category</h2>
                 <p className="text-muted-foreground mt-1 text-sm">Create a new category.</p>
               </div>
 
