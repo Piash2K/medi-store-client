@@ -61,9 +61,11 @@ export default async function SellerMedicinesPage() {
   });
 
   return (
-    <SellerMedicinesPageContent
-      initialMedicines={initialMedicines}
-      initialCategories={initialCategories}
-    />
+    <section className="rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
+      <SellerMedicinesPageContent
+        initialMedicines={initialMedicines}
+        initialCategories={initialCategories}
+      />
+    </section>
   );
 }
