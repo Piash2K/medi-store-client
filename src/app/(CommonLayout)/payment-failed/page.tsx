@@ -25,33 +25,33 @@ export default function PaymentFailedPage() {
   const displayReason = failureReasons[reason] || reason || "Payment was not completed successfully.";
 
   return (
-    <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-      <div className="mx-auto max-w-md rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
+    <section className="w-full bg-linear-to-b from-emerald-50/30 to-white px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <div className="mx-auto max-w-md rounded-2xl border-2 border-rose-200 bg-rose-50 p-8 text-center shadow-sm">
         <div className="mb-4 flex justify-center">
-          <div className="rounded-full bg-amber-100 p-3">
-            <AlertCircle className="h-8 w-8 text-amber-600" />
+          <div className="rounded-full bg-rose-100 p-3">
+            <AlertCircle className="h-8 w-8 text-rose-600" />
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-amber-900">Payment Failed</h1>
-        <p className="mt-2 text-sm text-amber-700">{displayReason}</p>
+        <h1 className="text-2xl font-bold text-rose-900">Payment Failed</h1>
+        <p className="mt-2 text-sm text-rose-700">{displayReason}</p>
 
         {orderId && (
-          <p className="mt-3 text-xs text-amber-600">
+          <p className="mt-3 text-xs text-rose-600">
             Order ID: <span className="font-mono font-semibold">{orderId}</span>
           </p>
         )}
 
         {transactionId && (
-          <p className="mt-1 text-xs text-amber-600">
+          <p className="mt-1 text-xs text-rose-600">
             Transaction ID: <span className="font-mono font-semibold">{transactionId}</span>
           </p>
         )}
 
-        <div className="mt-6 rounded-lg bg-white p-4">
+        <div className="mt-6 rounded-lg border border-rose-200 bg-white p-4">
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-amber-900">What you can do:</h3>
-            <ul className="mt-2 space-y-1 text-xs text-amber-700">
+            <h3 className="text-sm font-semibold text-rose-900">What you can do:</h3>
+            <ul className="mt-2 space-y-1 text-xs text-rose-700">
               <li>• Check your payment method details and try again</li>
               <li>• Use a different payment method if available</li>
               <li>• Contact your bank if the issue persists</li>
@@ -63,26 +63,26 @@ export default function PaymentFailedPage() {
         <div className="mt-6 space-y-3">
           {orderId ? (
             <>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full bg-emerald-600 text-white hover:bg-emerald-700">
                 <Link href={`/checkout?items=${orderId}`}>Retry Payment</Link>
               </Button>
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50">
                 <Link href={`/orders/${orderId}`}>View Order</Link>
               </Button>
             </>
           ) : (
             <>
-              <Button asChild className="w-full">
+              <Button asChild className="w-full bg-emerald-600 text-white hover:bg-emerald-700">
                 <Link href="/checkout">Return to Checkout</Link>
               </Button>
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50">
                 <Link href="/shop">Continue Shopping</Link>
               </Button>
             </>
           )}
         </div>
 
-        <p className="mt-4 text-xs text-muted-foreground">
+        <p className="mt-4 text-xs text-emerald-600">
           Need help? Contact our support team at support@medistore.com or call us.
         </p>
       </div>
