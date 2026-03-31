@@ -313,31 +313,31 @@ export default function SellerMedicinesPageContent({
   };
 
   return (
-    <section className="space-y-6 p-1">
+    <section className="space-y-6 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl font-semibold tracking-tight">Manage Medicines</h1>
-        <Button className="gap-2" type="button" onClick={handleOpenAddModal}>
+        <h1 className="text-3xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300">Manage Medicines</h1>
+        <Button className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600" type="button" onClick={handleOpenAddModal}>
           <Plus className="h-4 w-4" />
           Add Medicine
         </Button>
       </div>
 
       <div className="relative max-w-xl">
-        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-600 dark:text-emerald-300" />
         <Input
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder="Search medicines..."
-          className="pl-9"
+          className="border-emerald-200/80 bg-emerald-50/60 pl-9 text-emerald-900 placeholder:text-emerald-700/70 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:placeholder:text-emerald-300/70"
         />
       </div>
 
-      <Card>
+      <Card className="border border-border/70 bg-card shadow-sm">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b bg-emerald-50/60 dark:bg-emerald-950/20">
                   <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Name</th>
                   <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Category</th>
                   <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Price</th>
@@ -360,18 +360,18 @@ export default function SellerMedicinesPageContent({
                     const isInStock = stock > 0;
 
                     return (
-                      <tr key={medicineId} className="border-b last:border-0">
+                      <tr key={medicineId} className="border-b last:border-0 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10">
                         <td className="px-4 py-4 text-base font-medium whitespace-nowrap max-w-40 truncate">{medicine.name}</td>
                         <td className="px-4 py-4 whitespace-nowrap max-w-32 truncate">
-                          <Badge variant="secondary">{medicine.category?.name || "Uncategorized"}</Badge>
+                          <Badge className="bg-slate-100 text-slate-800 hover:bg-slate-100 dark:bg-slate-500/25 dark:text-slate-200 dark:hover:bg-slate-500/25">{medicine.category?.name || "Uncategorized"}</Badge>
                         </td>
                         <td className="px-4 py-4 text-base whitespace-nowrap">{`BDT ${Number(medicine.price || 0).toFixed(2)}`}</td>
-                        <td className="px-4 py-4 text-base whitespace-nowrap">{stock}</td>
+                        <td className="px-4 py-4 text-base whitespace-nowrap text-muted-foreground">{stock}</td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           {isInStock ? (
-                            <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Active</Badge>
+                            <Badge className="bg-emerald-600 text-white hover:bg-emerald-600 dark:bg-emerald-500 dark:hover:bg-emerald-500">Active</Badge>
                           ) : (
-                            <Badge variant="destructive">Out of Stock</Badge>
+                            <Badge className="bg-rose-600 text-white hover:bg-rose-600 dark:bg-rose-500 dark:hover:bg-rose-500">Out of Stock</Badge>
                           )}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
@@ -383,6 +383,7 @@ export default function SellerMedicinesPageContent({
                               aria-label="Edit medicine"
                               onClick={() => handleEditClick(medicine)}
                               disabled={deletingMedicineId === medicineId}
+                              className="text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-200"
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -393,8 +394,9 @@ export default function SellerMedicinesPageContent({
                               aria-label="Delete medicine"
                               onClick={() => handleDeleteClick(medicine)}
                               disabled={deletingMedicineId === medicineId}
+                              className="text-rose-700 hover:bg-rose-100 hover:text-rose-800 dark:text-rose-300 dark:hover:bg-rose-900/35 dark:hover:text-rose-200"
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </td>
@@ -410,10 +412,10 @@ export default function SellerMedicinesPageContent({
 
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
-          <Card className="max-h-[90vh] w-full max-w-xl overflow-y-auto">
+          <Card className="max-h-[90vh] w-full max-w-xl overflow-y-auto border border-border/70 bg-card shadow-xl">
             <CardContent className="space-y-4 pt-5 sm:space-y-5 sm:pt-6">
               <div>
-                <h2 className="text-xl font-semibold sm:text-2xl">Add Medicine</h2>
+                <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 sm:text-2xl">Add Medicine</h2>
                 <p className="text-muted-foreground mt-1 text-sm">Fill out the fields to add a new medicine.</p>
               </div>
 
@@ -514,10 +516,10 @@ export default function SellerMedicinesPageContent({
 
       {editingMedicine && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4">
-          <Card className="max-h-[90vh] w-full max-w-xl overflow-y-auto">
+          <Card className="max-h-[90vh] w-full max-w-xl overflow-y-auto border border-border/70 bg-card shadow-xl">
             <CardContent className="space-y-4 pt-5 sm:space-y-5 sm:pt-6">
               <div>
-                <h2 className="text-xl font-semibold sm:text-2xl">Update Medicine</h2>
+                <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 sm:text-2xl">Update Medicine</h2>
                 <p className="text-muted-foreground mt-1 text-sm">Edit medicine information and save changes.</p>
               </div>
 
