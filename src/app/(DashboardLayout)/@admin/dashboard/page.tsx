@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Package, PackageCheck, Pill, Users, Wallet, XCircle } from "lucide-react";
+import { ArrowLeft, Package, PackageCheck, Pill, Store, UserRound, Users, Wallet, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -199,104 +199,106 @@ export default async function DashboardPage() {
     .slice(0, 5);
 
   return (
-    <section className="space-y-5 p-1 sm:space-y-6">
+    <section className="space-y-5 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10 sm:space-y-6">
       <div className="space-y-2">
-        <Link href="/shop" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
+        <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200">
           <ArrowLeft className="h-4 w-4" />
           Back to Store
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Admin Dashboard</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-3xl">Admin Dashboard</h1>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-emerald-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-emerald-400/15">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold sm:text-4xl">{users.length}</p>
-            <p className="mt-1 text-sm text-primary">{formatDelta(userDelta)} this month</p>
+            <p className="text-3xl font-semibold text-foreground sm:text-4xl">{users.length}</p>
+            <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">{formatDelta(userDelta)} this month</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-cyan-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-cyan-400/15">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <Package className="h-4 w-4 text-cyan-600 dark:text-cyan-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold sm:text-4xl">{orders.length}</p>
-            <p className="mt-1 text-sm text-primary">{formatDelta(orderDelta)} this month</p>
+            <p className="text-3xl font-semibold text-foreground sm:text-4xl">{orders.length}</p>
+            <p className="mt-1 text-sm text-cyan-600 dark:text-cyan-400">{formatDelta(orderDelta)} this month</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-lime-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-lime-400/15">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active Medicines</CardTitle>
-            <Pill className="h-4 w-4 text-muted-foreground" />
+            <Pill className="h-4 w-4 text-lime-600 dark:text-lime-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold sm:text-4xl">{activeMedicines.length}</p>
-            <p className="mt-1 text-sm text-primary">{formatDelta(medicineDelta)} this month</p>
+            <p className="text-3xl font-semibold text-foreground sm:text-4xl">{activeMedicines.length}</p>
+            <p className="mt-1 text-sm text-lime-600 dark:text-lime-400">{formatDelta(medicineDelta)} this month</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-teal-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-teal-400/15">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
+            <Wallet className="h-4 w-4 text-teal-600 dark:text-teal-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold sm:text-3xl xl:text-4xl">BDT {currencyFormatter.format(totalRevenue)}</p>
-            <p className="mt-1 text-sm text-primary">{formatRevenueDelta(revenueDelta)} this month</p>
+            <p className="text-2xl font-semibold text-foreground sm:text-3xl xl:text-4xl">BDT {currencyFormatter.format(totalRevenue)}</p>
+            <p className="mt-1 text-sm text-teal-600 dark:text-teal-400">{formatRevenueDelta(revenueDelta)} this month</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-indigo-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-indigo-400/15">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Customer</CardTitle>
+            <UserRound className="h-4 w-4 text-indigo-600 dark:text-indigo-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{totalCustomers}</p>
+            <p className="text-3xl font-semibold text-foreground">{totalCustomers}</p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-amber-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-amber-400/15">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Seller</CardTitle>
+            <Store className="h-4 w-4 text-amber-600 dark:text-amber-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{totalSellers}</p>
+            <p className="text-3xl font-semibold text-foreground">{totalSellers}</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-emerald-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-emerald-400/15">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Delivered Orders</CardTitle>
-            <PackageCheck className="h-4 w-4 text-muted-foreground" />
+            <PackageCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{totalDeliveredOrders}</p>
+            <p className="text-3xl font-semibold text-foreground">{totalDeliveredOrders}</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-rose-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-rose-400/15">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Cancel Orders</CardTitle>
-            <XCircle className="h-4 w-4 text-muted-foreground" />
+            <XCircle className="h-4 w-4 text-rose-600 dark:text-rose-300" />
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{totalCancelledOrders}</p>
+            <p className="text-3xl font-semibold text-foreground">{totalCancelledOrders}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="border border-border/70 bg-card shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl sm:text-2xl">Recent Users</CardTitle>
+          <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300 sm:text-2xl">Recent Users</CardTitle>
         </CardHeader>
         <CardContent>
           {recentUsers.length === 0 ? (
