@@ -5,14 +5,12 @@ import { OrderResponse, OrdersResponse } from "@/types/order";
 import { isDynamicServerUsageError } from "@/lib/is-dynamic-server-usage-error";
 
 export type CreateOrderPayload = {
-  customerId?: string;
-  paymentMethod: "COD";
+  paymentMethod: "COD" | "SSLCOMMERZ";
   shippingAddress: string;
-  totalAmount: number;
+  shippingCost: number;
   items: {
     medicineId: string;
     quantity: number;
-    price: number;
   }[];
 };
 

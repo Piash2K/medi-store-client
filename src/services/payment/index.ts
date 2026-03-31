@@ -12,11 +12,11 @@ const getToken = async () => {
 
 export type InitializePaymentPayload = {
   shippingAddress: string;
+  shippingCost: number;
   paymentMethod: "SSLCOMMERZ";
   items: {
     medicineId: string;
     quantity: number;
-    price: number;
   }[];
 };
 

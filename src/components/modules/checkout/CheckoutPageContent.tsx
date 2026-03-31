@@ -15,8 +15,7 @@ import { getUser } from "@/services/auth";
 import { getMedicineById } from "@/services/medicine";
 import { createOrder } from "@/services/order";
 
-const SHIPPING_COST = 120;
-const FREE_SHIPPING_THRESHOLD = 1000;
+const SHIPPING_COST = 60;
 
 const currencyFormatter = new Intl.NumberFormat("en-BD", {
   minimumFractionDigits: 2,
@@ -100,8 +99,7 @@ export default function CheckoutPageContent() {
       : items;
 
   const subtotal = checkoutItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-  const shipping = checkoutItems.length > 0 && !hasFreeShipping ? SHIPPING_COST : 0;
+  const shipping = checkoutItems.length > 0 ? SHIPPING_COST : 0;
   const total = subtotal + shipping;
   const itemsCount = checkoutItems.reduce((totalQty, item) => totalQty + item.quantity, 0);
 
@@ -138,29 +136,13 @@ export default function CheckoutPageContent() {
     setCheckoutError("");
     setCheckoutMessage("");
 
-    const customerId =
-      (currentUser.id as string | undefined) ||
-      (currentUser.userId as string | undefined) ||
-      (currentUser.sub as string | undefined);
-
-    if (!customerId) {
-      const message = "Please login again to continue checkout.";
-      setCheckoutError(message);
-      setIsPlacingOrder(false);
-      await Swal.fire({ icon: "error", title: "Authentication required", text: message });
-      router.push(`/login?redirect=${encodeURIComponent(checkoutPath)}`);
-      return;
-    }
-
     const result = await createOrder({
-      customerId,
-      paymentMethod: "COD",
+      paymentMethod,
       shippingAddress: shippingAddress.trim(),
-      totalAmount: Number(total.toFixed(2)),
+      shippingCost: shipping,
       items: checkoutItems.map((item) => ({
         medicineId: item.id,
         quantity: item.quantity,
-        price: item.price,
       })),
     });
 
@@ -255,8 +237,8 @@ export default function CheckoutPageContent() {
               items={checkoutItems.map((item) => ({
                 medicineId: item.id,
                 quantity: item.quantity,
-                price: item.price,
               }))}
+              shippingCost={shipping}
               onPaymentMethodChange={(method) => setPaymentMethod(method)}
             />
           </div>

@@ -14,10 +14,10 @@ export type PaymentMethodSelectorProps = {
   shipping: number;
   total: number;
   shippingAddress: string;
+  shippingCost: number;
   items: {
     medicineId: string;
     quantity: number;
-    price: number;
   }[];
   onPaymentMethodChange?: (method: "COD" | "SSLCOMMERZ") => void;
 };
@@ -30,6 +30,7 @@ export default function PaymentMethodSelector({
   shipping,
   total,
   shippingAddress,
+  shippingCost,
   items,
   onPaymentMethodChange,
 }: PaymentMethodSelectorProps) {
@@ -58,6 +59,7 @@ export default function PaymentMethodSelector({
       const result = await initializeSSLCommerzPayment(
         {
           shippingAddress: shippingAddress.trim(),
+          shippingCost,
           paymentMethod: "SSLCOMMERZ",
           items,
         }
