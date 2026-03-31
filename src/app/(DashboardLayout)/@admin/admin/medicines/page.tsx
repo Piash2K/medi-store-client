@@ -34,9 +34,9 @@ export default async function AdminMedicinesPage() {
   const activeMedicines = medicines.filter((medicine) => !medicine.isDeleted);
 
   return (
-    <section className="space-y-6 p-1">
+    <section className="space-y-6 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
       <div className="space-y-2">
-        <Link href="/shop" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
+        <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200">
           <ArrowLeft className="h-4 w-4" />
           Back to Store
         </Link>

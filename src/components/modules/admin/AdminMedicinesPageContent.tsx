@@ -59,24 +59,24 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-4xl font-semibold tracking-tight">View Medicines Inventory</h1>
+        <h1 className="text-4xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300">View Medicines Inventory</h1>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-72 flex-1">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-600 dark:text-emerald-300" />
           <Input
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             placeholder="Search medicines, seller, or category"
-            className="pl-9"
+            className="border-emerald-200/80 bg-emerald-50/60 pl-9 text-emerald-900 placeholder:text-emerald-700/70 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:placeholder:text-emerald-300/70"
           />
         </div>
 
         <select
           value={stockFilter}
           onChange={(event) => setStockFilter(event.target.value as "all" | "in-stock" | "out-of-stock")}
-          className="border-input bg-background h-10 rounded-md border px-3 text-sm"
+          className="h-10 rounded-md border border-emerald-200/80 bg-emerald-50/60 px-3 text-sm text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100"
         >
           <option value="all">All stock statuses</option>
           <option value="in-stock">In stock</option>
@@ -84,12 +84,12 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
         </select>
       </div>
 
-      <Card>
+      <Card className="border border-border/70 bg-card shadow-sm">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b bg-emerald-50/60 dark:bg-emerald-950/20">
                   <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Name</th>
                   <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Seller</th>
                   <th className="px-4 py-4 text-sm font-medium text-muted-foreground">Category</th>
@@ -112,21 +112,21 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
                     const isInStock = stock > 0;
 
                     return (
-                      <tr key={medicineId} className="border-b last:border-0">
+                      <tr key={medicineId} className="border-b last:border-0 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10">
                         <td className="px-4 py-4 text-base font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-40">{medicine.name}</td>
                         <td className="px-4 py-4 text-base text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis max-w-40">
                           {medicine.seller?.name || medicine.seller?.email || "N/A"}
                         </td>
                         <td className="px-4 py-4">
-                          <Badge variant="secondary">{medicine.category?.name || "Uncategorized"}</Badge>
+                          <Badge className="bg-slate-100 text-slate-800 hover:bg-slate-100 dark:bg-slate-500/25 dark:text-slate-200 dark:hover:bg-slate-500/25">{medicine.category?.name || "Uncategorized"}</Badge>
                         </td>
                         <td className="px-4 py-4 text-base whitespace-nowrap overflow-hidden text-ellipsis max-w-32">{`BDT ${Number(medicine.price || 0).toFixed(2)}`}</td>
-                        <td className="px-4 py-4 text-base">{stock}</td>
+                        <td className="px-4 py-4 text-base text-muted-foreground">{stock}</td>
                         <td className="px-4 py-4">
                           {isInStock ? (
-                            <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">In Stock</Badge>
+                            <Badge className="bg-emerald-600 text-white hover:bg-emerald-600 dark:bg-emerald-500 dark:hover:bg-emerald-500">In Stock</Badge>
                           ) : (
-                            <Badge variant="destructive">Out of Stock</Badge>
+                            <Badge className="bg-rose-600 text-white hover:bg-rose-600 dark:bg-rose-500 dark:hover:bg-rose-500">Out of Stock</Badge>
                           )}
                         </td>
                       </tr>
