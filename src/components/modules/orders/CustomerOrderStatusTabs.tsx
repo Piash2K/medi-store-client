@@ -136,15 +136,15 @@ export default function CustomerOrderStatusTabs({
   };
 
   return (
-    <section className="w-full space-y-4 rounded-xl bg-linear-to-b from-emerald-50/25 to-white p-0 sm:space-y-5 sm:p-1">
+    <section className="w-full space-y-4 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-0 dark:from-emerald-950/10 sm:space-y-5 sm:p-1">
       <div className="space-y-2">
         <h1 className="text-xl font-semibold tracking-tight text-emerald-700 sm:text-2xl md:text-3xl">Order Status</h1>
-        <p className="text-sm text-emerald-600">View your orders by status with quick filters.</p>
+        <p className="text-sm text-emerald-600 dark:text-emerald-400">View your orders by status with quick filters.</p>
       </div>
 
       <Tabs selectedIndex={selectedIndex} onSelect={(index) => setSelectedIndex(index)}>
         <div className="mt-1 overflow-x-auto sm:mt-2">
-          <TabList className="mt-0! mb-2! pb-0! flex min-w-max list-none items-center gap-1 border-b border-emerald-200 sm:gap-2">
+          <TabList className="mt-0! mb-2! pb-0! flex min-w-max list-none items-center gap-1 border-b border-emerald-200 dark:border-emerald-800/60 sm:gap-2">
             {statusConfig.map((statusItem, index) => {
               const count = statusItem.key === "ALL" ? sortedOrders.length : statusCount[statusItem.key];
               const isActive = selectedIndex === index;
@@ -154,8 +154,8 @@ export default function CustomerOrderStatusTabs({
                   key={statusItem.key}
                   className={`bottom-0! cursor-pointer rounded-t-md border border-transparent border-b-0 bg-transparent px-2.5 py-2 text-xs font-medium whitespace-nowrap outline-none transition-colors sm:px-3 sm:text-sm ${
                     isActive
-                      ? "text-emerald-700! border-emerald-200! bg-white! border-b-white!"
-                      : "text-emerald-500 hover:text-emerald-700"
+                      ? "text-emerald-700! border-emerald-200! bg-white! border-b-white! dark:text-emerald-300! dark:border-emerald-700! dark:bg-emerald-950/30! dark:border-b-emerald-950/30!"
+                      : "text-emerald-500 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
                   }`}
                 >
                   <span>{statusItem.label}</span>
@@ -187,8 +187,8 @@ export default function CustomerOrderStatusTabs({
 
               {!isError && panelOrders.length === 0 && (
                 <div className="rounded-xl border-2 border-dashed border-emerald-200 bg-white p-4 text-center sm:p-6">
-                  <p className="font-medium text-emerald-800">No orders found for this status</p>
-                  <p className="mt-1 text-sm text-emerald-600">Try another tab or place a new order.</p>
+                  <p className="font-medium text-emerald-800 dark:text-emerald-200">No orders found for this status</p>
+                  <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">Try another tab or place a new order.</p>
                   <Button asChild size="sm" className="mt-4 bg-emerald-600 text-white hover:bg-emerald-700">
                     <Link href="/shop">Browse Medicines</Link>
                   </Button>
@@ -198,9 +198,9 @@ export default function CustomerOrderStatusTabs({
               {!isError && panelPaginatedOrders.length > 0 && (
                 <div className="space-y-4">
                   {panelPaginatedOrders.map((order) => (
-                    <Card key={order.id} className="border-2 border-emerald-200 bg-white shadow-sm">
+                    <Card key={order.id} className="border-2 border-emerald-200 bg-white shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20">
                       <CardHeader className="pb-2 sm:pb-3">
-                        <CardTitle className="text-sm text-emerald-800 sm:text-base md:text-lg">#{order.id.slice(0, 8).toUpperCase()}</CardTitle>
+                        <CardTitle className="text-sm text-emerald-800 dark:text-emerald-200 sm:text-base md:text-lg">#{order.id.slice(0, 8).toUpperCase()}</CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-2.5 sm:space-y-3">
                         <div className="flex flex-wrap items-start justify-between gap-2 text-sm sm:items-center sm:gap-3">
@@ -212,19 +212,19 @@ export default function CustomerOrderStatusTabs({
                         </div>
 
                         <div className="grid gap-2 text-sm sm:grid-cols-2">
-                          <p className="text-emerald-600">
-                            Date: <span className="text-emerald-800">{formatDate(order.createdAt)}</span>
+                          <p className="text-emerald-600 dark:text-emerald-400">
+                            Date: <span className="text-emerald-800 dark:text-emerald-200">{formatDate(order.createdAt)}</span>
                           </p>
-                          <p className="text-emerald-600 sm:text-right">
+                          <p className="text-emerald-600 dark:text-emerald-400 sm:text-right">
                             Total:
-                            <span className="ml-1 font-semibold text-emerald-800">
+                            <span className="ml-1 font-semibold text-emerald-800 dark:text-emerald-200">
                               BDT {currencyFormatter.format(order.totalAmount)}
                             </span>
                           </p>
                         </div>
 
                         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-                          <Button asChild variant="outline" size="sm" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 sm:w-auto">
+                          <Button asChild variant="outline" size="sm" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:w-auto">
                             <Link href={`/orders/${order.id}`}>View Details</Link>
                           </Button>
                           <Button asChild size="sm" className="w-full bg-emerald-600 text-white hover:bg-emerald-700 sm:w-auto">
@@ -238,15 +238,15 @@ export default function CustomerOrderStatusTabs({
                     </Card>
                   ))}
 
-                  <div className="flex flex-col gap-3 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-emerald-600">
+                  <div className="flex flex-col gap-3 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-emerald-600 dark:text-emerald-400">
                       Page {panelCurrentPage} of {panelTotalPages}
                     </p>
                     <div className="flex w-full items-center gap-2 sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 sm:flex-none"
+                        className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:flex-none"
                         disabled={panelCurrentPage <= 1}
                         onClick={() => setPage(statusItem.key, panelCurrentPage - 1)}
                       >
@@ -255,7 +255,7 @@ export default function CustomerOrderStatusTabs({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 sm:flex-none"
+                        className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:flex-none"
                         disabled={panelCurrentPage >= panelTotalPages}
                         onClick={() => setPage(statusItem.key, panelCurrentPage + 1)}
                       >

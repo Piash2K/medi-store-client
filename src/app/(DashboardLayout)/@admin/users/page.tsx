@@ -42,5 +42,9 @@ export default async function AdminUsersPage() {
     }))
     .sort((a, b) => +new Date(b.createdAt || 0) - +new Date(a.createdAt || 0));
 
-  return <AdminUsersPageContent initialUsers={initialUsers} />;
+  return (
+    <section className="rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
+      <AdminUsersPageContent initialUsers={initialUsers} />
+    </section>
+  );
 }
