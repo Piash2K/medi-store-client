@@ -49,23 +49,23 @@ const formatDate = (value?: string) => {
 const statusMeta: Record<NormalizedStatus, { label: string; className: string }> = {
   PLACED: {
     label: "Placed",
-    className: "bg-secondary text-secondary-foreground hover:bg-secondary",
+    className: "bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-500/25 dark:text-amber-200 dark:hover:bg-amber-500/25",
   },
   PROCESSING: {
     label: "Processing",
-    className: "bg-muted text-foreground hover:bg-muted",
+    className: "bg-slate-100 text-slate-800 hover:bg-slate-100 dark:bg-slate-500/25 dark:text-slate-200 dark:hover:bg-slate-500/25",
   },
   SHIPPED: {
     label: "Shipped",
-    className: "bg-emerald-600 text-white hover:bg-emerald-600",
+    className: "bg-emerald-600 text-white hover:bg-emerald-600 dark:bg-emerald-500 dark:hover:bg-emerald-500",
   },
   DELIVERED: {
     label: "Delivered",
-    className: "bg-emerald-600 text-white hover:bg-emerald-600",
+    className: "bg-emerald-600 text-white hover:bg-emerald-600 dark:bg-emerald-500 dark:hover:bg-emerald-500",
   },
   CANCELLED: {
     label: "Cancelled",
-    className: "bg-red-600 text-white hover:bg-red-600",
+    className: "bg-rose-600 text-white hover:bg-rose-600 dark:bg-rose-500 dark:hover:bg-rose-500",
   },
 };
 
@@ -149,18 +149,18 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
     <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:w-72">
-          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-600 dark:text-emerald-300" />
           <Input
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             placeholder="Search orders..."
-            className="pl-9"
+            className="border-emerald-200/80 bg-emerald-50/60 pl-9 text-emerald-900 placeholder:text-emerald-700/70 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:placeholder:text-emerald-300/70"
           />
         </div>
 
         <div className="w-full sm:ml-auto sm:w-44">
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full border-emerald-200/80 bg-emerald-50/60 text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -175,12 +175,12 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
         </div>
       </div>
 
-      <Card>
+      <Card className="border border-border/70 bg-card shadow-sm">
         <CardContent className="p-0">
           <div className="w-full overflow-x-auto">
             <table className="min-w-175 w-full border-collapse text-left text-sm sm:text-base">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b bg-emerald-50/60 dark:bg-emerald-950/20">
                   <th className="px-4 py-4 font-medium text-muted-foreground">Order ID</th>
                   <th className="px-4 py-4 font-medium text-muted-foreground">Customer</th>
                   <th className="px-4 py-4 font-medium text-muted-foreground">Seller</th>
@@ -202,7 +202,7 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
                     const normalizedStatus = getNormalizedStatus(order.status);
 
                     return (
-                      <tr key={order.id} className={index === filteredOrders.length - 1 ? "" : "border-b"}>
+                      <tr key={order.id} className={index === filteredOrders.length - 1 ? "hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10" : "border-b hover:bg-emerald-50/40 dark:hover:bg-emerald-950/10"}>
                         <td className="px-4 py-4 font-medium break-all max-w-32">ORD-{String(index + 1).padStart(3, "0")}</td>
                         <td className="px-4 py-4 break-all max-w-40">{getCustomerText(order)}</td>
                         <td className="px-4 py-4 text-muted-foreground break-all max-w-40">{getSellerText(order)}</td>
