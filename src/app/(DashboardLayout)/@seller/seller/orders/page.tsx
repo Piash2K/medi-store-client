@@ -21,5 +21,9 @@ export default async function SellerOrdersPage() {
   const ordersResult = await getSellerOrders();
   const initialOrders = ordersResult.success ? ordersResult.data : [];
 
-  return <SellerOrdersPageContent initialOrders={initialOrders} />;
+  return (
+    <section className="rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
+      <SellerOrdersPageContent initialOrders={initialOrders} />
+    </section>
+  );
 }

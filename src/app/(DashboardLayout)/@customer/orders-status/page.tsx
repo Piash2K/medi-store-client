@@ -12,11 +12,14 @@ export default async function CustomerOrderStatusPage() {
   const ordersResult = await getOrders();
   // Only show error if the API call itself failed, not just if there are no orders
   const isError = !ordersResult.success && ordersResult.data === undefined;
+
   return (
-    <CustomerOrderStatusTabs
-      orders={ordersResult.success ? ordersResult.data : []}
-      isError={isError}
-      errorMessage={ordersResult.message}
-    />
+    <section className="rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
+      <CustomerOrderStatusTabs
+        orders={ordersResult.success ? ordersResult.data : []}
+        isError={isError}
+        errorMessage={ordersResult.message}
+      />
+    </section>
   );
 }

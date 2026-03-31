@@ -291,14 +291,14 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   };
 
   return (
-    <section className="mx-auto w-full max-w-7xl bg-linear-to-b from-emerald-50/20 to-white px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800">
+    <section className="mx-auto w-full max-w-7xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 dark:from-emerald-950/10">
+      <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200">
         <ArrowLeft className="h-4 w-4" />
         Back to Shop
       </Link>
 
       <div className="mt-5 grid items-start gap-6 lg:grid-cols-2">
-        <div className="relative flex min-h-80 items-center justify-center rounded-2xl border-2 border-emerald-200 bg-emerald-50 sm:min-h-96 lg:min-h-130">
+        <div className="relative flex min-h-80 items-center justify-center rounded-2xl border-2 border-emerald-200 bg-emerald-50 dark:border-emerald-800/60 dark:bg-emerald-950/25 sm:min-h-96 lg:min-h-130">
           {medicine.image ? (
             <Image
               src={medicine.image}
@@ -308,21 +308,21 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
               className="rounded-2xl object-cover"
             />
           ) : (
-            <div className="flex h-18 w-18 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+            <div className="flex h-18 w-18 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-300">
               <Package className="h-9 w-9" />
             </div>
           )}
         </div>
 
         <div>
-          <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">
+          <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/45 dark:text-emerald-300">
             {medicine.category?.name || "General"}
           </span>
 
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-emerald-800 sm:text-3xl lg:text-4xl">{medicine.name}</h1>
-          <p className="mt-1 text-base text-emerald-600">by {medicine.manufacturer || "Unknown"}</p>
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-emerald-800 dark:text-emerald-200 sm:text-3xl lg:text-4xl">{medicine.name}</h1>
+          <p className="mt-1 text-base text-emerald-600 dark:text-emerald-400">by {medicine.manufacturer || "Unknown"}</p>
 
-          <div className="mt-3 flex items-center gap-1 text-sm text-emerald-600">
+          <div className="mt-3 flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400">
             {Array.from({ length: 5 }).map((_, index) => (
               <Star key={index} className={getStarClassName(index + 1, averageRating)} />
             ))}
@@ -332,14 +332,14 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           </div>
 
           <div className="mt-3 flex items-baseline gap-2">
-            <p className="text-2xl font-bold text-emerald-700 sm:text-3xl lg:text-4xl">{formatPrice(medicine.price)}</p>
+            <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 sm:text-3xl lg:text-4xl">{formatPrice(medicine.price)}</p>
           </div>
 
-          <p className="mt-4 border-b border-emerald-100 pb-4 text-base leading-relaxed text-emerald-700">
+          <p className="mt-4 border-b border-emerald-100 pb-4 text-base leading-relaxed text-emerald-700 dark:border-emerald-800/50 dark:text-emerald-300">
             {medicine.description || "No description available for this medicine."}
           </p>
 
-          <p className="mt-4 text-base font-semibold text-emerald-800">
+          <p className="mt-4 text-base font-semibold text-emerald-800 dark:text-emerald-200">
             <span className={isInStock ? "text-emerald-600" : "text-destructive"}>●</span>{" "}
             {isInStock
               ? `In Stock (${medicine.stock} available)`
@@ -347,18 +347,18 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           </p>
 
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="flex items-center rounded-md border border-emerald-200 bg-white">
+            <div className="flex items-center rounded-md border border-emerald-200 bg-white dark:border-emerald-800/60 dark:bg-emerald-950/25">
               <button
                 type="button"
-                className="inline-flex h-10 w-10 items-center justify-center text-emerald-700 hover:text-emerald-800"
+                className="inline-flex h-10 w-10 items-center justify-center text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
                 onClick={() => setQuantity((previousValue) => Math.max(previousValue - 1, 1))}
               >
                 -
               </button>
-              <span className="w-10 text-center text-sm font-semibold text-emerald-800">{quantity}</span>
+              <span className="w-10 text-center text-sm font-semibold text-emerald-800 dark:text-emerald-200">{quantity}</span>
               <button
                 type="button"
-                className="inline-flex h-10 w-10 items-center justify-center text-emerald-700 hover:text-emerald-800"
+                className="inline-flex h-10 w-10 items-center justify-center text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
                 onClick={() => setQuantity((previousValue) => previousValue + 1)}
               >
                 +
@@ -389,7 +389,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
             <Button
               type="button"
               variant="outline"
-              className="h-10 w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 sm:min-w-35 sm:w-auto"
+              className="h-10 w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:min-w-35 sm:w-auto"
               disabled={!isInStock || !medicineCheckoutId}
               onClick={async () => {
                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -408,20 +408,20 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3 dark:border-emerald-800/60 dark:bg-emerald-950/20">
               <div className="flex items-center gap-2">
-                <Truck className="h-4 w-4 text-emerald-600" />
-                <p className="text-sm font-semibold text-emerald-800">Free Delivery</p>
+                <Truck className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
+                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Free Delivery</p>
               </div>
-              <p className="mt-1 text-sm text-emerald-600">Orders over BDT 500</p>
+              <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">Orders over BDT 500</p>
             </div>
 
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-3 dark:border-emerald-800/60 dark:bg-emerald-950/20">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
-                <p className="text-sm font-semibold text-emerald-800">Verified Seller</p>
+                <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
+                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Verified Seller</p>
               </div>
-              <p className="mt-1 text-sm text-emerald-600">
+              <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
                 {medicine.seller?.name || "Quality assured"}
               </p>
             </div>
@@ -429,17 +429,17 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         </div>
       </div>
 
-      <div className="mt-8 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-emerald-700">Details</h2>
-        <p className="mt-3 text-sm leading-relaxed text-emerald-700">
+      <div className="mt-8 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
+        <h2 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">Details</h2>
+        <p className="mt-3 text-sm leading-relaxed text-emerald-700 dark:text-emerald-300">
           {medicine.description || "No additional details available."}
         </p>
       </div>
 
-      <div className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-emerald-700">Customer Reviews</h2>
+      <div className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
+        <h2 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">Customer Reviews</h2>
 
-        <div className="mt-2 flex items-center gap-2 text-sm text-emerald-600">
+        <div className="mt-2 flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
           <span className="inline-flex items-center gap-1">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
             {averageRating.toFixed(1)}
@@ -448,16 +448,16 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         </div>
 
         {isLoadingReviews ? (
-          <p className="mt-4 text-sm text-emerald-600">Loading reviews...</p>
+          <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400">Loading reviews...</p>
         ) : reviews.length === 0 ? (
-          <p className="mt-4 text-sm text-emerald-600">No reviews yet.</p>
+          <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400">No reviews yet.</p>
         ) : (
           <div className="mt-4 space-y-3">
             {reviews.map((review) => (
-              <article key={review.id} className="rounded-xl border border-emerald-200 bg-emerald-50/30 p-4">
+              <article key={review.id} className="rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 dark:border-emerald-800/60 dark:bg-emerald-950/25">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                  <p className="text-sm font-semibold text-emerald-800">{review.customer?.name || "Customer"}</p>
-                  <div className="flex items-center gap-2 text-xs text-emerald-600">
+                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">{review.customer?.name || "Customer"}</p>
+                  <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
                     <span className="inline-flex items-center gap-1">
                       <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                       {review.rating || 0}
@@ -465,24 +465,24 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
                     <span>{formatReviewDate(review.createdAt)}</span>
                   </div>
                 </div>
-                <p className="mt-2 text-sm text-emerald-700">{review.comment || "No comment"}</p>
+                <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300">{review.comment || "No comment"}</p>
               </article>
             ))}
           </div>
         )}
       </div>
 
-      <div id="review-section" className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-emerald-700">Leave a Review</h2>
-        <p className="mt-2 text-sm text-emerald-600">{reviewStatusMessage}</p>
+      <div id="review-section" className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
+        <h2 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">Leave a Review</h2>
+        <p className="mt-2 text-sm text-emerald-600 dark:text-emerald-400">{reviewStatusMessage}</p>
 
         <div className="mt-4 grid gap-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-emerald-700">Rating</label>
+            <label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Rating</label>
             <select
               value={rating}
               onChange={(event) => setRating(Number(event.target.value))}
-              className="h-10 w-full rounded-md border border-emerald-300 bg-white px-3 text-sm text-emerald-700 shadow-sm ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500"
+              className="h-10 w-full rounded-md border border-emerald-300 bg-white px-3 text-sm text-emerald-700 shadow-sm ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200 dark:placeholder:text-emerald-500"
               disabled={!canReview || isSubmittingReview}
             >
               <option value={5}>5 - Excellent</option>
@@ -494,12 +494,12 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-emerald-700">Comment</label>
+            <label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Comment</label>
             <textarea
               value={reviewComment}
               onChange={(event) => setReviewComment(event.target.value)}
               placeholder="Share your experience with this medicine..."
-              className="min-h-28 w-full rounded-md border border-emerald-300 bg-white px-3 py-2 text-sm text-emerald-700 shadow-xs ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500"
+              className="min-h-28 w-full rounded-md border border-emerald-300 bg-white px-3 py-2 text-sm text-emerald-700 shadow-xs ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200 dark:placeholder:text-emerald-500"
               disabled={!canReview || isSubmittingReview}
             />
           </div>

@@ -81,11 +81,11 @@ export default function PaymentSuccessPage() {
 
   if (isVerifying) {
     return (
-      <section className="w-full bg-linear-to-b from-emerald-50/30 to-white px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-        <div className="flex h-96 flex-col items-center justify-center rounded-2xl border-2 border-emerald-200 bg-white">
+      <section className="w-full bg-linear-to-b from-emerald-50/30 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+        <div className="flex h-96 flex-col items-center justify-center rounded-2xl border-2 border-emerald-200 bg-white dark:border-emerald-800/60 dark:bg-emerald-950/20">
           <Loader2 className="mb-4 h-12 w-12 animate-spin text-emerald-600" />
-          <p className="text-lg font-semibold text-emerald-800">Verifying your payment...</p>
-          <p className="mt-1 text-sm text-emerald-600">
+          <p className="text-lg font-semibold text-emerald-800 dark:text-emerald-200">Verifying your payment...</p>
+          <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
             Please wait while we confirm your transaction
           </p>
         </div>
@@ -95,10 +95,10 @@ export default function PaymentSuccessPage() {
 
   if (verificationError) {
     return (
-      <section className="w-full bg-linear-to-b from-emerald-50/30 to-white px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-        <div className="mx-auto max-w-md rounded-2xl border-2 border-rose-200 bg-rose-50 p-8 text-center shadow-sm">
+      <section className="w-full bg-linear-to-b from-emerald-50/30 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+        <div className="mx-auto max-w-md rounded-2xl border-2 border-rose-200 bg-rose-50 p-8 text-center shadow-sm dark:border-rose-800/60 dark:bg-rose-950/20">
           <div className="mb-4 flex justify-center">
-            <div className="rounded-full bg-rose-100 p-3">
+            <div className="rounded-full bg-rose-100 p-3 dark:bg-rose-900/40">
               <svg
                 className="h-8 w-8 text-rose-600"
                 fill="none"
@@ -114,17 +114,17 @@ export default function PaymentSuccessPage() {
               </svg>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-rose-900">Payment Verification Failed</h1>
-          <p className="mt-2 text-sm text-rose-700">{verificationError}</p>
+          <h1 className="text-2xl font-bold text-rose-900 dark:text-rose-200">Payment Verification Failed</h1>
+          <p className="mt-2 text-sm text-rose-700 dark:text-rose-300">{verificationError}</p>
 
           {orderId && (
-            <p className="mt-3 text-xs text-rose-600">
+            <p className="mt-3 text-xs text-rose-600 dark:text-rose-400">
               Order ID: <span className="font-mono font-semibold">{orderId}</span>
             </p>
           )}
 
           {transactionId && (
-            <p className="mt-1 text-xs text-rose-600">
+            <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">
               Transaction ID: <span className="font-mono font-semibold">{transactionId}</span>
             </p>
           )}
@@ -133,12 +133,12 @@ export default function PaymentSuccessPage() {
             <Button asChild className="w-full bg-emerald-600 text-white hover:bg-emerald-700">
               <Link href={`/orders/${orderId}`}>View Order Details</Link>
             </Button>
-            <Button asChild variant="outline" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50">
+            <Button asChild variant="outline" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30">
               <Link href="/orders">Back to Orders</Link>
             </Button>
           </div>
 
-          <p className="mt-4 text-xs text-emerald-600">
+          <p className="mt-4 text-xs text-emerald-600 dark:text-emerald-400">
             If this is a mistake, please contact our support team for assistance.
           </p>
         </div>
@@ -148,37 +148,37 @@ export default function PaymentSuccessPage() {
 
   if (orderStatus) {
     return (
-      <section className="w-full bg-linear-to-b from-emerald-50/30 to-white px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-        <div className="mx-auto max-w-md rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-8 text-center shadow-sm">
+      <section className="w-full bg-linear-to-b from-emerald-50/30 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+        <div className="mx-auto max-w-md rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-8 text-center shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20">
           <div className="mb-4 flex justify-center">
             <CheckCircle2 className="h-12 w-12 text-emerald-600" />
           </div>
 
-          <h1 className="text-2xl font-bold text-emerald-900">Payment Successful!</h1>
-          <p className="mt-2 text-sm text-emerald-700">
+          <h1 className="text-2xl font-bold text-emerald-900 dark:text-emerald-200">Payment Successful!</h1>
+          <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300">
             Your payment has been verified and your order is being processed.
           </p>
 
-          <div className="mt-6 rounded-lg border border-emerald-200 bg-white p-4 text-left">
+          <div className="mt-6 rounded-lg border border-emerald-200 bg-white p-4 text-left dark:border-emerald-800/60 dark:bg-emerald-950/30">
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-emerald-600">Order ID:</span>
-                <span className="font-mono font-semibold text-emerald-900">{orderStatus.orderId}</span>
+                <span className="text-emerald-600 dark:text-emerald-400">Order ID:</span>
+                <span className="font-mono font-semibold text-emerald-900 dark:text-emerald-200">{orderStatus.orderId}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-emerald-600">Amount Paid:</span>
-                <span className="font-semibold text-emerald-900">৳{orderStatus.totalAmount.toFixed(2)}</span>
+                <span className="text-emerald-600 dark:text-emerald-400">Amount Paid:</span>
+                <span className="font-semibold text-emerald-900 dark:text-emerald-200">৳{orderStatus.totalAmount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-emerald-600">Status:</span>
-                <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                <span className="text-emerald-600 dark:text-emerald-400">Status:</span>
+                <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/45 dark:text-emerald-300">
                   {orderStatus.status}
                 </span>
               </div>
             </div>
           </div>
 
-          <p className="mt-4 text-xs text-emerald-600">
+          <p className="mt-4 text-xs text-emerald-600 dark:text-emerald-400">
             Redirecting to order details in 3 seconds...
           </p>
 
@@ -186,7 +186,7 @@ export default function PaymentSuccessPage() {
             <Button asChild className="w-full bg-emerald-600 text-white hover:bg-emerald-700">
               <Link href={`/orders/${orderStatus.orderId}`}>View Order Details</Link>
             </Button>
-            <Button asChild variant="outline" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50">
+            <Button asChild variant="outline" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30">
               <Link href="/shop">Continue Shopping</Link>
             </Button>
           </div>

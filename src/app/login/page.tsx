@@ -6,7 +6,7 @@ export const dynamic = "force-static";
 
 export default function LoginPage() {
 	return (
-		<Suspense fallback={<div className="p-8 text-sm text-muted-foreground">Loading login...</div>}>
+		<Suspense fallback={<div className="p-8 text-sm text-emerald-700 dark:text-emerald-300">Loading login...</div>}>
 			<LoginForm />
 		</Suspense>
 	);
