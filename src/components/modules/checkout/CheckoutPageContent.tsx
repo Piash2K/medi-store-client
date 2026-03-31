@@ -208,16 +208,16 @@ export default function CheckoutPageContent() {
 
   return (
     <section className="w-full px-4 py-8 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
-      <h1 className="text-4xl font-bold tracking-tight">Checkout</h1>
+      <h1 className="text-4xl font-bold tracking-tight text-emerald-700">Checkout</h1>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           {/* Shipping Information */}
-          <div className="rounded-2xl border bg-card p-6">
-            <h2 className="text-2xl font-semibold tracking-tight">Shipping Information</h2>
+          <div className="rounded-2xl border-2 border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-6">
+            <h2 className="text-2xl font-bold tracking-tight text-emerald-700">Shipping Information</h2>
 
             <div className="mt-5 space-y-2">
-              <p className="text-sm font-medium">Shipping Address</p>
+              <p className="text-sm font-semibold text-emerald-700">Shipping Address</p>
               <Input
                 value={shippingAddress}
                 onChange={(event) => setShippingAddress(event.target.value)}
@@ -227,7 +227,7 @@ export default function CheckoutPageContent() {
           </div>
 
           {/* Payment Method Selection */}
-          <div className="rounded-2xl border bg-card p-6">
+          <div className="rounded-2xl border-2 border-blue-200 bg-linear-to-br from-blue-50 to-white p-6">
             <PaymentMethodSelector
               isLoading={isPlacingOrder}
               subtotal={subtotal}
@@ -239,25 +239,25 @@ export default function CheckoutPageContent() {
                 quantity: item.quantity,
               }))}
               shippingCost={shipping}
-              onPaymentMethodChange={(method) => setPaymentMethod(method)}
+              onPaymentMethodChange={(method: "COD" | "SSLCOMMERZ") => setPaymentMethod(method)}
             />
           </div>
 
           {/* COD Place Order Button */}
           {paymentMethod === "COD" && (
-            <div className="rounded-2xl border bg-card p-6">
+            <div className="rounded-2xl border-2 border-teal-200 bg-linear-to-br from-teal-50 to-white p-6">
               {checkoutError && (
-                <p className="text-destructive mb-2 rounded-lg bg-destructive/10 p-3 text-sm">
+                <p className="text-red-700 mb-2 rounded-lg bg-red-50 border-2 border-red-200 p-3 text-sm font-semibold">
                   {checkoutError}
                 </p>
               )}
               {checkoutMessage && (
-                <p className="text-primary mb-2 rounded-lg bg-primary/10 p-3 text-sm">
+                <p className="text-emerald-700 mb-2 rounded-lg bg-emerald-50 border-2 border-emerald-200 p-3 text-sm font-semibold">
                   {checkoutMessage}
                 </p>
               )}
               <Button
-                className="h-11 w-full text-base"
+                className="h-11 w-full text-base bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold"
                 onClick={handlePlaceOrder}
                 disabled={isPlacingOrder || (isBuyNowMode && !buyNowItem)}
               >
@@ -266,7 +266,7 @@ export default function CheckoutPageContent() {
               <Button
                 asChild
                 variant="outline"
-                className="mt-3 h-11 w-full text-base"
+                className="mt-3 h-11 w-full text-base border-2 border-emerald-300 hover:bg-emerald-50"
               >
                 <Link href={isBuyNowMode ? "/shop" : "/cart"}>
                   {isBuyNowMode ? "Back to Shop" : "Back to Cart"}
@@ -277,41 +277,41 @@ export default function CheckoutPageContent() {
         </div>
 
         {/* Order Summary Sidebar */}
-        <aside className="h-fit rounded-2xl border bg-card p-6">
-          <h2 className="text-2xl font-semibold tracking-tight">Order Summary</h2>
+        <aside className="h-fit rounded-2xl border-2 border-emerald-200 bg-white p-6 shadow-lg">
+          <h2 className="text-2xl font-bold tracking-tight text-emerald-700">Order Summary</h2>
 
-          <div className="mt-4 space-y-2 border-b pb-4">
+          <div className="mt-5 space-y-2 border-b-2 border-emerald-100 pb-4">
             {checkoutItems.map((item) => (
-              <div key={item.id} className="flex items-start justify-between gap-3 text-sm">
+              <div key={item.id} className="flex items-start justify-between gap-3 text-sm pb-2">
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-foreground">{item.name}</p>
-                  <p className="text-muted-foreground">Qty: {item.quantity}</p>
+                  <p className="truncate font-semibold text-gray-800">{item.name}</p>
+                  <p className="text-emerald-600 text-xs font-medium">Qty: {item.quantity}</p>
                 </div>
-                <p className="font-medium text-foreground">
+                <p className="font-bold text-gray-900">
                   ৳{currencyFormatter.format(item.price * item.quantity)}
                 </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-5 space-y-2 text-lg">
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span>Subtotal ({itemsCount} items)</span>
-              <span className="text-foreground">৳{currencyFormatter.format(subtotal)}</span>
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm font-medium text-gray-600">Subtotal ({itemsCount} items)</span>
+              <span className="font-semibold text-gray-800">৳{currencyFormatter.format(subtotal)}</span>
             </div>
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span>Shipping</span>
-              <span className="text-foreground">
+            <div className="flex items-center justify-between py-2 border-b-2 border-emerald-100 pb-3">
+              <span className="text-sm font-medium text-gray-600">Shipping</span>
+              <span className="font-semibold text-emerald-700">
                 {shipping === 0 ? "FREE" : `৳${currencyFormatter.format(shipping)}`}
               </span>
             </div>
           </div>
 
-          <div className="my-5 border-t" />
-
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-semibold">Total</span>
-            <span className="text-3xl font-bold">৳{currencyFormatter.format(total)}</span>
+          <div className="mt-4 rounded-xl bg-linear-to-r from-emerald-50 to-teal-50 p-4 border-2 border-emerald-200">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold text-emerald-700">Total</span>
+              <span className="text-3xl font-black text-emerald-600">৳{currencyFormatter.format(total)}</span>
+            </div>
           </div>
         </aside>
       </div>
