@@ -287,19 +287,19 @@ export default function ShopPageContent() {
   }, []);
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">Shop All Medicines</h1>
-      <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+    <section className="mx-auto w-full max-w-7xl bg-linear-to-b from-emerald-50/20 to-white px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <h1 className="text-2xl font-bold tracking-tight text-emerald-700 sm:text-3xl lg:text-4xl">Shop All Medicines</h1>
+      <p className="mt-2 text-sm text-emerald-600 sm:text-base">
         Browse our collection of quality OTC medicines
       </p>
 
       <div className="mt-6 grid items-start gap-6 lg:mt-8 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-2xl border bg-card p-4 sm:p-5 lg:sticky lg:top-20">
-          <h2 className="text-xl font-semibold sm:text-2xl">Filters</h2>
+        <aside className="h-fit rounded-2xl border-2 border-emerald-200 bg-linear-to-b from-emerald-50/40 to-white p-4 shadow-sm sm:p-5 lg:sticky lg:top-20">
+          <h2 className="text-xl font-semibold text-emerald-700 sm:text-2xl">Filters</h2>
 
           <div className="mt-5 space-y-7">
             <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-500" />
               <Input
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
@@ -309,7 +309,7 @@ export default function ShopPageContent() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold sm:text-xl">Categories</h3>
+              <h3 className="text-lg font-semibold text-emerald-700 sm:text-xl">Categories</h3>
               <div className="mt-3 space-y-2.5">
                 {categories.map((item, index) => (
                   <label
@@ -323,11 +323,11 @@ export default function ShopPageContent() {
                         onChange={() =>
                           setCategory((prev) => (prev === item.name ? "" : item.name))
                         }
-                        className="accent-primary"
+                        className="accent-emerald-600"
                       />
                       {item.name}
                     </span>
-                    <span className="text-muted-foreground text-sm">
+                    <span className="text-sm text-emerald-600">
                       {categoryCounts.get(item.name) || 0}
                     </span>
                   </label>
@@ -336,7 +336,7 @@ export default function ShopPageContent() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold sm:text-xl">Price Range</h3>
+              <h3 className="text-lg font-semibold text-emerald-700 sm:text-xl">Price Range</h3>
               <div className="mt-4">
                 <input
                   type="range"
@@ -347,9 +347,9 @@ export default function ShopPageContent() {
                     setMinPrice("0");
                     setMaxPrice(event.target.value);
                   }}
-                  className="accent-primary w-full"
+                  className="w-full accent-emerald-600"
                 />
-                <div className="mt-2 flex items-center justify-between text-sm text-muted-foreground">
+                <div className="mt-2 flex items-center justify-between text-sm text-emerald-600">
                   <span>BDT {minPrice || "0"}</span>
                   <span>BDT {maxPrice || "1000"}</span>
                 </div>
@@ -357,7 +357,7 @@ export default function ShopPageContent() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold sm:text-xl">Manufacturer</h3>
+              <h3 className="text-lg font-semibold text-emerald-700 sm:text-xl">Manufacturer</h3>
               <div className="mt-3 space-y-2.5">
                 {manufacturers.length > 0 ? (
                   manufacturers.map((item, index) => (
@@ -372,11 +372,11 @@ export default function ShopPageContent() {
                           onChange={() =>
                             setManufacturer((prev) => (prev === item ? "" : item))
                           }
-                          className="accent-primary"
+                          className="accent-emerald-600"
                         />
                         {item}
                       </span>
-                      <span className="text-muted-foreground text-sm">
+                      <span className="text-sm text-emerald-600">
                         {manufacturerCounts.get(item) || 0}
                       </span>
                     </label>
@@ -396,16 +396,16 @@ export default function ShopPageContent() {
                 type="checkbox"
                 checked={inStockOnly}
                 onChange={(event) => setInStockOnly(event.target.checked)}
-                className="accent-primary"
+                className="accent-emerald-600"
               />
               <span>In Stock Only</span>
             </label>
 
             <div className="flex flex-col gap-2 sm:flex-row">
-              <Button type="button" onClick={handleApplyFilters} className="flex-1">
+              <Button type="button" onClick={handleApplyFilters} className="flex-1 bg-emerald-600 text-white hover:bg-emerald-700">
                 Apply
               </Button>
-              <Button type="button" variant="outline" onClick={handleResetFilters} className="flex-1">
+              <Button type="button" variant="outline" onClick={handleResetFilters} className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50">
                 Clear
               </Button>
             </div>
@@ -414,13 +414,13 @@ export default function ShopPageContent() {
 
         <div className="flex min-w-0 flex-col">
           <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <p className="text-sm text-muted-foreground sm:text-base lg:text-lg">
+            <p className="text-sm text-emerald-600 sm:text-base lg:text-lg">
               {totalMedicines > 0 ? "Available medicines" : "No medicines found"}
             </p>
             <select
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value)}
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring h-9 w-full rounded-md border px-3 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none sm:w-auto"
+              className="h-9 w-full rounded-md border border-emerald-300 bg-white px-3 text-sm text-emerald-700 shadow-sm ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 sm:w-auto"
             >
               <option value="relevance">Sort by: Relevance</option>
               <option value="price-low-high">Sort by: Price Low to High</option>
@@ -456,14 +456,14 @@ export default function ShopPageContent() {
                   return (
                     <article
                       key={`${medicine._id}-${medicine.name}-${index}`}
-                      className="overflow-hidden rounded-2xl border bg-card"
+                      className="overflow-hidden rounded-2xl border-2 border-emerald-200 bg-white shadow-sm transition hover:shadow-md"
                     >
                       <Link
                         href={`/shop/${getMedicinePathId(medicine)}`}
                         className="block"
                         aria-label={`View details for ${medicine.name}`}
                       >
-                        <div className="bg-muted/50 relative flex h-52 items-center justify-center">
+                        <div className="relative flex h-52 items-center justify-center bg-emerald-50">
                           {!isInStock && (
                             <span className="bg-destructive text-destructive-foreground absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold">
                               Out of Stock
@@ -478,7 +478,7 @@ export default function ShopPageContent() {
                               className="object-cover"
                             />
                           ) : (
-                            <div className="bg-primary/10 text-primary flex h-16 w-16 items-center justify-center rounded-full">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                               <ShoppingCart className="h-8 w-8" />
                             </div>
                           )}
@@ -491,24 +491,24 @@ export default function ShopPageContent() {
                             className="block space-y-1.5"
                             aria-label={`Open ${medicine.name} details`}
                           >
-                            <span className="bg-muted inline-flex rounded-full px-2 py-1 text-xs font-medium">
+                            <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">
                               {medicine.category?.name || "General"}
                             </span>
-                            <h2 className="text-xl leading-tight font-semibold tracking-tight sm:text-2xl">
+                            <h2 className="text-xl leading-tight font-semibold tracking-tight text-emerald-800 sm:text-2xl">
                               {medicine.name}
                             </h2>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-emerald-600">
                               by {medicine.manufacturer || "Unknown manufacturer"}
                             </p>
                             <div className="flex items-center justify-between mt-1">
-                              <div className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                              <div className="flex items-center gap-1 text-xs text-emerald-600 sm:text-sm">
                                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                                 <span>{averageRating.toFixed(1)}</span>
                                 <span>({totalReviewsForMedicine})</span>
                               </div>
                               <span className="text-xs sm:text-sm ml-2">
                                 {isInStock ? (
-                                  <span className="text-primary">In stock ({medicine.stock})</span>
+                                  <span className="text-emerald-600">In stock ({medicine.stock})</span>
                                 ) : (
                                   <span className="text-destructive font-medium">Stock out</span>
                                 )}
@@ -517,13 +517,13 @@ export default function ShopPageContent() {
                           </Link>
 
                           <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                            <p className="text-base font-semibold sm:text-lg">BDT {medicine.price}</p>
+                            <p className="text-base font-semibold text-emerald-700 sm:text-lg">BDT {medicine.price}</p>
                             <div className="flex w-full items-center gap-2 sm:w-auto">
                             <Button
                               type="button"
                               size="sm"
                               variant="outline"
-                              className="h-8 flex-1 px-3 sm:flex-none"
+                              className="h-8 flex-1 border-emerald-300 px-3 text-emerald-700 hover:bg-emerald-50 sm:flex-none"
                               disabled={!medicineCheckoutId || !isInStock}
                               onClick={async () => {
                                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -542,7 +542,7 @@ export default function ShopPageContent() {
                             <Button
                               type="button"
                               size="sm"
-                              className="h-8 flex-1 px-4 sm:flex-none"
+                              className="h-8 flex-1 bg-emerald-600 px-4 text-white hover:bg-emerald-700 sm:flex-none"
                               disabled={isAlreadyInCart}
                               onClick={async () => {
                                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -576,8 +576,8 @@ export default function ShopPageContent() {
             )}
           </div>
 
-          <div className="mt-6 flex flex-col items-start justify-between gap-3 rounded-xl border bg-card p-3 sm:flex-row sm:items-center">
-            <p className="px-1 text-sm text-muted-foreground sm:px-2">
+          <div className="mt-6 flex flex-col items-start justify-between gap-3 rounded-xl border-2 border-emerald-200 bg-white p-3 sm:flex-row sm:items-center">
+            <p className="px-1 text-sm text-emerald-600 sm:px-2">
               Page {page} of {totalPage}
             </p>
 
@@ -585,7 +585,7 @@ export default function ShopPageContent() {
             <Button
               type="button"
               variant="outline"
-              className="flex-1 sm:flex-none"
+              className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 sm:flex-none"
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={page <= 1}
             >
@@ -594,7 +594,7 @@ export default function ShopPageContent() {
             <Button
               type="button"
               variant="outline"
-              className="flex-1 sm:flex-none"
+              className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 sm:flex-none"
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPage))}
               disabled={page >= totalPage}
             >
