@@ -54,17 +54,17 @@ export default function WhyChooseMediStore() {
   return (
     <section
       id="why-choose-medistore"
-      className="relative overflow-hidden px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-16"
+      className="relative overflow-hidden home-section"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.16),transparent_40%)] dark:bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.2),transparent_45%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.25)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.25)_1px,transparent_1px)] bg-size-[28px_28px] opacity-25" />
-      <div className="mx-auto max-w-screen-2xl">
-        <div className="relative max-w-3xl text-center sm:text-left">
+      <div className="home-shell">
+        <div className="relative max-w-3xl text-left">
           <span className="bg-primary/10 text-primary ring-primary/25 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1">
             Trusted Care Platform
           </span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">Why Choose MediStore</h2>
-          <p className="text-muted-foreground mt-3 text-sm sm:text-base lg:text-lg">
+          <h2 className="mt-3 home-heading">Why Choose MediStore</h2>
+          <p className="home-lead">
             A secure, convenient, and dependable way to buy your medicines online.
           </p>
         </div>

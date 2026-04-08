@@ -124,3 +124,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .home-section {
+    @apply py-10 sm:py-14 lg:py-16;
+  }
+
+  .home-shell {
+    @apply mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .home-heading {
+    @apply text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl;
+  }
+
+  .home-lead {
+    @apply text-muted-foreground mt-3 text-sm sm:text-base lg:text-lg;
+  }
+}

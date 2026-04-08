@@ -16,12 +16,12 @@ export default async function FeaturedMedicines() {
   const featuredMedicines = result.success ? result.data.slice(0, 4) : [];
 
   return (
-    <section className="bg-muted/40 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
-      <div className="mx-auto max-w-screen-2xl">
+    <section className="bg-muted/40 home-section">
+      <div className="home-shell">
         <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center sm:gap-3">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">Featured Medicines</h2>
-            <p className="text-muted-foreground mt-1.5 text-sm sm:mt-2 sm:text-base lg:text-lg">
+            <h2 className="home-heading">Featured Medicines</h2>
+            <p className="home-lead">
               Popular picks from our verified sellers
             </p>
           </div>
