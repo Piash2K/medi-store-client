@@ -287,7 +287,7 @@ export default function ShopPageContent() {
   }, []);
 
   return (
-    <section className="mx-auto w-full max-w-7xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
+    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
       <h1 className="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-3xl lg:text-4xl">Shop All Medicines</h1>
       <p className="mt-2 text-sm text-emerald-600 dark:text-emerald-400 sm:text-base">
         Browse our collection of quality OTC medicines
@@ -443,7 +443,7 @@ export default function ShopPageContent() {
             )}
 
             {!isLoading && !errorMessage && sortedMedicines.length > 0 && (
-              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {sortedMedicines.map((medicine, index) => {
                   const medicineReviewId = medicine._id || medicine.id || "";
                   const medicineCheckoutId = getMedicineCheckoutId(medicine);

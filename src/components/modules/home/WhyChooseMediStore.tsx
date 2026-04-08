@@ -58,7 +58,7 @@ export default function WhyChooseMediStore() {
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.16),transparent_40%)] dark:bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.2),transparent_45%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.25)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.25)_1px,transparent_1px)] bg-size-[28px_28px] opacity-25" />
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-screen-2xl">
         <div className="relative max-w-3xl text-center sm:text-left">
           <span className="bg-primary/10 text-primary ring-primary/25 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1">
             Trusted Care Platform
