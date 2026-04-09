@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/providers/cart-provider";
+import AiSearchSuggestions from "@/components/modules/shop/AiSearchSuggestions";
 import { getUser } from "@/services/auth";
 import { getCategories, getMedicines } from "@/services/medicine";
 import { getMedicineReviews } from "@/services/review";
@@ -62,6 +63,20 @@ export default function ShopPageContent() {
   const [reviewStatsByMedicineId, setReviewStatsByMedicineId] = React.useState<
     Map<string, { averageRating: number; totalReviews: number }>
   >(new Map());
+
+  const aiSearchCatalog = React.useMemo(() => {
+    return Array.from(
+      new Set(
+        [
+          ...categories.map((item) => item.name),
+          ...manufacturers,
+          ...medicines.map((medicine) => medicine.name),
+        ]
+          .map((item) => item?.trim())
+          .filter((item): item is string => Boolean(item)),
+      ),
+    ).slice(0, 18);
+  }, [categories, manufacturers, medicines]);
 
   const loadMedicines = React.useCallback(async () => {
     setIsLoading(true);
@@ -352,6 +367,17 @@ export default function ShopPageContent() {
                 onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder="Search medicines..."
                 className="border-emerald-200/80 bg-white pl-9 text-emerald-800 placeholder:text-emerald-500 dark:border-emerald-700/60 dark:bg-emerald-950/35 dark:text-emerald-200 dark:placeholder:text-emerald-500"
+              />
+
+              <AiSearchSuggestions
+                query={searchTerm}
+                categories={categories.map((item) => item.name)}
+                manufacturers={manufacturers}
+                medicines={aiSearchCatalog}
+                onSelectSuggestion={(suggestion) => {
+                  setSearchTerm(suggestion);
+                  setPage(DEFAULT_PAGE);
+                }}
               />
             </div>
 

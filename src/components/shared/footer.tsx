@@ -36,6 +36,21 @@ export async function Footer() {
                   Shop All
                 </Link>
               </li>
+              <li>
+                <Link href="/about" className="hover:text-foreground transition-colors">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/help" className="hover:text-foreground transition-colors">
+                  Help
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-foreground transition-colors">
+                  Contact
+                </Link>
+              </li>
               {quickCategories.map((category, index) => (
                 <li key={`${category._id || category.name}-${index}`}>
                   <Link

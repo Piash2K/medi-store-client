@@ -41,6 +41,9 @@ interface MenuItem {
 const baseMenu: MenuItem[] = [
   { title: "Home", url: "/" },
   { title: "Shop", url: "/shop" },
+  { title: "About", url: "/about" },
+  { title: "Help", url: "/help" },
+  { title: "Contact", url: "/contact" },
   { title: "Cart", url: "/cart" },
 ];
 
