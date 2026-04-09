@@ -10,6 +10,8 @@ import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { signInWithGooglePopup } from "@/lib/firebase";
+import { loginOrRegisterWithGoogle } from "@/services/auth";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -24,6 +26,7 @@ type RegisterFormData = {
 
 export default function RegisterForm() {
   const router = useRouter();
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const form = useForm<RegisterFormData>({
     defaultValues: {
       name: "",
@@ -109,6 +112,53 @@ export default function RegisterForm() {
         title: "Something went wrong",
         text: "Please try again.",
       });
+    }
+  };
+
+  const handleGoogleRegister = async () => {
+    setIsGoogleLoading(true);
+
+    try {
+      const googleUser = await signInWithGooglePopup();
+
+      if (!googleUser.email) {
+        await Swal.fire({
+          icon: "error",
+          title: "Google sign-up failed",
+          text: "No email was returned from your Google account.",
+        });
+        return;
+      }
+
+      const selectedRole = form.getValues("role") || "CUSTOMER";
+      const result = await loginOrRegisterWithGoogle({
+        email: googleUser.email,
+        name: googleUser.name,
+        profileImage: googleUser.photoURL,
+        uid: googleUser.uid,
+        idToken: googleUser.idToken,
+        role: selectedRole,
+      });
+
+      if (!result.success) {
+        await Swal.fire({
+          icon: "error",
+          title: "Google sign-up failed",
+          text: result.message || "Google auth endpoint is not configured on the backend.",
+        });
+        return;
+      }
+
+      toast.success("Google authentication successful!");
+      router.push("/");
+    } catch {
+      await Swal.fire({
+        icon: "error",
+        title: "Google sign-in failed",
+        text: "Please try again.",
+      });
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -339,9 +389,22 @@ export default function RegisterForm() {
               <Button
                 type="submit"
                 className="mt-2 h-11 w-full bg-[linear-gradient(90deg,#059669_0%,#10b981_100%)] text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 hover:opacity-95"
-                disabled={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting || isGoogleLoading}
               >
                 {form.formState.isSubmitting ? "Creating account..." : "Create account"}
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGoogleRegister}
+                disabled={form.formState.isSubmitting || isGoogleLoading}
+                className="h-11 w-full border-slate-300/90 bg-white text-slate-800 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-800"
+              >
+                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#4285F4" d="M21.35 11.1H12v2.98h5.37c-.23 1.47-1.68 4.31-5.37 4.31-3.23 0-5.86-2.67-5.86-5.96s2.63-5.96 5.86-5.96c1.84 0 3.07.79 3.77 1.46l2.57-2.5C16.7 3.9 14.56 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.19 0 8.62-3.65 8.62-8.79 0-.59-.07-1.04-.15-1.11Z" />
+                </svg>
+                {isGoogleLoading ? "Connecting Google..." : "Continue with Google"}
               </Button>
             </form>
 

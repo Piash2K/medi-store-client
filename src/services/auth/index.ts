@@ -256,3 +256,79 @@ export const updateMyProfilePhoto = async (
     };
   }
 };
+
+type GoogleAuthPayload = {
+  email: string;
+  name: string;
+  profileImage?: string;
+  uid: string;
+  idToken: string;
+  role?: "CUSTOMER" | "SELLER";
+};
+
+const getTokenFromAuthResponse = (result: unknown) => {
+  const resultData = result as {
+    data?: {
+      token?: string;
+      accessToken?: string;
+      jwt?: string;
+    };
+  };
+
+  return resultData?.data?.token || resultData?.data?.accessToken || resultData?.data?.jwt || "";
+};
+
+export const loginOrRegisterWithGoogle = async (payload: GoogleAuthPayload) => {
+  const candidatePaths = [
+    "/auth/google",
+    "/auth/google-login",
+    "/auth/social-login",
+    "/auth/login/google",
+    "/auth/register/google",
+  ];
+
+  let fallbackMessage = "Google auth endpoint is not available on the server.";
+
+  for (const path of candidatePaths) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result?.success) {
+        fallbackMessage = result?.message || fallbackMessage;
+        continue;
+      }
+
+      const token = getTokenFromAuthResponse(result);
+
+      if (!token) {
+        fallbackMessage = result?.message || "Token missing from Google auth response.";
+        continue;
+      }
+
+      const storeCookie = await cookies();
+      storeCookie.set("token", token);
+
+      return {
+        success: true,
+        message: result?.message || "Google authentication successful.",
+      };
+    } catch (error) {
+      if (!isDynamicServerUsageError(error)) {
+        console.error(`Google auth error (${path}):`, error);
+      }
+    }
+  }
+
+  return {
+    success: false,
+    message: fallbackMessage,
+  };
+};
