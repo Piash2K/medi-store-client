@@ -223,7 +223,7 @@ export default function ProfilePageContent({
   };
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 lg:px-8">
+    <section className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <h1 className="text-3xl font-bold tracking-tight text-emerald-700">My Profile</h1>
 
       <div className="mt-5 grid items-start gap-5 lg:grid-cols-[300px_1fr]">

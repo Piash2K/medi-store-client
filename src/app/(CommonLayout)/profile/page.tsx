@@ -23,7 +23,7 @@ export default async function ProfilePage() {
 
   if (!profileResult.success || !profileResult.data) {
     return (
-      <section className="w-full rounded-xl bg-linear-to-b from-emerald-50/25 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <section className="mx-auto w-full max-w-screen-2xl rounded-xl bg-linear-to-b from-emerald-50/25 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">My Profile</h1>
         <p className="mt-6 text-sm text-rose-600 dark:text-rose-300">
           {profileResult.message || "Failed to load profile. Please try again."}

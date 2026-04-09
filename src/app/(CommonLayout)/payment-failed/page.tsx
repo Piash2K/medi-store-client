@@ -25,7 +25,7 @@ export default function PaymentFailedPage() {
   const displayReason = failureReasons[reason] || reason || "Payment was not completed successfully.";
 
   return (
-    <section className="w-full bg-linear-to-b from-emerald-50/30 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/30 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
       <div className="mx-auto max-w-md rounded-2xl border-2 border-rose-200 bg-rose-50 p-8 text-center shadow-sm dark:border-rose-800/60 dark:bg-rose-950/20">
         <div className="mb-4 flex justify-center">
           <div className="rounded-full bg-rose-100 p-3 dark:bg-rose-900/40">

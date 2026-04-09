@@ -176,7 +176,7 @@ export default function CheckoutPageContent() {
 
   if (isBuyNowMode && isLoadingBuyNow) {
     return (
-      <section className="w-full bg-linear-to-b from-emerald-50/20 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight">Checkout</h1>
         <div className="mt-8 flex h-44 items-center justify-center rounded-2xl border bg-card">
           <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
@@ -187,7 +187,7 @@ export default function CheckoutPageContent() {
 
   if (checkoutItems.length === 0) {
     return (
-      <section className="w-full bg-linear-to-b from-emerald-50/20 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+      <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
         <h1 className="text-4xl font-bold tracking-tight">Checkout</h1>
         <div className="mt-8 rounded-2xl border bg-card p-8 text-center">
           <p className="text-lg font-medium">No item selected for checkout</p>
@@ -207,7 +207,7 @@ export default function CheckoutPageContent() {
   }
 
   return (
-    <section className="w-full bg-linear-to-b from-emerald-50/20 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
       <h1 className="text-4xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">Checkout</h1>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">

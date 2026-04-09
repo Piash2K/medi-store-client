@@ -241,7 +241,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
 
   if (isLoading) {
     return (
-      <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="flex h-60 items-center justify-center">
           <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </div>
@@ -251,7 +251,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
 
   if (errorMessage || !medicine) {
     return (
-      <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <section className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <Link href="/shop" className="text-muted-foreground inline-flex items-center gap-2 text-sm">
           <ArrowLeft className="h-4 w-4" />
           Back to Shop
@@ -303,7 +303,7 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   };
 
   return (
-    <section className="mx-auto w-full max-w-7xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 dark:from-emerald-950/10">
+    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 dark:from-emerald-950/10">
       <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200">
         <ArrowLeft className="h-4 w-4" />
         Back to Shop

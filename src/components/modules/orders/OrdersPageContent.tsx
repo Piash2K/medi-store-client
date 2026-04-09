@@ -29,7 +29,7 @@ export default async function OrdersPageContent() {
   const orders = result.success ? result.data : [];
 
   return (
-    <section className="w-full bg-linear-to-b from-emerald-50/30 to-background px-4 py-8 dark:from-emerald-950/10 sm:px-8 lg:px-16 xl:px-20 2xl:px-24">
+    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/30 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
       <h1 className="text-4xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">Track Orders</h1>
       <p className="mt-2 text-base text-emerald-600 dark:text-emerald-400">
         Track your placed orders and view medicine details.
