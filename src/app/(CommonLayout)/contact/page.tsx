@@ -40,7 +40,7 @@ const contactCards = [
 
 export default function ContactPage() {
   return (
-    <section className="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+    <section className="mx-auto w-full max-w-screen-2xl space-y-8 bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
       <div className="space-y-4">
         <Badge className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-300">
           Contact MediStore
