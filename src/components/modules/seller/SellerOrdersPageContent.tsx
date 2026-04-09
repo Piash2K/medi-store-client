@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import TablePagination from "@/components/shared/table-pagination";
 import { Order } from "@/types/order";
 import { updateSellerOrderStatus } from "@/services/order";
 
@@ -102,17 +104,58 @@ const allowedSellerTransitions: Record<OrderStatus, OrderStatus[]> = {
 };
 
 export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersPageContentProps) {
+  const PAGE_SIZE = 8;
   const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [updatingOrderId, setUpdatingOrderId] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredOrders = useMemo(() => {
-    if (statusFilter === "ALL") {
-      return orders;
-    }
+    const query = searchTerm.trim().toLowerCase();
 
-    return orders.filter((order) => order.status?.toUpperCase() === statusFilter);
-  }, [orders, statusFilter]);
+    return orders.filter((order) => {
+      const statusMatched = statusFilter === "ALL" ? true : order.status?.toUpperCase() === statusFilter;
+
+      if (!statusMatched) {
+        return false;
+      }
+
+      if (!query) {
+        return true;
+      }
+
+      const haystack = [
+        order.id,
+        order.customerId,
+        order.customer?.name,
+        order.customer?.email,
+        getItemsSummary(order),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [orders, statusFilter, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredOrders.slice(start, start + PAGE_SIZE);
+  }, [filteredOrders, currentPage, PAGE_SIZE]);
 
   const handleStatusChange = async (order: Order, nextStatus: string) => {
     const normalizedStatus = nextStatus.toUpperCase() as OrderStatus;
@@ -173,6 +216,15 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-3xl">Manage Orders</h1>
 
+        <div className="w-full sm:w-72">
+          <Input
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Search orders..."
+            className="border-emerald-200/80 bg-emerald-50/60 text-emerald-900 placeholder:text-emerald-700/70 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:placeholder:text-emerald-300/70"
+          />
+        </div>
+
         <div className="w-full sm:ml-auto sm:w-48">
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
             <SelectTrigger className="w-full border-emerald-200/80 bg-emerald-50/60 text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100">
@@ -206,14 +258,14 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.length === 0 ? (
+                {paginatedOrders.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-10 text-sm text-muted-foreground">
                       No orders found.
                     </td>
                   </tr>
                 ) : (
-                  filteredOrders.map((order, index) => {
+                  paginatedOrders.map((order, index) => {
                     const statusValue = order.status?.toUpperCase() || "PLACED";
                     const isUpdating = updatingOrderId === order.id;
 
@@ -252,6 +304,8 @@ export default function SellerOrdersPageContent({ initialOrders }: SellerOrdersP
               </tbody>
             </table>
           </div>
+
+          <TablePagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </CardContent>
       </Card>
     </section>

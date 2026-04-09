@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import TablePagination from "@/components/shared/table-pagination";
 import { AdminOrder } from "@/services/admin";
 
 type AdminOrdersPageContentProps = {
@@ -112,8 +113,10 @@ const getSellerText = (order: AdminOrder) => {
 };
 
 export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPageContentProps) {
+  const PAGE_SIZE = 8;
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredOrders = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -144,6 +147,23 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
       return searchableText.includes(query);
     });
   }, [initialOrders, searchTerm, statusFilter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredOrders.slice(start, start + PAGE_SIZE);
+  }, [filteredOrders, currentPage, PAGE_SIZE]);
 
   return (
     <>
@@ -191,14 +211,14 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
               </thead>
 
               <tbody>
-                {filteredOrders.length === 0 ? (
+                {paginatedOrders.length === 0 ? (
                   <tr>
                     <td className="px-4 py-10 text-sm text-muted-foreground" colSpan={6}>
                       No orders found.
                     </td>
                   </tr>
                 ) : (
-                  filteredOrders.map((order, index) => {
+                  paginatedOrders.map((order, index) => {
                     const normalizedStatus = getNormalizedStatus(order.status);
 
                     return (
@@ -218,6 +238,8 @@ export default function AdminOrdersPageContent({ initialOrders }: AdminOrdersPag
               </tbody>
             </table>
           </div>
+
+          <TablePagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </CardContent>
       </Card>
     </>

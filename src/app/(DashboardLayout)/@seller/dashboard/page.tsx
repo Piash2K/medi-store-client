@@ -3,6 +3,7 @@ import { ArrowLeft, Box, ShoppingBag, TrendingUp, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import SellerRecentOrdersTable from "@/components/modules/dashboard/SellerRecentOrdersTable";
 import { getSellerOrders } from "@/services/order";
 import { Order } from "@/types/order";
 
@@ -385,30 +386,7 @@ export default async function DashboardPage() {
           {recentOrders.length === 0 ? (
             <p className="text-sm text-muted-foreground">No recent orders available.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b">
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Order ID</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Customer</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Items</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Total</th>
-                    <th className="px-3 py-2 text-sm font-medium text-muted-foreground">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentOrders.map((order, index) => (
-                    <tr key={order.id} className={index === recentOrders.length - 1 ? "" : "border-b"}>
-                      <td className="px-3 py-3 text-base font-medium whitespace-nowrap">{getOrderCode(index)}</td>
-                      <td className="px-3 py-3 text-base whitespace-nowrap max-w-40 truncate">{getCustomerName(order)}</td>
-                      <td className="px-3 py-3 text-base max-w-56 truncate whitespace-nowrap md:whitespace-normal md:max-w-xs">{getOrderItemsLabel(order)}</td>
-                      <td className="px-3 py-3 text-base font-medium whitespace-nowrap">BDT {currencyFormatter.format(order.totalAmount)}</td>
-                      <td className="px-3 py-3 whitespace-nowrap"><Badge variant={getStatusVariant(order.status)}>{order.status}</Badge></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <SellerRecentOrdersTable orders={recentOrders} />
           )}
         </CardContent>
       </Card>

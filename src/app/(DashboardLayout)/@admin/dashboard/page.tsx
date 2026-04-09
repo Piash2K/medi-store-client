@@ -3,6 +3,7 @@ import { ArrowLeft, Package, PackageCheck, Pill, Store, UserRound, Users, Wallet
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import AdminRecentUsersTable from "@/components/modules/dashboard/AdminRecentUsersTable";
 import { AdminOrder, AdminUser, getAdminOrders, getAdminUsers } from "@/services/admin";
 import { getMedicines } from "@/services/medicine";
 import { Medicine } from "@/types/medicine";
@@ -444,34 +445,7 @@ export default async function DashboardPage() {
           {recentUsers.length === 0 ? (
             <p className="text-sm text-muted-foreground">No users found.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-170 w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b">
-                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Name</th>
-                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Email</th>
-                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Role</th>
-                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Status</th>
-                    <th className="px-3 py-2 text-xs font-medium whitespace-nowrap text-muted-foreground sm:text-sm">Joined</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentUsers.map((user, index) => (
-                    <tr key={`${user.id || user.email || "user"}-${index}`} className="border-b last:border-0">
-                      <td className="px-3 py-3 text-sm font-medium whitespace-nowrap sm:text-base">{getDisplayName(user)}</td>
-                      <td className="px-3 py-3 text-sm text-muted-foreground whitespace-nowrap sm:text-base">{user.email || "N/A"}</td>
-                      <td className="px-3 py-3">
-                        <Badge variant="secondary">{normalizeText(user.role)}</Badge>
-                      </td>
-                      <td className="px-3 py-3">
-                        <Badge variant={getStatusVariant(user.status)}>{normalizeText(user.status)}</Badge>
-                      </td>
-                      <td className="px-3 py-3 text-sm text-muted-foreground whitespace-nowrap sm:text-base">{formatDate(user.createdAt)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <AdminRecentUsersTable users={recentUsers} />
           )}
         </CardContent>
       </Card>

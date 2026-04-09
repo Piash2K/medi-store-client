@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Ban, CheckCircle2, Search } from "lucide-react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import TablePagination from "@/components/shared/table-pagination";
 import { AdminUser, updateAdminUserStatus } from "@/services/admin";
 
 type AdminUsersPageContentProps = {
@@ -90,10 +91,12 @@ const getDisplayName = (user: AdminUser) => {
 };
 
 export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageContentProps) {
+  const PAGE_SIZE = 8;
   const [users, setUsers] = useState(initialUsers);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("ALL");
   const [updatingUserId, setUpdatingUserId] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredUsers = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -114,6 +117,23 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
       return haystack.includes(query);
     });
   }, [users, searchTerm, roleFilter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, roleFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredUsers.slice(start, start + PAGE_SIZE);
+  }, [filteredUsers, currentPage, PAGE_SIZE]);
 
   const handleToggleUserStatus = async (user: AdminUser & { ordersCount: number }) => {
     if (!user.id) {
@@ -220,14 +240,14 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
               </thead>
 
               <tbody>
-                {filteredUsers.length === 0 ? (
+                {paginatedUsers.length === 0 ? (
                   <tr>
                     <td className="px-4 py-10 text-sm text-muted-foreground" colSpan={7}>
                       No users found.
                     </td>
                   </tr>
                 ) : (
-                  filteredUsers.map((user) => {
+                  paginatedUsers.map((user) => {
                     const isBanned = isUserBanned(user.status);
                     const isUpdating = updatingUserId === user.id;
 
@@ -275,6 +295,8 @@ export default function AdminUsersPageContent({ initialUsers }: AdminUsersPageCo
               </tbody>
             </table>
           </div>
+
+          <TablePagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </CardContent>
       </Card>
     </section>

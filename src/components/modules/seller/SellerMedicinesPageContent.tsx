@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import TablePagination from "@/components/shared/table-pagination";
 import {
   createSellerMedicine,
   deleteSellerMedicine,
@@ -34,8 +35,10 @@ export default function SellerMedicinesPageContent({
   initialMedicines,
   initialCategories,
 }: SellerMedicinesPageContentProps) {
+  const PAGE_SIZE = 8;
   const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null);
   const [editName, setEditName] = useState("");
@@ -71,6 +74,23 @@ export default function SellerMedicinesPageContent({
       return value.includes(query);
     });
   }, [medicines, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredMedicines.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedMedicines = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredMedicines.slice(start, start + PAGE_SIZE);
+  }, [filteredMedicines, currentPage, PAGE_SIZE]);
 
   const handleEditClick = (medicine: Medicine) => {
     setEditingMedicine(medicine);
@@ -347,14 +367,14 @@ export default function SellerMedicinesPageContent({
                 </tr>
               </thead>
               <tbody>
-                {filteredMedicines.length === 0 ? (
+                {paginatedMedicines.length === 0 ? (
                   <tr>
                     <td className="px-4 py-10 text-sm text-muted-foreground" colSpan={6}>
                       No medicines found.
                     </td>
                   </tr>
                 ) : (
-                  filteredMedicines.map((medicine) => {
+                  paginatedMedicines.map((medicine) => {
                     const medicineId = getMedicineId(medicine);
                     const stock = medicine.stock ?? 0;
                     const isInStock = stock > 0;
@@ -407,6 +427,8 @@ export default function SellerMedicinesPageContent({
               </tbody>
             </table>
           </div>
+
+          <TablePagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </CardContent>
       </Card>
 

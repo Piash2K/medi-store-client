@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import TablePagination from "@/components/shared/table-pagination";
 import { createCategory, deleteCategory, updateCategory } from "@/services/category";
 
 type CategoryRow = {
@@ -33,7 +34,10 @@ const toSlug = (value: string) => {
 };
 
 export default function AdminCategoriesPageContent({ initialCategories }: AdminCategoriesPageContentProps) {
+  const PAGE_SIZE = 8;
   const [categories, setCategories] = useState(initialCategories);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -44,6 +48,40 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
   const [isSaving, setIsSaving] = useState(false);
   const [deletingCategoryId, setDeletingCategoryId] = useState("");
   const editingCategory = categories.find((category) => category.id === editingCategoryId) || null;
+
+  const filteredCategories = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+
+    if (!query) {
+      return categories;
+    }
+
+    return categories.filter((category) => {
+      const value = [category.name, category.description]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return value.includes(query);
+    });
+  }, [categories, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredCategories.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedCategories = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredCategories.slice(start, start + PAGE_SIZE);
+  }, [filteredCategories, currentPage, PAGE_SIZE]);
 
   const handleEditClick = (category: CategoryRow) => {
     setEditingCategoryId(category.id);
@@ -228,6 +266,15 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
         </Button>
       </div>
 
+      <div className="max-w-xl">
+        <Input
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          placeholder="Search categories..."
+          className="border-emerald-200/80 bg-emerald-50/60 text-emerald-900 placeholder:text-emerald-700/70 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:placeholder:text-emerald-300/70"
+        />
+      </div>
+
       <Card className="border border-border/70 bg-card shadow-sm">
         <CardContent className="p-0">
           <div className="w-full overflow-x-auto">
@@ -243,14 +290,14 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
               </thead>
 
               <tbody>
-                {categories.length === 0 ? (
+                {paginatedCategories.length === 0 ? (
                   <tr>
                     <td className="px-4 py-10 text-sm text-muted-foreground" colSpan={5}>
                       No categories found.
                     </td>
                   </tr>
                 ) : (
-                  categories.map((category) => {
+                  paginatedCategories.map((category) => {
                     const isActive = category.medicinesCount > 0;
                     const isDeleting = deletingCategoryId === category.id;
 
@@ -299,6 +346,8 @@ export default function AdminCategoriesPageContent({ initialCategories }: AdminC
               </tbody>
             </table>
           </div>
+
+          <TablePagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </CardContent>
       </Card>
 

@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import TablePagination from "@/components/shared/table-pagination";
 import { Medicine } from "@/types/medicine";
 
 type AdminMedicinesPageContentProps = {
@@ -15,9 +16,11 @@ type AdminMedicinesPageContentProps = {
 const getMedicineId = (medicine: Medicine) => medicine.id || medicine._id || medicine.slug || "";
 
 export default function AdminMedicinesPageContent({ initialMedicines }: AdminMedicinesPageContentProps) {
+  const PAGE_SIZE = 8;
   const medicines = initialMedicines;
   const [searchTerm, setSearchTerm] = useState("");
   const [stockFilter, setStockFilter] = useState<"all" | "in-stock" | "out-of-stock">("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredMedicines = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -55,6 +58,23 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
       return searchValue.includes(query);
     });
   }, [medicines, searchTerm, stockFilter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, stockFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredMedicines.length / PAGE_SIZE));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const paginatedMedicines = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredMedicines.slice(start, start + PAGE_SIZE);
+  }, [filteredMedicines, currentPage, PAGE_SIZE]);
 
   return (
     <>
@@ -99,14 +119,14 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
                 </tr>
               </thead>
               <tbody>
-                {filteredMedicines.length === 0 ? (
+                {paginatedMedicines.length === 0 ? (
                   <tr>
                     <td className="px-4 py-10 text-sm text-muted-foreground" colSpan={6}>
                       No medicines found.
                     </td>
                   </tr>
                 ) : (
-                  filteredMedicines.map((medicine) => {
+                  paginatedMedicines.map((medicine) => {
                     const medicineId = getMedicineId(medicine);
                     const stock = medicine.stock ?? 0;
                     const isInStock = stock > 0;
@@ -136,6 +156,8 @@ export default function AdminMedicinesPageContent({ initialMedicines }: AdminMed
               </tbody>
             </table>
           </div>
+
+          <TablePagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </CardContent>
       </Card>
     </>
