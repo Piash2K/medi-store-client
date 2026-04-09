@@ -55,7 +55,7 @@ export default function Hero() {
 	return (
 		<section className="w-full">
 			<div className="relative w-full overflow-hidden">
-				<div className="relative h-[calc(100vh-4rem)] min-h-115 w-full sm:min-h-130 lg:min-h-140">
+				<div className="relative h-[70vh] min-h-115 w-full sm:min-h-130 lg:min-h-140">
 					<Image
 						src={activeSlide.image}
 						alt={activeSlide.title}

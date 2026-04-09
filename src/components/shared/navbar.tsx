@@ -188,7 +188,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto w-full  px-4 sm:px-6 lg:px-8">
-        <nav className="hidden h-16 items-center justify-between lg:flex">
+        <nav className="hidden h-12 items-center justify-between lg:flex">
           <div className="flex items-center gap-6">
             <Link href="/" className="text-lg font-semibold tracking-tight">
               MediStore 💊
@@ -230,7 +230,7 @@ export function Navbar() {
           </div>
         </nav>
 
-        <div className="flex h-16 items-center justify-between lg:hidden">
+        <div className="flex h-12 items-center justify-between lg:hidden">
           <div className="flex items-center gap-2">
             <Link href="/" className="text-lg font-semibold tracking-tight">
               MediStore 💊
