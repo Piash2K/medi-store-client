@@ -22,6 +22,35 @@ const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
 
+const MEDICINE_KEYWORD_HINTS = [
+  "tablet",
+  "capsule",
+  "syrup",
+  "drop",
+  "drops",
+  "cream",
+  "ointment",
+  "gel",
+  "spray",
+  "inhaler",
+  "injection",
+  "powder",
+  "pain",
+  "fever",
+  "cold",
+  "cough",
+  "allergy",
+  "acidity",
+  "gastric",
+  "diabetes",
+  "pressure",
+  "vitamin",
+  "antibiotic",
+  "antiseptic",
+  "oral care",
+  "skin care",
+];
+
 const getShortMedicineDescription = (medicine: Medicine) => {
   const rawDescription = medicine.description?.trim();
 
@@ -36,11 +65,47 @@ const getShortMedicineDescription = (medicine: Medicine) => {
   return fallbackParts || "Trusted medicine with quality checks and easy ordering.";
 };
 
+const matchesMedicineSearch = (medicine: Medicine, query: string) => {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return true;
+  }
+
+  const searchableText = [
+    medicine.name,
+    medicine.category?.name,
+    medicine.manufacturer,
+    medicine.description,
+    getShortMedicineDescription(medicine),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return searchableText.includes(normalizedQuery);
+};
+
+const getMedicineKeywordTokens = (medicine: Medicine) => {
+  const rawText = [
+    medicine.name,
+    medicine.category?.name,
+    medicine.manufacturer,
+    medicine.description,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return MEDICINE_KEYWORD_HINTS.filter((keyword) => rawText.includes(keyword));
+};
+
 export default function ShopPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addItem, items } = useCart();
   const [medicines, setMedicines] = React.useState<Medicine[]>([]);
+  const [allMedicinesCatalog, setAllMedicinesCatalog] = React.useState<Medicine[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]);
 
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -78,9 +143,97 @@ export default function ShopPageContent() {
     ).slice(0, 18);
   }, [categories, manufacturers, medicines]);
 
+  const aiMedicineKeywords = React.useMemo(() => {
+    return Array.from(
+      new Set(
+        medicines.flatMap((medicine) => getMedicineKeywordTokens(medicine)),
+      ),
+    ).slice(0, 24);
+  }, [medicines]);
+
   const loadMedicines = React.useCallback(async () => {
     setIsLoading(true);
     setErrorMessage("");
+
+    const normalizedQuery = debouncedSearchTerm.trim().toLowerCase();
+
+    if (normalizedQuery && allMedicinesCatalog.length > 0) {
+      const locallyMatchedMedicines = allMedicinesCatalog.filter((medicine) => {
+        if (medicine.isDeleted) {
+          return false;
+        }
+
+        if (category && medicine.category?.name !== category) {
+          return false;
+        }
+
+        if (manufacturer && medicine.manufacturer !== manufacturer) {
+          return false;
+        }
+
+        if (minPrice && medicine.price < Number(minPrice)) {
+          return false;
+        }
+
+        if (maxPrice && medicine.price > Number(maxPrice)) {
+          return false;
+        }
+
+        if (inStockOnly && (medicine.stock || 0) <= 0) {
+          return false;
+        }
+
+        return matchesMedicineSearch(medicine, normalizedQuery);
+      });
+
+      const nextTotalPage = Math.max(1, Math.ceil(locallyMatchedMedicines.length / DEFAULT_LIMIT));
+      const safePage = Math.min(page, nextTotalPage);
+
+      if (safePage !== page) {
+        setPage(safePage);
+      }
+
+      const start = (safePage - 1) * DEFAULT_LIMIT;
+      const paginatedMedicines = locallyMatchedMedicines.slice(start, start + DEFAULT_LIMIT);
+
+      const medicineIds = Array.from(
+        new Set(
+          paginatedMedicines
+            .map((medicine) => medicine._id || medicine.id)
+            .filter((medicineId): medicineId is string => Boolean(medicineId)),
+        ),
+      );
+
+      const nextReviewStatsMap = new Map<string, { averageRating: number; totalReviews: number }>();
+
+      if (medicineIds.length > 0) {
+        const reviewResults = await Promise.all(
+          medicineIds.map(async (id) => {
+            const reviewResult = await getMedicineReviews(id);
+
+            return {
+              id,
+              averageRating: reviewResult.success && reviewResult.data ? reviewResult.data.averageRating : 0,
+              totalReviews: reviewResult.success && reviewResult.data ? reviewResult.data.totalReviews : 0,
+            };
+          }),
+        );
+
+        reviewResults.forEach((reviewItem) => {
+          nextReviewStatsMap.set(reviewItem.id, {
+            averageRating: reviewItem.averageRating,
+            totalReviews: reviewItem.totalReviews,
+          });
+        });
+      }
+
+      setMedicines(paginatedMedicines);
+      setReviewStatsByMedicineId(nextReviewStatsMap);
+      setTotalPage(nextTotalPage);
+      setTotalMedicines(locallyMatchedMedicines.length);
+      setIsLoading(false);
+      return;
+    }
 
     const result = await getMedicines({
       searchTerm: debouncedSearchTerm || undefined,
@@ -139,7 +292,7 @@ export default function ShopPageContent() {
     setTotalPage(result.meta?.totalPage || 1);
     setTotalMedicines(result.meta?.total || result.data.length);
     setIsLoading(false);
-  }, [debouncedSearchTerm, category, manufacturer, minPrice, maxPrice, inStockOnly, page]);
+  }, [debouncedSearchTerm, category, manufacturer, minPrice, maxPrice, inStockOnly, page, allMedicinesCatalog]);
 
   const loadFilterStats = React.useCallback(async () => {
     const firstPage = await getMedicines({
@@ -149,6 +302,7 @@ export default function ShopPageContent() {
     }, { noStore: true });
 
     if (!firstPage.success) {
+      setAllMedicinesCatalog([]);
       setCategoryCounts(new Map());
       setManufacturerCounts(new Map());
       setManufacturers([]);
@@ -202,6 +356,7 @@ export default function ShopPageContent() {
     setCategoryCounts(nextCategoryCounts);
     setManufacturerCounts(nextManufacturerCounts);
     setManufacturers(Array.from(nextManufacturerCounts.keys()).sort());
+    setAllMedicinesCatalog(allMedicines.filter((medicine) => !medicine.isDeleted));
   }, []);
 
   React.useEffect(() => {
@@ -374,6 +529,7 @@ export default function ShopPageContent() {
                 categories={categories.map((item) => item.name)}
                 manufacturers={manufacturers}
                 medicines={aiSearchCatalog}
+                medicineKeywords={aiMedicineKeywords}
                 onSelectSuggestion={(suggestion) => {
                   setSearchTerm(suggestion);
                   setPage(DEFAULT_PAGE);

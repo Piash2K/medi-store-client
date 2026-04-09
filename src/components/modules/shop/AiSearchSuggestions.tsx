@@ -10,6 +10,7 @@ type AiSearchSuggestionsProps = {
   categories: string[];
   manufacturers: string[];
   medicines: string[];
+  medicineKeywords: string[];
   onSelectSuggestion: (value: string) => void;
 };
 
@@ -32,6 +33,7 @@ export default function AiSearchSuggestions({
   categories,
   manufacturers,
   medicines,
+  medicineKeywords,
   onSelectSuggestion,
 }: AiSearchSuggestionsProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -61,6 +63,7 @@ export default function AiSearchSuggestions({
             categories,
             manufacturers,
             medicines,
+            medicineKeywords,
           }),
           signal: controller.signal,
         });
@@ -87,7 +90,7 @@ export default function AiSearchSuggestions({
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query, categories, manufacturers, medicines]);
+  }, [query, categories, manufacturers, medicines, medicineKeywords]);
 
   if (query.trim().length < 2 && suggestions.length === 0) {
     return null;
