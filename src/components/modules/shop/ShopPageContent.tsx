@@ -537,9 +537,16 @@ export default function ShopPageContent() {
                             className="block space-y-1.5"
                             aria-label={`Open ${medicine.name} details`}
                           >
-                            <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/45 dark:text-emerald-300">
-                              {medicine.category?.name || "General"}
-                            </span>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/45 dark:text-emerald-300">
+                                {medicine.category?.name || "General"}
+                              </span>
+                              <div className="rounded-full bg-emerald-50 px-2.5 py-1 dark:bg-emerald-900/20">
+                                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                                  BDT {medicine.price}
+                                </p>
+                              </div>
+                            </div>
                             <h2 className="line-clamp-2 min-h-13 text-xl leading-tight font-semibold tracking-tight text-emerald-800 dark:text-emerald-200 sm:text-2xl">
                               {medicine.name}
                             </h2>
@@ -562,20 +569,13 @@ export default function ShopPageContent() {
                               </span>
                             </div>
 
-                          <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2 dark:bg-emerald-900/20">
-                              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">৳</span>
-                              <p className="text-base font-semibold text-emerald-700 dark:text-emerald-300 sm:text-lg">
-                                {medicine.price}
-                              </p>
-                            </div>
-
-                            <div className="flex w-full items-center gap-2 sm:w-auto">
+                          <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
+                            <div className="flex w-full items-center gap-2">
                             <Button
                               type="button"
                               size="sm"
                               variant="outline"
-                              className="h-8 flex-1 border-emerald-300 px-3 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:flex-none"
+                              className="h-9 w-full flex-1 rounded-full border-emerald-300 px-3 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
                               disabled={!medicineCheckoutId || !isInStock}
                               onClick={async () => {
                                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -594,7 +594,7 @@ export default function ShopPageContent() {
                             <Button
                               type="button"
                               size="sm"
-                              className="h-8 flex-1 bg-emerald-600 px-4 text-white hover:bg-emerald-700 sm:flex-none"
+                              className="h-9 w-full flex-1 rounded-full bg-emerald-600 px-4 text-white shadow-sm hover:bg-emerald-700"
                               asChild
                             >
                               <Link href={`/shop/${getMedicinePathId(medicine)}`}>
