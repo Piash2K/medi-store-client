@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, User } from "lucide-react";
+import { Menu, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -38,12 +38,19 @@ interface MenuItem {
   url: string;
 }
 
-const baseMenu: MenuItem[] = [
+const primaryBaseMenu: MenuItem[] = [
   { title: "Home", url: "/" },
   { title: "Shop", url: "/shop" },
   { title: "About", url: "/about" },
   { title: "Help", url: "/help" },
   { title: "Contact", url: "/contact" },
+];
+
+const customerPrimaryMenu: MenuItem[] = [
+  { title: "Track Order", url: "/orders" },
+];
+
+const utilityMenu: MenuItem[] = [
   { title: "Cart", url: "/cart" },
 ];
 
@@ -138,9 +145,9 @@ export function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState(null);
 
-  const menu = isCustomerUser(user)
-    ? [...baseMenu, { title: "Track Order", url: "/orders" }]
-    : baseMenu;
+  const primaryMenu = isCustomerUser(user)
+    ? [...primaryBaseMenu, ...customerPrimaryMenu]
+    : primaryBaseMenu;
 
   const isActivePath = (url: string) => {
     if (url === "/") {
@@ -206,7 +213,7 @@ export function Navbar() {
           <div>
             <NavigationMenu>
               <NavigationMenuList className="gap-6">
-                {menu.map((item) => (
+                {primaryMenu.map((item) => (
                   <NavigationMenuItem key={item.title}>
                     <NavigationMenuLink asChild>
                       <Link
@@ -226,6 +233,20 @@ export function Navbar() {
             </NavigationMenu>
           </div>
           <div className="flex items-center gap-2">
+            {utilityMenu.map((item) => (
+              <Button
+                key={item.title}
+                asChild
+                variant={isActivePath(item.url) ? "default" : "outline"}
+                size="sm"
+                className={isActivePath(item.url) ? "h-8 bg-emerald-600 text-white hover:bg-emerald-700" : "h-8 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30"}
+              >
+                <Link href={item.url} className="inline-flex items-center gap-1.5">
+                  <ShoppingCart className="h-3.5 w-3.5" />
+                  {item.title}
+                </Link>
+              </Button>
+            ))}
             <UserMenu user={user} onLogout={handleLogout} />
             <ThemeToggle />
           </div>
@@ -260,8 +281,12 @@ export function Navbar() {
               </SheetHeader>
 
               <div className="flex flex-col gap-6 p-4">
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+                    Main Navigation
+                  </p>
                 <div className="flex w-full flex-col gap-2">
-                  {menu.map((item) => (
+                    {primaryMenu.map((item) => (
                     <Link
                       key={item.title}
                       href={item.url}
@@ -275,6 +300,30 @@ export function Navbar() {
                       {item.title}
                     </Link>
                   ))}
+                </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+                    Quick Access
+                  </p>
+                  <div className="flex w-full flex-col gap-2">
+                    {utilityMenu.map((item) => (
+                      <Link
+                        key={item.title}
+                        href={item.url}
+                        prefetch={true}
+                        className={`inline-flex items-center gap-2 rounded-md px-1 py-1 text-base font-semibold transition-colors ${
+                          isActivePath(item.url)
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-foreground/90"
+                        }`}
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                        {item.title}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
               </SheetContent>
