@@ -5,7 +5,7 @@ import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { Loader2, Search, ShoppingCart, Star } from "lucide-react";
+import { Heart, Loader2, Search, ShoppingCart, Star } from "lucide-react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
@@ -20,6 +20,20 @@ import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
+
+const getShortMedicineDescription = (medicine: Medicine) => {
+  const rawDescription = medicine.description?.trim();
+
+  if (rawDescription) {
+    return rawDescription.length > 96 ? `${rawDescription.slice(0, 96).trimEnd()}...` : rawDescription;
+  }
+
+  const fallbackParts = [medicine.category?.name, medicine.manufacturer]
+    .filter(Boolean)
+    .join(" • ");
+
+  return fallbackParts || "Trusted medicine with quality checks and easy ordering.";
+};
 
 export default function ShopPageContent() {
   const router = useRouter();
@@ -457,36 +471,67 @@ export default function ShopPageContent() {
                   return (
                     <article
                       key={`${medicine._id}-${medicine.name}-${index}`}
-                      className="overflow-hidden rounded-2xl border-2 border-emerald-200 bg-white shadow-sm transition hover:shadow-md dark:border-emerald-800/60 dark:bg-emerald-950/20"
+                      className="flex h-full flex-col overflow-hidden rounded-3xl border border-emerald-200/80 bg-white shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20"
                     >
-                      <Link
-                        href={`/shop/${getMedicinePathId(medicine)}`}
-                        className="block"
-                        aria-label={`View details for ${medicine.name}`}
-                      >
-                        <div className="relative flex h-52 items-center justify-center bg-emerald-50 dark:bg-emerald-950/30">
-                          {!isInStock && (
-                            <span className="bg-destructive text-destructive-foreground absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold">
-                              Out of Stock
-                            </span>
-                          )}
-                          {medicine.image ? (
-                            <Image
-                              src={medicine.image}
-                              alt={medicine.name}
-                              fill
-                              sizes="(max-width: 768px) 100vw, 33vw"
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/45 dark:text-emerald-300">
-                              <ShoppingCart className="h-8 w-8" />
-                            </div>
-                          )}
-                        </div>
-                      </Link>
+                      <div className="relative">
+                        <Link
+                          href={`/shop/${getMedicinePathId(medicine)}`}
+                          className="block"
+                          aria-label={`View details for ${medicine.name}`}
+                        >
+                          <div className="relative flex h-56 items-center justify-center overflow-hidden bg-emerald-50 dark:bg-emerald-950/30">
+                            {!isInStock && (
+                              <span className="bg-destructive text-destructive-foreground absolute top-3 left-3 z-10 rounded-full px-3 py-1 text-xs font-semibold">
+                                Out of Stock
+                              </span>
+                            )}
+                            {medicine.image ? (
+                              <Image
+                                src={medicine.image}
+                                alt={medicine.name}
+                                fill
+                                sizes="(max-width: 768px) 100vw, 33vw"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/45 dark:text-emerald-300">
+                                <ShoppingCart className="h-8 w-8" />
+                              </div>
+                            )}
+                          </div>
+                        </Link>
 
-                        <div className="space-y-1.5 p-4">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="secondary"
+                          className="absolute top-3 right-3 z-20 h-10 w-10 rounded-full border border-white/70 bg-white/90 text-rose-500 shadow-lg backdrop-blur transition hover:bg-white hover:text-rose-600 dark:border-emerald-900/40 dark:bg-emerald-950/85 dark:text-rose-400"
+                          aria-label={`Add ${medicine.name} to cart`}
+                          disabled={!isInStock || isAlreadyInCart}
+                          onClick={async () => {
+                            const hasAccess = await guardCustomerPurchaseAccess();
+
+                            if (!hasAccess || isAlreadyInCart || !isInStock) {
+                              return;
+                            }
+
+                            addItem({
+                              id: medicineCartId,
+                              name: medicine.name,
+                              price: medicine.price,
+                              manufacturer: medicine.manufacturer,
+                              category: medicine.category?.name,
+                              image: medicine.image,
+                            });
+
+                            toast.success(`${medicine.name} added to cart`);
+                          }}
+                        >
+                          <Heart className={`h-4.5 w-4.5 ${isAlreadyInCart ? "fill-current" : ""}`} />
+                        </Button>
+                      </div>
+
+                      <div className="flex flex-1 flex-col space-y-3 p-4">
                           <Link
                             href={`/shop/${getMedicinePathId(medicine)}`}
                             className="block space-y-1.5"
@@ -495,30 +540,36 @@ export default function ShopPageContent() {
                             <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/45 dark:text-emerald-300">
                               {medicine.category?.name || "General"}
                             </span>
-                            <h2 className="text-xl leading-tight font-semibold tracking-tight text-emerald-800 dark:text-emerald-200 sm:text-2xl">
+                            <h2 className="line-clamp-2 min-h-13 text-xl leading-tight font-semibold tracking-tight text-emerald-800 dark:text-emerald-200 sm:text-2xl">
                               {medicine.name}
                             </h2>
                             <p className="text-sm text-emerald-600 dark:text-emerald-400">
                               by {medicine.manufacturer || "Unknown manufacturer"}
                             </p>
+                            <p className="min-h-12 text-sm leading-6 text-muted-foreground">
+                              {getShortMedicineDescription(medicine)}
+                            </p>
+                          </Link>
+
                             <div className="flex items-center justify-between mt-1">
                               <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 sm:text-sm">
                                 <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                                 <span>{averageRating.toFixed(1)}</span>
                                 <span>({totalReviewsForMedicine})</span>
                               </div>
-                              <span className="text-xs sm:text-sm ml-2">
-                                {isInStock ? (
-                                  <span className="text-emerald-600">In stock ({medicine.stock})</span>
-                                ) : (
-                                  <span className="text-destructive font-medium">Stock out</span>
-                                )}
+                              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                                {isInStock ? `In stock (${medicine.stock})` : "Stock out"}
                               </span>
                             </div>
-                          </Link>
 
-                          <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                            <p className="text-base font-semibold text-emerald-700 dark:text-emerald-300 sm:text-lg">BDT {medicine.price}</p>
+                          <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-center gap-2 rounded-2xl bg-emerald-50 px-3 py-2 dark:bg-emerald-900/20">
+                              <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">৳</span>
+                              <p className="text-base font-semibold text-emerald-700 dark:text-emerald-300 sm:text-lg">
+                                {medicine.price}
+                              </p>
+                            </div>
+
                             <div className="flex w-full items-center gap-2 sm:w-auto">
                             <Button
                               type="button"
@@ -544,28 +595,11 @@ export default function ShopPageContent() {
                               type="button"
                               size="sm"
                               className="h-8 flex-1 bg-emerald-600 px-4 text-white hover:bg-emerald-700 sm:flex-none"
-                              disabled={isAlreadyInCart}
-                              onClick={async () => {
-                                const hasAccess = await guardCustomerPurchaseAccess();
-
-                                if (!hasAccess) {
-                                  return;
-                                }
-
-                                addItem({
-                                  id: medicineCartId,
-                                  name: medicine.name,
-                                  price: medicine.price,
-                                  manufacturer: medicine.manufacturer,
-                                  category: medicine.category?.name,
-                                  image: medicine.image,
-                                });
-
-                                toast.success(`${medicine.name} added to cart`);
-                              }}
+                              asChild
                             >
-                              <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-                              {isAlreadyInCart ? "Added" : "Add"}
+                              <Link href={`/shop/${getMedicinePathId(medicine)}`}>
+                                View Detail
+                              </Link>
                             </Button>
                           </div>
                         </div>
