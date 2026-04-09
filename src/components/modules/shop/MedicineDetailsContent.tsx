@@ -65,6 +65,18 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   const [averageRating, setAverageRating] = React.useState(0);
   const [isLoadingReviews, setIsLoadingReviews] = React.useState(true);
 
+  const ratingBreakdown = React.useMemo(() => {
+    const counts = [5, 4, 3, 2, 1].map((star) => ({
+      star,
+      count: reviews.filter((review) => Number(review.rating || 0) === star).length,
+    }));
+
+    return counts.map((item) => ({
+      ...item,
+      percent: totalReviews > 0 ? Math.round((item.count / totalReviews) * 100) : 0,
+    }));
+  }, [reviews, totalReviews]);
+
   const loadReviews = React.useCallback(async (medicineReviewId: string) => {
     setIsLoadingReviews(true);
 
@@ -322,7 +334,11 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
           <h1 className="mt-3 text-2xl font-bold tracking-tight text-emerald-800 dark:text-emerald-200 sm:text-3xl lg:text-4xl">{medicine.name}</h1>
           <p className="mt-1 text-base text-emerald-600 dark:text-emerald-400">by {medicine.manufacturer || "Unknown"}</p>
 
-          <div className="mt-3 flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400">
+          <p className="mt-4 border-b border-emerald-100 pb-4 text-base leading-relaxed text-emerald-700 dark:border-emerald-800/50 dark:text-emerald-300">
+            {medicine.description || "No description available for this medicine."}
+          </p>
+
+          <div className="mt-4 flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400">
             {Array.from({ length: 5 }).map((_, index) => (
               <Star key={index} className={getStarClassName(index + 1, averageRating)} />
             ))}
@@ -331,13 +347,9 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
             </span>
           </div>
 
-          <div className="mt-3 flex items-baseline gap-2">
+          <div className="mt-4 flex items-baseline gap-2">
             <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 sm:text-3xl lg:text-4xl">{formatPrice(medicine.price)}</p>
           </div>
-
-          <p className="mt-4 border-b border-emerald-100 pb-4 text-base leading-relaxed text-emerald-700 dark:border-emerald-800/50 dark:text-emerald-300">
-            {medicine.description || "No description available for this medicine."}
-          </p>
 
           <p className="mt-4 text-base font-semibold text-emerald-800 dark:text-emerald-200">
             <span className={isInStock ? "text-emerald-600" : "text-destructive"}>●</span>{" "}
@@ -429,93 +441,99 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
         </div>
       </div>
 
-      <div className="mt-8 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
-        <h2 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">Details</h2>
-        <p className="mt-3 text-sm leading-relaxed text-emerald-700 dark:text-emerald-300">
-          {medicine.description || "No additional details available."}
-        </p>
-      </div>
+      <section className="mt-10">
+        <div className="grid items-start gap-8 lg:grid-cols-[1.6fr_1fr]">
+          <div>
+            <div className="border-b border-emerald-200 pb-4 dark:border-emerald-800/60">
+              <h2 className="text-xl font-semibold tracking-tight text-emerald-800 dark:text-emerald-200">Customer Reviews</h2>
+              <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">Real customer opinions for this medicine</p>
+            </div>
 
-      <div className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
-        <h2 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">Customer Reviews</h2>
+            <div className="mt-5 grid gap-6 sm:grid-cols-[220px_1fr]">
+              <div className="rounded-2xl bg-emerald-50/70 p-4 dark:bg-emerald-950/25">
+                <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">{averageRating.toFixed(1)}</p>
+                <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">out of 5</p>
+                <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400">{totalReviews} review{totalReviews === 1 ? "" : "s"}</p>
 
-        <div className="mt-2 flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
-          <span className="inline-flex items-center gap-1">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            {averageRating.toFixed(1)}
-          </span>
-          <span>({totalReviews} review{totalReviews === 1 ? "" : "s"})</span>
-        </div>
-
-        {isLoadingReviews ? (
-          <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400">Loading reviews...</p>
-        ) : reviews.length === 0 ? (
-          <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400">No reviews yet.</p>
-        ) : (
-          <div className="mt-4 space-y-3">
-            {reviews.map((review) => (
-              <article key={review.id} className="rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 dark:border-emerald-800/60 dark:bg-emerald-950/25">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">{review.customer?.name || "Customer"}</p>
-                  <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
-                    <span className="inline-flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                      {review.rating || 0}
-                    </span>
-                    <span>{formatReviewDate(review.createdAt)}</span>
-                  </div>
+                <div className="mt-4 space-y-2">
+                  {ratingBreakdown.map((item) => (
+                    <div key={`rating-${item.star}`} className="grid grid-cols-[20px_1fr_32px] items-center gap-2 text-xs text-emerald-700 dark:text-emerald-300">
+                      <span>{item.star}</span>
+                      <div className="h-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/45">
+                        <div className="h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" style={{ width: `${item.percent}%` }} />
+                      </div>
+                      <span className="text-right">{item.count}</span>
+                    </div>
+                  ))}
                 </div>
-                <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300">{review.comment || "No comment"}</p>
-              </article>
-            ))}
-          </div>
-        )}
-      </div>
+              </div>
 
-      <div id="review-section" className="mt-6 rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
-        <h2 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">Leave a Review</h2>
-        <p className="mt-2 text-sm text-emerald-600 dark:text-emerald-400">{reviewStatusMessage}</p>
-
-        <div className="mt-4 grid gap-4">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Rating</label>
-            <select
-              value={rating}
-              onChange={(event) => setRating(Number(event.target.value))}
-              className="h-10 w-full rounded-md border border-emerald-300 bg-white px-3 text-sm text-emerald-700 shadow-sm ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200 dark:placeholder:text-emerald-500"
-              disabled={!canReview || isSubmittingReview}
-            >
-              <option value={5}>5 - Excellent</option>
-              <option value={4}>4 - Very Good</option>
-              <option value={3}>3 - Good</option>
-              <option value={2}>2 - Fair</option>
-              <option value={1}>1 - Poor</option>
-            </select>
+              <div>
+                {isLoadingReviews ? (
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400">Loading reviews...</p>
+                ) : reviews.length === 0 ? (
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400">No customer reviews yet.</p>
+                ) : (
+                  <div className="divide-y divide-emerald-100 dark:divide-emerald-800/60">
+                    {reviews.map((review) => (
+                      <article key={review.id} className="py-4 first:pt-0">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">{review.customer?.name || "Customer"}</p>
+                          <p className="text-xs text-emerald-600 dark:text-emerald-400">{review.rating || 0}/5 . {formatReviewDate(review.createdAt)}</p>
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-emerald-700 dark:text-emerald-300">{review.comment || "No comment"}</p>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Comment</label>
-            <textarea
-              value={reviewComment}
-              onChange={(event) => setReviewComment(event.target.value)}
-              placeholder="Share your experience with this medicine..."
-              className="min-h-28 w-full rounded-md border border-emerald-300 bg-white px-3 py-2 text-sm text-emerald-700 shadow-xs ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200 dark:placeholder:text-emerald-500"
-              disabled={!canReview || isSubmittingReview}
-            />
-          </div>
+          <aside id="review-section" className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-emerald-200/80 dark:bg-emerald-950/20 dark:ring-emerald-800/60 sm:p-6 lg:sticky lg:top-24">
+            <h2 className="text-xl font-semibold tracking-tight text-emerald-800 dark:text-emerald-200">Leave a Review</h2>
+            <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">{reviewStatusMessage}</p>
 
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              className="w-full bg-emerald-600 text-white hover:bg-emerald-700 sm:w-auto"
-              onClick={handleSubmitReview}
-              disabled={!canReview || isSubmittingReview}
-            >
-              {isSubmittingReview ? "Submitting..." : "Submit Review"}
-            </Button>
-          </div>
+            <div className="mt-5 grid gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Rating</label>
+                <select
+                  value={rating}
+                  onChange={(event) => setRating(Number(event.target.value))}
+                  className="h-11 w-full rounded-lg border border-emerald-300 bg-white px-3 text-sm text-emerald-700 shadow-sm ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200 dark:placeholder:text-emerald-500"
+                  disabled={!canReview || isSubmittingReview}
+                >
+                  <option value={5}>5 - Excellent</option>
+                  <option value={4}>4 - Very Good</option>
+                  <option value={3}>3 - Good</option>
+                  <option value={2}>2 - Fair</option>
+                  <option value={1}>1 - Poor</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Review</label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(event) => setReviewComment(event.target.value)}
+                  placeholder="Describe your experience with product quality, packaging, and delivery."
+                  className="min-h-32 w-full rounded-lg border border-emerald-300 bg-white px-3 py-2 text-sm text-emerald-700 shadow-xs ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200 dark:placeholder:text-emerald-500"
+                  disabled={!canReview || isSubmittingReview}
+                />
+              </div>
+
+              <Button
+                type="button"
+                className="h-10 w-full bg-emerald-600 text-white hover:bg-emerald-700"
+                onClick={handleSubmitReview}
+                disabled={!canReview || isSubmittingReview}
+              >
+                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+              </Button>
+            </div>
+          </aside>
         </div>
-      </div>
+      </section>
     </section>
   );
 }
