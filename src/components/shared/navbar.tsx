@@ -59,6 +59,11 @@ const isCustomerUser = (user: unknown) => {
   return role?.toUpperCase() === "CUSTOMER";
 };
 
+const isSellerOrAdminUser = (user: unknown) => {
+  const role = (user as { role?: string } | null)?.role?.toUpperCase();
+  return role === "SELLER" || role === "ADMIN";
+};
+
 const getUserName = (user: unknown) => {
   const userData = user as Record<string, unknown> | null;
   return (userData?.name as string | undefined) || (userData?.email as string | undefined) || "User";
@@ -148,6 +153,7 @@ export function Navbar() {
   const primaryMenu = isCustomerUser(user)
     ? [...primaryBaseMenu, ...customerPrimaryMenu]
     : primaryBaseMenu;
+  const utilityMenuItems = isSellerOrAdminUser(user) ? [] : utilityMenu;
 
   const isActivePath = (url: string) => {
     if (url === "/") {
@@ -233,7 +239,7 @@ export function Navbar() {
             </NavigationMenu>
           </div>
           <div className="flex items-center gap-2">
-            {utilityMenu.map((item) => (
+            {utilityMenuItems.map((item) => (
               <Button
                 key={item.title}
                 asChild
@@ -308,7 +314,7 @@ export function Navbar() {
                     Quick Access
                   </p>
                   <div className="flex w-full flex-col gap-2">
-                    {utilityMenu.map((item) => (
+                    {utilityMenuItems.map((item) => (
                       <Link
                         key={item.title}
                         href={item.url}
