@@ -5,7 +5,7 @@ import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { Heart, Loader2, Search, ShoppingCart, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Loader2, Search, ShoppingCart, Star } from "lucide-react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
@@ -256,6 +256,39 @@ export default function ShopPageContent() {
     return filteredMedicines;
   }, [medicines, sortBy, inStockOnly]);
 
+  const paginationItems = React.useMemo(() => {
+    const items: Array<number | "..."> = [];
+
+    if (totalPage <= 7) {
+      for (let pageNumber = 1; pageNumber <= totalPage; pageNumber += 1) {
+        items.push(pageNumber);
+      }
+
+      return items;
+    }
+
+    items.push(1);
+
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPage - 1, page + 1);
+
+    if (start > 2) {
+      items.push("...");
+    }
+
+    for (let pageNumber = start; pageNumber <= end; pageNumber += 1) {
+      items.push(pageNumber);
+    }
+
+    if (end < totalPage - 1) {
+      items.push("...");
+    }
+
+    items.push(totalPage);
+
+    return items;
+  }, [page, totalPage]);
+
   const getMedicineCartId = React.useCallback((medicine: Medicine) => {
     const medicineWithOptionalId = medicine as Medicine & { id?: string };
 
@@ -427,7 +460,7 @@ export default function ShopPageContent() {
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-col">
+        <div className="flex min-w-0 min-h-[72vh] flex-col">
           <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
             <p className="text-sm text-emerald-600 dark:text-emerald-400 sm:text-base lg:text-lg">
               {totalMedicines > 0 ? "Available medicines" : "No medicines found"}
@@ -611,31 +644,59 @@ export default function ShopPageContent() {
             )}
           </div>
 
-          <div className="mt-6 flex flex-col items-start justify-between gap-3 rounded-xl border-2 border-emerald-200 bg-white p-3 dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:flex-row sm:items-center">
-            <p className="px-1 text-sm text-emerald-600 dark:text-emerald-400 sm:px-2">
-              Page {page} of {totalPage}
-            </p>
-
-            <div className="flex w-full items-center gap-2 sm:w-auto">
-            <Button
+          <div className="mt-auto pt-6">
+          <div className="flex items-center justify-center gap-1.5 py-2">
+            <button
               type="button"
-              variant="outline"
-              className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:flex-none"
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={page <= 1}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-35 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
+              aria-label="Previous page"
             >
-              Previous
-            </Button>
-            <Button
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            {paginationItems.map((item, index) => {
+              if (item === "...") {
+                return (
+                  <span
+                    key={`ellipsis-${index}`}
+                    className="inline-flex h-8 min-w-8 items-center justify-center px-1 text-sm text-emerald-600/80 dark:text-emerald-400/80"
+                  >
+                    ...
+                  </span>
+                );
+              }
+
+              const isActive = page === item;
+
+              return (
+                <button
+                  key={`page-${item}`}
+                  type="button"
+                  onClick={() => setPage(item)}
+                  className={`inline-flex h-8 min-w-8 items-center justify-center px-2 text-sm font-medium transition ${
+                    isActive
+                      ? "text-emerald-700 underline decoration-2 underline-offset-6 dark:text-emerald-300"
+                      : "text-emerald-700/80 hover:text-emerald-700 dark:text-emerald-300/80 dark:hover:text-emerald-300"
+                  }`}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  {item}
+                </button>
+              );
+            })}
+
+            <button
               type="button"
-              variant="outline"
-              className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:flex-none"
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPage))}
               disabled={page >= totalPage}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-35 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
+              aria-label="Next page"
             >
-              Next
-            </Button>
-            </div>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
           </div>
         </div>
       </div>
