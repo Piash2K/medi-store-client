@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Menu, ShoppingCart, User } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,7 +19,6 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import {
   Sheet,
@@ -32,7 +31,6 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { getMyProfile, getUser, logOut } from "@/services/auth";
-import { useCart } from "@/providers/cart-provider";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 interface MenuItem {
@@ -43,6 +41,7 @@ interface MenuItem {
 const baseMenu: MenuItem[] = [
   { title: "Home", url: "/" },
   { title: "Shop", url: "/shop" },
+  { title: "Cart", url: "/cart" },
 ];
 
 const isCustomerUser = (user: unknown) => {
@@ -133,13 +132,20 @@ function UserMenu({ user, onLogout }: { user: unknown; onLogout: () => void }) {
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState(null);
-  const { totalItems } = useCart();
-  const canShowCart = !user || isCustomerUser(user);
 
   const menu = isCustomerUser(user)
     ? [...baseMenu, { title: "Track Order", url: "/orders" }]
     : baseMenu;
+
+  const isActivePath = (url: string) => {
+    if (url === "/") {
+      return pathname === "/";
+    }
+
+    return pathname === url || pathname.startsWith(`${url}/`);
+  };
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -196,13 +202,17 @@ export function Navbar() {
           </div>
           <div>
             <NavigationMenu>
-              <NavigationMenuList>
+              <NavigationMenuList className="gap-6">
                 {menu.map((item) => (
                   <NavigationMenuItem key={item.title}>
                     <NavigationMenuLink asChild>
                       <Link
                         href={item.url}
-                        className={navigationMenuTriggerStyle()}
+                        className={`border-b-2 py-1 text-sm font-medium transition-colors focus-visible:outline-none ${
+                          isActivePath(item.url)
+                            ? "border-emerald-500 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400"
+                            : "border-transparent text-foreground/80 hover:text-foreground"
+                        }`}
                       >
                         {item.title}
                       </Link>
@@ -213,18 +223,6 @@ export function Navbar() {
             </NavigationMenu>
           </div>
           <div className="flex items-center gap-2">
-            {canShowCart ? (
-              <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
-                <Link href="/cart">
-                  <ShoppingCart className="size-5" />
-                  {totalItems > 0 && (
-                    <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
-                      {totalItems}
-                    </span>
-                  )}
-                </Link>
-              </Button>
-            ) : null}
             <UserMenu user={user} onLogout={handleLogout} />
             <ThemeToggle />
           </div>
@@ -235,18 +233,6 @@ export function Navbar() {
             <Link href="/" className="text-lg font-semibold tracking-tight">
               MediStore 💊
             </Link>
-            {canShowCart ? (
-              <Button asChild variant="ghost" size="icon" className="relative" aria-label="Cart">
-                <Link href="/cart">
-                  <ShoppingCart className="size-5" />
-                  {totalItems > 0 && (
-                    <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold">
-                      {totalItems}
-                    </span>
-                  )}
-                </Link>
-              </Button>
-            ) : null}
           </div>
 
           <div className="flex items-center gap-1">
@@ -277,7 +263,11 @@ export function Navbar() {
                       key={item.title}
                       href={item.url}
                       prefetch={true}
-                      className="text-base font-semibold"
+                      className={`text-base font-semibold transition-colors ${
+                        isActivePath(item.url)
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-foreground/90"
+                      }`}
                     >
                       {item.title}
                     </Link>

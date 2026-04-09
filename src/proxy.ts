@@ -3,9 +3,9 @@ import type { NextRequest } from "next/server";
 import { getUser } from "./services/auth";
 
 const ALLOWED_ROLES = ["ADMIN", "SELLER", "CUSTOMER"];
-const PUBLIC_ROUTES = ["/login", "/register", "/"];
+const PUBLIC_ROUTES = ["/login", "/register", "/", "/cart"];
 
-const CUSTOMER_ONLY_PREFIXES = ["/cart", "/checkout", "/orders", "/orders-status"];
+const CUSTOMER_ONLY_PREFIXES = ["/checkout", "/orders", "/orders-status"];
 const SELLER_ONLY_PREFIXES = ["/seller", "/medicines"];
 const ADMIN_ONLY_PREFIXES = ["/admin", "/users"];
 
