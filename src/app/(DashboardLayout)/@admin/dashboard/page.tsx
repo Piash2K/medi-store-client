@@ -145,6 +145,43 @@ const countOrdersByStatus = (orders: AdminOrder[]) => {
   );
 };
 
+const getRecentMonthRanges = (monthCount: number) => {
+  const now = new Date();
+
+  return Array.from({ length: monthCount }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (monthCount - index - 1), 1);
+    const nextDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+
+    return {
+      label: date.toLocaleDateString("en-US", { month: "short" }),
+      start: date,
+      end: nextDate,
+    };
+  });
+};
+
+const getNormalizedOrderStatus = (status?: string) => {
+  const normalizedStatus = status?.toUpperCase() || "PLACED";
+
+  if (["CANCELLED", "CANCELED"].includes(normalizedStatus)) {
+    return "CANCELLED";
+  }
+
+  if (["DELIVERED", "COMPLETED"].includes(normalizedStatus)) {
+    return "DELIVERED";
+  }
+
+  if (["SHIPPED", "OUT_FOR_DELIVERY"].includes(normalizedStatus)) {
+    return "SHIPPED";
+  }
+
+  if (["PROCESSING", "CONFIRMED", "APPROVED"].includes(normalizedStatus)) {
+    return "PROCESSING";
+  }
+
+  return "PLACED";
+};
+
 export default async function DashboardPage() {
   const [usersResponse, ordersResponse, medicinesResponse] = await Promise.all([
     getAdminUsers(),
@@ -193,6 +230,55 @@ export default async function DashboardPage() {
 
   const { customers: totalCustomers, sellers: totalSellers } = countUsersByRole(users);
   const { delivered: totalDeliveredOrders, cancelled: totalCancelledOrders } = countOrdersByStatus(orders);
+
+  const monthlyRanges = getRecentMonthRanges(6);
+  const monthlyOrderData = monthlyRanges.map((range) => {
+    const orderCount = orders.filter((order) =>
+      isBetweenDates(getDateValue(order.createdAt), range.start, range.end),
+    ).length;
+
+    return {
+      label: range.label,
+      count: orderCount,
+    };
+  });
+
+  const maxMonthlyOrderCount = Math.max(...monthlyOrderData.map((item) => item.count), 1);
+
+  const orderStatusData = [
+    { key: "PLACED", label: "Placed", count: 0, color: "#64748b" },
+    { key: "PROCESSING", label: "Processing", count: 0, color: "#0891b2" },
+    { key: "SHIPPED", label: "Shipped", count: 0, color: "#2563eb" },
+    { key: "DELIVERED", label: "Delivered", count: 0, color: "#059669" },
+    { key: "CANCELLED", label: "Cancelled", count: 0, color: "#ef4444" },
+  ];
+
+  orders.forEach((order) => {
+    const normalizedStatus = getNormalizedOrderStatus(order.status);
+    const statusItem = orderStatusData.find((item) => item.key === normalizedStatus);
+
+    if (statusItem) {
+      statusItem.count += 1;
+    }
+  });
+
+  const totalStatusCount = orderStatusData.reduce((sum, item) => sum + item.count, 0);
+  const orderStatusPieGradient =
+    totalStatusCount === 0
+      ? "conic-gradient(#d1d5db 0deg 360deg)"
+      : (() => {
+          let startAngle = 0;
+
+          return `conic-gradient(${orderStatusData
+            .map((item) => {
+              const segmentSize = (item.count / totalStatusCount) * 360;
+              const endAngle = startAngle + segmentSize;
+              const segment = `${item.color} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
+              startAngle = endAngle;
+              return segment;
+            })
+            .join(", ")})`;
+        })();
 
   const recentUsers = [...users]
     .sort((a, b) => +(getDateValue(b.createdAt) || 0) - +(getDateValue(a.createdAt) || 0))
@@ -292,6 +378,60 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-semibold text-foreground">{totalCancelledOrders}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card className="border border-border/70 bg-card shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Orders Per Month (Bar)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid h-52 grid-cols-6 items-end gap-2 rounded-lg border border-emerald-100/80 bg-emerald-50/20 p-3 dark:border-emerald-900/50 dark:bg-emerald-900/10">
+                {monthlyOrderData.map((item) => {
+                  const barHeight = Math.max((item.count / maxMonthlyOrderCount) * 100, item.count > 0 ? 8 : 3);
+
+                  return (
+                    <div key={item.label} className="flex h-full flex-col items-center justify-end gap-2">
+                      <span className="text-xs text-emerald-700 dark:text-emerald-300">{item.count}</span>
+                      <div className="w-full rounded-md bg-emerald-500/85" style={{ height: `${barHeight}%` }} />
+                      <span className="text-xs text-emerald-700 dark:text-emerald-300">{item.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border/70 bg-card shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Order Status Mix (Pie)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-[220px_1fr] md:items-center">
+              <div className="mx-auto h-40 w-40 rounded-full" style={{ background: orderStatusPieGradient }} />
+
+              <div className="space-y-2">
+                {orderStatusData.map((item) => {
+                  const percentage = totalStatusCount === 0 ? 0 : (item.count / totalStatusCount) * 100;
+
+                  return (
+                    <div key={item.key} className="flex items-center justify-between gap-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="font-medium text-emerald-800 dark:text-emerald-200">{item.label}</span>
+                      </div>
+                      <span className="text-emerald-600 dark:text-emerald-400">
+                        {item.count} ({percentage.toFixed(1)}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

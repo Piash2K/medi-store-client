@@ -61,6 +61,33 @@ const normalizeOrderStatus = (status?: string): OrderStatusKey => {
   return "PLACED";
 };
 
+const getRecentMonthRanges = (monthCount: number) => {
+  const now = new Date();
+
+  return Array.from({ length: monthCount }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (monthCount - index - 1), 1);
+    const nextDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+
+    return {
+      label: date.toLocaleDateString("en-BD", { month: "short" }),
+      start: date,
+      end: nextDate,
+    };
+  });
+};
+
+const getLinePath = (values: number[]) => {
+  const maxValue = Math.max(...values, 1);
+
+  return values
+    .map((value, index) => {
+      const x = (index / Math.max(values.length - 1, 1)) * 100;
+      const y = 40 - (value / maxValue) * 34;
+      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(" ");
+};
+
 export default async function DashboardPage() {
   const [profileResult, ordersResult] = await Promise.all([getMyProfile(), getOrders()]);
 
@@ -85,6 +112,45 @@ export default async function DashboardPage() {
   const deliveredOrders = statusOrderCountMap.get("DELIVERED") || 0;
 
   const maxStatusCount = Math.max(...statusChartData.map((item) => item.count), 1);
+
+  const monthlyRanges = getRecentMonthRanges(6);
+  const monthlySpending = monthlyRanges.map((range) => {
+    const amount = orders
+      .filter((order) => {
+        const createdAt = new Date(order.createdAt);
+        return !Number.isNaN(createdAt.getTime()) && createdAt >= range.start && createdAt < range.end;
+      })
+      .reduce((sum, order) => sum + order.totalAmount, 0);
+
+    return {
+      label: range.label,
+      amount,
+    };
+  });
+
+  const spendingValues = monthlySpending.map((item) => item.amount);
+  const monthlyLinePath = getLinePath(spendingValues);
+  const maxMonthlySpending = Math.max(...spendingValues, 1);
+
+  const totalOrdersForPie = statusChartData.reduce((sum, item) => sum + item.count, 0);
+  const piePalette = ["#059669", "#0891b2", "#2563eb", "#7c3aed", "#ef4444"];
+
+  const pieGradient =
+    totalOrdersForPie === 0
+      ? "conic-gradient(#d1d5db 0deg 360deg)"
+      : (() => {
+          let startAngle = 0;
+
+          return `conic-gradient(${statusChartData
+            .map((item, index) => {
+              const segmentSize = (item.count / totalOrdersForPie) * 360;
+              const endAngle = startAngle + segmentSize;
+              const segment = `${piePalette[index]} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
+              startAngle = endAngle;
+              return segment;
+            })
+            .join(", ")})`;
+        })();
 
   return (
     <section className="w-full space-y-5 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
@@ -152,10 +218,10 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[360px_1fr]">
+      <div className="grid gap-4 xl:grid-cols-3">
         <Card className="border border-border/70 bg-card shadow-sm">
           <CardHeader>
-            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Order Status Chart</CardTitle>
+            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Order Status (Bar)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -182,6 +248,72 @@ export default async function DashboardPage() {
         </Card>
 
         <Card className="border border-border/70 bg-card shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Monthly Spending (Line)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="rounded-lg border border-emerald-100/80 bg-emerald-50/25 p-3 dark:border-emerald-900/50 dark:bg-emerald-900/10">
+                <svg viewBox="0 0 100 40" className="h-36 w-full" role="img" aria-label="Monthly spending trend">
+                  <path d={monthlyLinePath} fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+                  {monthlySpending.map((item, index) => {
+                    const x = (index / Math.max(monthlySpending.length - 1, 1)) * 100;
+                    const y = 40 - (item.amount / maxMonthlySpending) * 34;
+
+                    return <circle key={item.label} cx={x} cy={y} r="1.2" fill="#059669" />;
+                  })}
+                </svg>
+                <div className="mt-2 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-300">
+                  {monthlySpending.map((item) => (
+                    <span key={item.label}>{item.label}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {monthlySpending.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between text-sm">
+                    <span className="text-emerald-800 dark:text-emerald-200">{item.label}</span>
+                    <span className="font-medium text-emerald-700 dark:text-emerald-300">
+                      BDT {currencyFormatter.format(item.amount)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border/70 bg-card shadow-sm xl:col-span-3">
+          <CardHeader>
+            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Order Distribution (Pie)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-[220px_1fr] md:items-center">
+              <div className="mx-auto h-40 w-40 rounded-full" style={{ background: pieGradient }} />
+
+              <div className="space-y-2">
+                {statusChartData.map((item, index) => {
+                  const percentage = totalOrdersForPie === 0 ? 0 : (item.count / totalOrdersForPie) * 100;
+
+                  return (
+                    <div key={item.key} className="flex items-center justify-between gap-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: piePalette[index] }} />
+                        <span className="font-medium text-emerald-800 dark:text-emerald-200">{item.label}</span>
+                      </div>
+                      <span className="text-emerald-600 dark:text-emerald-400">
+                        {item.count} ({percentage.toFixed(1)}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border/70 bg-card shadow-sm xl:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Recent Orders</CardTitle>
             <Button asChild variant="ghost" size="sm" className="text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-200">

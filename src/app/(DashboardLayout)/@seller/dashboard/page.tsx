@@ -102,6 +102,55 @@ const parseOrders = (data: unknown): SellerOrder[] => {
   return [];
 };
 
+const getRecentMonthRanges = (monthCount: number) => {
+  const now = new Date();
+
+  return Array.from({ length: monthCount }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (monthCount - index - 1), 1);
+    const nextDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+
+    return {
+      label: date.toLocaleDateString("en-US", { month: "short" }),
+      start: date,
+      end: nextDate,
+    };
+  });
+};
+
+const getLinePath = (values: number[]) => {
+  const maxValue = Math.max(...values, 1);
+
+  return values
+    .map((value, index) => {
+      const x = (index / Math.max(values.length - 1, 1)) * 100;
+      const y = 40 - (value / maxValue) * 34;
+      return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(" ");
+};
+
+const normalizeOrderStatus = (status?: string) => {
+  const normalized = status?.toUpperCase() || "PLACED";
+
+  if (["CANCELLED", "CANCELED"].includes(normalized)) {
+    return "CANCELLED";
+  }
+
+  if (["DELIVERED", "COMPLETED"].includes(normalized)) {
+    return "DELIVERED";
+  }
+
+  if (["SHIPPED", "OUT_FOR_DELIVERY"].includes(normalized)) {
+    return "SHIPPED";
+  }
+
+  if (["PROCESSING", "CONFIRMED", "APPROVED"].includes(normalized)) {
+    return "PROCESSING";
+  }
+
+  return "PLACED";
+};
+
 export default async function DashboardPage() {
   const ordersResponse = await getSellerOrders();
   const orders = ordersResponse.success ? parseOrders(ordersResponse.data) : [];
@@ -145,6 +194,60 @@ export default async function DashboardPage() {
   ).length;
 
   const deliveredGrowth = calculateGrowth(currentDelivered, previousDelivered);
+
+  const monthlyRanges = getRecentMonthRanges(6);
+  const monthlyRevenueData = monthlyRanges.map((range) => {
+    const amount = orders
+      .filter((order) => {
+        const createdAt = new Date(order.createdAt);
+        return !Number.isNaN(createdAt.getTime()) && createdAt >= range.start && createdAt < range.end;
+      })
+      .reduce((sum, order) => sum + order.totalAmount, 0);
+
+    return {
+      label: range.label,
+      amount,
+    };
+  });
+
+  const revenueValues = monthlyRevenueData.map((item) => item.amount);
+  const monthlyRevenuePath = getLinePath(revenueValues);
+  const maxMonthlyRevenue = Math.max(...revenueValues, 1);
+
+  const orderStatusData = [
+    { key: "PLACED", label: "Placed", count: 0, color: "#64748b" },
+    { key: "PROCESSING", label: "Processing", count: 0, color: "#0891b2" },
+    { key: "SHIPPED", label: "Shipped", count: 0, color: "#2563eb" },
+    { key: "DELIVERED", label: "Delivered", count: 0, color: "#059669" },
+    { key: "CANCELLED", label: "Cancelled", count: 0, color: "#ef4444" },
+  ];
+
+  orders.forEach((order) => {
+    const normalizedStatus = normalizeOrderStatus(order.status);
+    const statusItem = orderStatusData.find((item) => item.key === normalizedStatus);
+
+    if (statusItem) {
+      statusItem.count += 1;
+    }
+  });
+
+  const totalStatusCount = orderStatusData.reduce((sum, item) => sum + item.count, 0);
+  const orderStatusPieGradient =
+    totalStatusCount === 0
+      ? "conic-gradient(#d1d5db 0deg 360deg)"
+      : (() => {
+          let startAngle = 0;
+
+          return `conic-gradient(${orderStatusData
+            .map((item) => {
+              const segmentSize = (item.count / totalStatusCount) * 360;
+              const endAngle = startAngle + segmentSize;
+              const segment = `${item.color} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
+              startAngle = endAngle;
+              return segment;
+            })
+            .join(", ")})`;
+        })();
 
   const recentOrders = [...orders]
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
@@ -202,6 +305,74 @@ export default async function DashboardPage() {
           <CardContent>
             <p className="text-4xl font-semibold text-foreground">{deliveredOrders}</p>
             <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">{formatGrowth(deliveredGrowth)}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card className="border border-border/70 bg-card shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Monthly Revenue (Line)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="rounded-lg border border-emerald-100/80 bg-emerald-50/20 p-3 dark:border-emerald-900/50 dark:bg-emerald-900/10">
+                <svg viewBox="0 0 100 40" className="h-36 w-full" role="img" aria-label="Seller monthly revenue trend">
+                  <path d={monthlyRevenuePath} fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+                  {monthlyRevenueData.map((item, index) => {
+                    const x = (index / Math.max(monthlyRevenueData.length - 1, 1)) * 100;
+                    const y = 40 - (item.amount / maxMonthlyRevenue) * 34;
+
+                    return <circle key={item.label} cx={x} cy={y} r="1.2" fill="#059669" />;
+                  })}
+                </svg>
+                <div className="mt-2 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-300">
+                  {monthlyRevenueData.map((item) => (
+                    <span key={item.label}>{item.label}</span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {monthlyRevenueData.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between text-sm">
+                    <span className="text-emerald-800 dark:text-emerald-200">{item.label}</span>
+                    <span className="font-medium text-emerald-700 dark:text-emerald-300">
+                      BDT {currencyFormatter.format(item.amount)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-border/70 bg-card shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Order Status Mix (Pie)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-[220px_1fr] md:items-center">
+              <div className="mx-auto h-40 w-40 rounded-full" style={{ background: orderStatusPieGradient }} />
+
+              <div className="space-y-2">
+                {orderStatusData.map((item) => {
+                  const percentage = totalStatusCount === 0 ? 0 : (item.count / totalStatusCount) * 100;
+
+                  return (
+                    <div key={item.key} className="flex items-center justify-between gap-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="font-medium text-emerald-800 dark:text-emerald-200">{item.label}</span>
+                      </div>
+                      <span className="text-emerald-600 dark:text-emerald-400">
+                        {item.count} ({percentage.toFixed(1)}%)
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
