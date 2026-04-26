@@ -146,6 +146,8 @@ export default function ShopPageContent() {
   const [reviewStatsByMedicineId, setReviewStatsByMedicineId] = React.useState<
     Map<string, { averageRating: number; totalReviews: number }>
   >(new Map());
+  const medicineSectionTopRef = React.useRef<HTMLDivElement | null>(null);
+  const hasMountedPaginationScrollRef = React.useRef(false);
 
   const aiSearchCatalog = React.useMemo(() => {
     return Array.from(
@@ -399,6 +401,29 @@ export default function ShopPageContent() {
   }, [loadMedicines]);
 
   React.useEffect(() => {
+    if (!hasMountedPaginationScrollRef.current) {
+      hasMountedPaginationScrollRef.current = true;
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      const medicineSectionTop = medicineSectionTopRef.current;
+
+      if (!medicineSectionTop) {
+        return;
+      }
+
+      const navbarOffset = 64;
+      const top = medicineSectionTop.getBoundingClientRect().top + window.scrollY - navbarOffset;
+
+      window.scrollTo({
+        top: Math.max(top, 0),
+        behavior: "smooth",
+      });
+    });
+  }, [page]);
+
+  React.useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
       setPage(DEFAULT_PAGE);
@@ -552,19 +577,19 @@ export default function ShopPageContent() {
   return (
     <section className="w-full bg-[#f2fbf8] dark:bg-emerald-950/10">
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-screen-2xl lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-emerald-100 bg-white/80 px-4 py-6 dark:border-emerald-900/60 dark:bg-background/70 sm:px-6 lg:sticky lg:top-12 lg:self-start lg:border-r lg:border-b-0 lg:px-6">
+        <aside className="border-b border-emerald-100 bg-white/80 px-4 py-4 dark:border-emerald-900/60 dark:bg-background/70 sm:px-6 lg:sticky lg:top-12 lg:self-start lg:border-r lg:border-b-0 lg:px-6">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">Filters</h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Precision Search</p>
           </div>
 
-          <div className="mt-7 space-y-8">
+          <div className="mt-5 space-y-5">
             <div>
-              <div className="flex items-center gap-3 rounded-lg bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-700 dark:bg-teal-950/50 dark:text-teal-200">
+              <div className="flex items-center gap-3 rounded-lg bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-700 dark:bg-teal-950/50 dark:text-teal-200">
                 <Shapes className="h-5 w-5" />
                 <span>Categories</span>
               </div>
-              <div className="mt-4 space-y-3">
+              <div className="mt-3 space-y-2.5">
                 {visibleCategories.map((item, index) => (
                   <label
                     key={`${item._id}-${item.name}-${index}`}
@@ -589,7 +614,7 @@ export default function ShopPageContent() {
                 <button
                   type="button"
                   onClick={() => setShowAllCategories((prev) => !prev)}
-                  className="mt-4 text-sm font-semibold text-teal-700 transition hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
+                  className="mt-2.5 text-sm font-semibold text-teal-700 transition hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
                 >
                   {showAllCategories ? "See Less" : "See More"}
                 </button>
@@ -601,7 +626,7 @@ export default function ShopPageContent() {
                 <Building2 className="h-5 w-5" />
                 <span>Manufacturers</span>
               </div>
-              <div className="mt-4 space-y-3">
+              <div className="mt-3 space-y-2.5">
                 {manufacturers.length > 0 ? (
                   visibleManufacturers.map((item, index) => (
                     <label
@@ -635,7 +660,7 @@ export default function ShopPageContent() {
                 <button
                   type="button"
                   onClick={() => setShowAllManufacturers((prev) => !prev)}
-                  className="mt-4 text-sm font-semibold text-teal-700 transition hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
+                  className="mt-2.5 text-sm font-semibold text-teal-700 transition hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
                 >
                   {showAllManufacturers ? "See Less" : "See More"}
                 </button>
@@ -647,7 +672,7 @@ export default function ShopPageContent() {
                 <SlidersHorizontal className="h-5 w-5" />
                 <span>Price Range</span>
               </div>
-              <div className="mt-5">
+              <div className="mt-3">
                 <input
                   type="range"
                   min={0}
@@ -677,17 +702,17 @@ export default function ShopPageContent() {
             </label>
 
             <div className="grid gap-2">
-              <Button type="button" onClick={handleApplyFilters} className="h-11 rounded-lg bg-teal-600 text-white shadow-sm hover:bg-teal-700">
+              <Button type="button" onClick={handleApplyFilters} className="h-10 rounded-lg bg-teal-600 text-white shadow-sm hover:bg-teal-700">
                 Apply Filters
               </Button>
-              <Button type="button" variant="outline" onClick={handleResetFilters} className="h-11 rounded-lg border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-emerald-900 dark:text-slate-200 dark:hover:bg-emerald-950/30">
+              <Button type="button" variant="outline" onClick={handleResetFilters} className="h-10 rounded-lg border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-emerald-900 dark:text-slate-200 dark:hover:bg-emerald-950/30">
                 Clear Filters
               </Button>
             </div>
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-col px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+        <div ref={medicineSectionTopRef} className="flex min-w-0 flex-col px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
           <div className="mb-8 grid gap-5 xl:grid-cols-[1fr_minmax(520px,0.9fr)] xl:items-end">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-slate-950 dark:text-slate-100 sm:text-4xl">
@@ -744,7 +769,7 @@ export default function ShopPageContent() {
             </div>
           </div>
 
-          <div className="min-h-[44rem]">
+          <div className="min-h-176">
             {isLoading && (
               <div className="mt-10 flex items-center justify-center">
                 <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
@@ -758,7 +783,7 @@ export default function ShopPageContent() {
             )}
 
             {!isLoading && !errorMessage && sortedMedicines.length > 0 && (
-              <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-4">
                 {sortedMedicines.map((medicine, index) => {
                   const medicineReviewId = medicine._id || medicine.id || "";
                   const medicineCheckoutId = getMedicineCheckoutId(medicine);
@@ -783,7 +808,7 @@ export default function ShopPageContent() {
                   return (
                     <article
                       key={`${medicine._id}-${medicine.name}-${index}`}
-                      className="group flex h-full min-h-[28rem] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-xl dark:border-emerald-900/70 dark:bg-background/80 dark:hover:border-teal-800"
+                      className="group flex h-full min-h-112 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-xl dark:border-emerald-900/70 dark:bg-background/80 dark:hover:border-teal-800"
                     >
                       <div className="relative h-44 overflow-hidden bg-teal-50 dark:bg-emerald-950/40">
                         <Link
