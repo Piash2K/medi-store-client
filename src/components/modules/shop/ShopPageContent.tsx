@@ -599,7 +599,10 @@ export default function ShopPageContent() {
                       <input
                         type="checkbox"
                         checked={category === item.name}
-                        onChange={() => setCategory((prev) => (prev === item.name ? "" : item.name))}
+                        onChange={() => {
+                          setCategory((prev) => (prev === item.name ? "" : item.name));
+                          setPage(DEFAULT_PAGE);
+                        }}
                         className="h-4 w-4 rounded border-slate-300 accent-teal-600"
                       />
                       <span className="truncate">{item.name}</span>
@@ -637,7 +640,10 @@ export default function ShopPageContent() {
                         <input
                           type="checkbox"
                           checked={manufacturer === item}
-                          onChange={() => setManufacturer((prev) => (prev === item ? "" : item))}
+                          onChange={() => {
+                            setManufacturer((prev) => (prev === item ? "" : item));
+                            setPage(DEFAULT_PAGE);
+                          }}
                           className="h-4 w-4 rounded border-slate-300 accent-teal-600"
                         />
                         <span className="truncate">{item}</span>
@@ -650,7 +656,10 @@ export default function ShopPageContent() {
                 ) : (
                   <Input
                     value={manufacturer}
-                    onChange={(event) => setManufacturer(event.target.value)}
+                    onChange={(event) => {
+                      setManufacturer(event.target.value);
+                      setPage(DEFAULT_PAGE);
+                    }}
                     placeholder="Manufacturer"
                     className="border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 dark:border-emerald-900 dark:bg-background/60 dark:text-slate-100"
                   />
@@ -681,6 +690,7 @@ export default function ShopPageContent() {
                   onChange={(event) => {
                     setMinPrice("0");
                     setMaxPrice(event.target.value);
+                    setPage(DEFAULT_PAGE);
                   }}
                   className="w-full accent-teal-700"
                 />
@@ -695,7 +705,10 @@ export default function ShopPageContent() {
               <input
                 type="checkbox"
                 checked={inStockOnly}
-                onChange={(event) => setInStockOnly(event.target.checked)}
+                onChange={(event) => {
+                  setInStockOnly(event.target.checked);
+                  setPage(DEFAULT_PAGE);
+                }}
                 className="h-4 w-4 rounded border-slate-300 accent-teal-600"
               />
               <span>In Stock Only</span>
