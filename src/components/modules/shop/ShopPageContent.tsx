@@ -5,7 +5,20 @@ import * as React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, Heart, Loader2, Search, ShoppingCart, Star } from "lucide-react";
+import {
+  ArrowUpDown,
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Loader2,
+  PackageCheck,
+  Search,
+  Shapes,
+  ShoppingCart,
+  SlidersHorizontal,
+  Star,
+} from "lucide-react";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
@@ -21,6 +34,8 @@ import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
+
+const formatPrice = (value: number) => `BDT ${value.toFixed(2)}`;
 
 const MEDICINE_KEYWORD_HINTS = [
   "tablet",
@@ -423,8 +438,28 @@ export default function ShopPageContent() {
       return nextMedicines;
     }
 
+    if (sortBy === "name-a-z") {
+      nextMedicines.sort((firstMedicine, secondMedicine) => firstMedicine.name.localeCompare(secondMedicine.name));
+      return nextMedicines;
+    }
+
+    if (sortBy === "rating-high-low") {
+      nextMedicines.sort((firstMedicine, secondMedicine) => {
+        const firstRating = reviewStatsByMedicineId.get(firstMedicine._id || firstMedicine.id || "")?.averageRating || 0;
+        const secondRating = reviewStatsByMedicineId.get(secondMedicine._id || secondMedicine.id || "")?.averageRating || 0;
+
+        return secondRating - firstRating;
+      });
+      return nextMedicines;
+    }
+
+    if (sortBy === "stock-high-low") {
+      nextMedicines.sort((firstMedicine, secondMedicine) => (secondMedicine.stock || 0) - (firstMedicine.stock || 0));
+      return nextMedicines;
+    }
+
     return filteredMedicines;
-  }, [medicines, sortBy, inStockOnly]);
+  }, [medicines, sortBy, inStockOnly, reviewStatsByMedicineId]);
 
   const paginationItems = React.useMemo(() => {
     const items: Array<number | "..."> = [];
@@ -504,59 +539,36 @@ export default function ShopPageContent() {
   }, []);
 
   return (
-    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
-      <h1 className="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-3xl lg:text-4xl">Shop All Medicines</h1>
-      <p className="mt-2 text-sm text-emerald-600 dark:text-emerald-400 sm:text-base">
-        Browse our collection of quality OTC medicines
-      </p>
+    <section className="w-full bg-[#f2fbf8] dark:bg-emerald-950/10">
+      <div className="mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-screen-2xl lg:grid-cols-[280px_1fr]">
+        <aside className="border-b border-emerald-100 bg-white/80 px-4 py-6 dark:border-emerald-900/60 dark:bg-background/70 sm:px-6 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-6 lg:py-8">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">Filters</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Precision Search</p>
+          </div>
 
-      <div className="mt-6 grid items-start gap-6 lg:mt-8 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-2xl border-2 border-emerald-200 bg-linear-to-b from-emerald-50/40 to-white p-4 shadow-sm dark:border-emerald-800/60 dark:from-emerald-950/20 dark:to-emerald-950/10 sm:p-5 lg:sticky lg:top-20">
-          <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300 sm:text-2xl">Filters</h2>
-
-          <div className="mt-5 space-y-7">
-            <div className="relative">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-emerald-500" />
-              <Input
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Search medicines..."
-                className="border-emerald-200/80 bg-white pl-9 text-emerald-800 placeholder:text-emerald-500 dark:border-emerald-700/60 dark:bg-emerald-950/35 dark:text-emerald-200 dark:placeholder:text-emerald-500"
-              />
-
-              <AiSearchSuggestions
-                query={searchTerm}
-                categories={categories.map((item) => item.name)}
-                manufacturers={manufacturers}
-                medicines={aiSearchCatalog}
-                medicineKeywords={aiMedicineKeywords}
-                onSelectSuggestion={(suggestion) => {
-                  setSearchTerm(suggestion);
-                  setPage(DEFAULT_PAGE);
-                }}
-              />
-            </div>
-
+          <div className="mt-7 space-y-8">
             <div>
-              <h3 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300 sm:text-xl">Categories</h3>
-              <div className="mt-3 space-y-2.5">
+              <div className="flex items-center gap-3 rounded-lg bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-700 dark:bg-teal-950/50 dark:text-teal-200">
+                <Shapes className="h-5 w-5" />
+                <span>Categories</span>
+              </div>
+              <div className="mt-4 max-h-64 space-y-3 overflow-y-auto pr-1">
                 {categories.map((item, index) => (
                   <label
                     key={`${item._id}-${item.name}-${index}`}
-                    className="flex cursor-pointer items-center justify-between gap-2 text-base"
+                    className="flex cursor-pointer items-center justify-between gap-3 text-sm text-slate-800 dark:text-slate-200"
                   >
-                    <span className="flex items-center gap-2">
+                    <span className="flex min-w-0 items-center gap-3">
                       <input
                         type="checkbox"
                         checked={category === item.name}
-                        onChange={() =>
-                          setCategory((prev) => (prev === item.name ? "" : item.name))
-                        }
-                        className="accent-emerald-600"
+                        onChange={() => setCategory((prev) => (prev === item.name ? "" : item.name))}
+                        className="h-4 w-4 rounded border-slate-300 accent-teal-600"
                       />
-                      {item.name}
+                      <span className="truncate">{item.name}</span>
                     </span>
-                    <span className="text-sm text-emerald-600 dark:text-emerald-400">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
                       {categoryCounts.get(item.name) || 0}
                     </span>
                   </label>
@@ -565,47 +577,27 @@ export default function ShopPageContent() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300 sm:text-xl">Price Range</h3>
-              <div className="mt-4">
-                <input
-                  type="range"
-                  min={0}
-                  max={1000}
-                  value={maxPrice || "1000"}
-                  onChange={(event) => {
-                    setMinPrice("0");
-                    setMaxPrice(event.target.value);
-                  }}
-                  className="w-full accent-emerald-600"
-                />
-                <div className="mt-2 flex items-center justify-between text-sm text-emerald-600 dark:text-emerald-400">
-                  <span>BDT {minPrice || "0"}</span>
-                  <span>BDT {maxPrice || "1000"}</span>
-                </div>
+              <div className="flex items-center gap-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                <Building2 className="h-5 w-5" />
+                <span>Manufacturers</span>
               </div>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-emerald-700 dark:text-emerald-300 sm:text-xl">Manufacturer</h3>
-              <div className="mt-3 space-y-2.5">
+              <div className="mt-4 max-h-56 space-y-3 overflow-y-auto pr-1">
                 {manufacturers.length > 0 ? (
                   manufacturers.map((item, index) => (
                     <label
                       key={`${item}-${index}`}
-                      className="flex cursor-pointer items-center justify-between gap-2 text-base"
+                      className="flex cursor-pointer items-center justify-between gap-3 text-sm text-slate-800 dark:text-slate-200"
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex min-w-0 items-center gap-3">
                         <input
                           type="checkbox"
                           checked={manufacturer === item}
-                          onChange={() =>
-                            setManufacturer((prev) => (prev === item ? "" : item))
-                          }
-                          className="accent-emerald-600"
+                          onChange={() => setManufacturer((prev) => (prev === item ? "" : item))}
+                          className="h-4 w-4 rounded border-slate-300 accent-teal-600"
                         />
-                        {item}
+                        <span className="truncate">{item}</span>
                       </span>
-                      <span className="text-sm text-emerald-600 dark:text-emerald-400">
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
                         {manufacturerCounts.get(item) || 0}
                       </span>
                     </label>
@@ -615,50 +607,115 @@ export default function ShopPageContent() {
                     value={manufacturer}
                     onChange={(event) => setManufacturer(event.target.value)}
                     placeholder="Manufacturer"
-                    className="border-emerald-200/80 bg-white text-emerald-800 placeholder:text-emerald-500 dark:border-emerald-700/60 dark:bg-emerald-950/35 dark:text-emerald-200 dark:placeholder:text-emerald-500"
+                    className="border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 dark:border-emerald-900 dark:bg-background/60 dark:text-slate-100"
                   />
                 )}
               </div>
             </div>
 
-            <label className="flex items-center gap-2 text-base">
+            <div>
+              <div className="flex items-center gap-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                <SlidersHorizontal className="h-5 w-5" />
+                <span>Price Range</span>
+              </div>
+              <div className="mt-5">
+                <input
+                  type="range"
+                  min={0}
+                  max={1000}
+                  value={maxPrice || "1000"}
+                  onChange={(event) => {
+                    setMinPrice("0");
+                    setMaxPrice(event.target.value);
+                  }}
+                  className="w-full accent-teal-700"
+                />
+                <div className="mt-2 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
+                  <span>BDT {minPrice || "0"}</span>
+                  <span>BDT {maxPrice || "1000"}+</span>
+                </div>
+              </div>
+            </div>
+
+            <label className="flex cursor-pointer items-center gap-3 text-sm text-slate-800 dark:text-slate-200">
               <input
                 type="checkbox"
                 checked={inStockOnly}
                 onChange={(event) => setInStockOnly(event.target.checked)}
-                className="accent-emerald-600"
+                className="h-4 w-4 rounded border-slate-300 accent-teal-600"
               />
               <span>In Stock Only</span>
             </label>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button type="button" onClick={handleApplyFilters} className="flex-1 bg-emerald-600 text-white hover:bg-emerald-700">
-                Apply
+            <div className="grid gap-2">
+              <Button type="button" onClick={handleApplyFilters} className="h-11 rounded-lg bg-teal-600 text-white shadow-sm hover:bg-teal-700">
+                Apply Filters
               </Button>
-              <Button type="button" variant="outline" onClick={handleResetFilters} className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30">
-                Clear
+              <Button type="button" variant="outline" onClick={handleResetFilters} className="h-11 rounded-lg border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-emerald-900 dark:text-slate-200 dark:hover:bg-emerald-950/30">
+                Clear Filters
               </Button>
             </div>
           </div>
         </aside>
 
-        <div className="flex min-w-0 min-h-[72vh] flex-col">
-          <div className="mb-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <p className="text-sm text-emerald-600 dark:text-emerald-400 sm:text-base lg:text-lg">
-              {totalMedicines > 0 ? "Available medicines" : "No medicines found"}
-            </p>
-            <select
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value)}
-              className="h-9 w-full rounded-md border border-emerald-300 bg-white px-3 text-sm text-emerald-700 shadow-sm ring-offset-background placeholder:text-emerald-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/35 dark:text-emerald-200 dark:placeholder:text-emerald-500 sm:w-auto"
-            >
-              <option value="relevance">Sort by: Relevance</option>
-              <option value="price-low-high">Sort by: Price Low to High</option>
-              <option value="price-high-low">Sort by: Price High to Low</option>
-            </select>
+        <div className="flex min-w-0 flex-col px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+          <div className="mb-8 grid gap-5 xl:grid-cols-[1fr_minmax(520px,0.9fr)] xl:items-end">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-slate-950 dark:text-slate-100 sm:text-4xl">
+                Shop All Medicine
+              </h1>
+              <p className="mt-3 max-w-2xl text-base leading-7 text-slate-700 dark:text-slate-300">
+                Browse our extensive pharmaceutical inventory. High-precision care delivered directly to your doorstep.
+              </p>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                {totalMedicines > 0 ? `${totalMedicines} medicines available` : "No medicines found"}
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_220px]">
+              <div className="relative">
+                <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-500" />
+                <Input
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Search medication, symptoms, or brand..."
+                  className="h-12 rounded-xl border-slate-300 bg-white/80 pl-12 text-slate-800 shadow-none placeholder:text-slate-500 focus-visible:ring-teal-600 dark:border-emerald-900 dark:bg-background/70 dark:text-slate-100"
+                />
+
+                <AiSearchSuggestions
+                  query={searchTerm}
+                  categories={categories.map((item) => item.name)}
+                  manufacturers={manufacturers}
+                  medicines={aiSearchCatalog}
+                  medicineKeywords={aiMedicineKeywords}
+                  onSelectSuggestion={(suggestion) => {
+                    setSearchTerm(suggestion);
+                    setPage(DEFAULT_PAGE);
+                  }}
+                />
+              </div>
+
+              <div className="relative">
+                <ArrowUpDown className="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <select
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value)}
+                  className="h-12 w-full appearance-none rounded-xl border border-slate-300 bg-white/80 px-11 text-sm font-medium text-slate-700 shadow-none outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 dark:border-emerald-900 dark:bg-background/70 dark:text-slate-100"
+                  aria-label="Sort medicines"
+                >
+                  <option value="relevance">Sort: Relevance</option>
+                  <option value="price-low-high">Price: Low to High</option>
+                  <option value="price-high-low">Price: High to Low</option>
+                  <option value="name-a-z">Name: A to Z</option>
+                  <option value="rating-high-low">Rating: High to Low</option>
+                  <option value="stock-high-low">Stock: High to Low</option>
+                </select>
+                <ChevronRight className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 rotate-90 text-slate-500" />
+              </div>
+            </div>
           </div>
 
-          <div className="min-h-170">
+          <div className="min-h-[44rem]">
             {isLoading && (
               <div className="mt-10 flex items-center justify-center">
                 <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
@@ -672,7 +729,7 @@ export default function ShopPageContent() {
             )}
 
             {!isLoading && !errorMessage && sortedMedicines.length > 0 && (
-              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
                 {sortedMedicines.map((medicine, index) => {
                   const medicineReviewId = medicine._id || medicine.id || "";
                   const medicineCheckoutId = getMedicineCheckoutId(medicine);
@@ -682,45 +739,65 @@ export default function ShopPageContent() {
                   const reviewStats = reviewStatsByMedicineId.get(medicineReviewId);
                   const averageRating = reviewStats?.averageRating || 0;
                   const totalReviewsForMedicine = reviewStats?.totalReviews || 0;
+                  const stockLabel = isInStock ? `In stock (${medicine.stock})` : "Stock out";
+                  let stockBadgeLabel = "Available";
+                  let stockBadgeClassName = "bg-teal-600";
+
+                  if (!isInStock) {
+                    stockBadgeLabel = "Out of Stock";
+                    stockBadgeClassName = "bg-orange-700";
+                  } else if ((medicine.stock || 0) <= 5) {
+                    stockBadgeLabel = "Low Stock";
+                    stockBadgeClassName = "bg-amber-700";
+                  }
 
                   return (
                     <article
                       key={`${medicine._id}-${medicine.name}-${index}`}
-                      className="flex h-full flex-col overflow-hidden rounded-3xl border border-emerald-200/80 bg-white shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20"
+                      className="group flex h-full min-h-[28rem] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-teal-200 hover:shadow-xl dark:border-emerald-900/70 dark:bg-background/80 dark:hover:border-teal-800"
                     >
-                      <div className="relative">
+                      <div className="relative h-44 overflow-hidden bg-teal-50 dark:bg-emerald-950/40">
                         <Link
                           href={`/shop/${getMedicinePathId(medicine)}`}
-                          className="block"
+                          className="block h-full"
                           aria-label={`View details for ${medicine.name}`}
                         >
-                          <div className="relative flex h-56 items-center justify-center overflow-hidden bg-emerald-50 dark:bg-emerald-950/30">
-                            {!isInStock && (
-                              <span className="bg-destructive text-destructive-foreground absolute top-3 left-3 z-10 rounded-full px-3 py-1 text-xs font-semibold">
-                                Out of Stock
-                              </span>
-                            )}
+                          <div className="relative flex h-full items-center justify-center overflow-hidden">
                             {medicine.image ? (
                               <Image
                                 src={medicine.image}
                                 alt={medicine.name}
                                 fill
-                                sizes="(max-width: 768px) 100vw, 33vw"
-                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                className="object-cover transition duration-500 group-hover:scale-105"
                               />
                             ) : (
-                              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/45 dark:text-emerald-300">
-                                <ShoppingCart className="h-8 w-8" />
+                              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/80 text-teal-700 shadow-sm dark:bg-emerald-950/70 dark:text-teal-200">
+                                <ShoppingCart className="h-9 w-9" />
                               </div>
                             )}
                           </div>
                         </Link>
 
+                        <div className="absolute top-4 left-4 z-10 flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-slate-900 shadow-sm backdrop-blur dark:bg-background/90 dark:text-slate-100">
+                          <Star className="h-3.5 w-3.5 fill-teal-600 text-teal-600" />
+                          <span>{averageRating.toFixed(1)}</span>
+                          <span className="text-slate-500">({totalReviewsForMedicine})</span>
+                        </div>
+
+                        <span
+                          className={`absolute top-4 right-4 z-10 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm ${
+                            stockBadgeClassName
+                          }`}
+                        >
+                          {stockBadgeLabel}
+                        </span>
+
                         <Button
                           type="button"
                           size="icon"
                           variant="secondary"
-                          className="absolute top-3 right-3 z-20 h-10 w-10 rounded-full border border-white/70 bg-white/90 text-rose-500 shadow-lg backdrop-blur transition hover:bg-white hover:text-rose-600 dark:border-emerald-900/40 dark:bg-emerald-950/85 dark:text-rose-400"
+                          className="absolute right-4 bottom-4 z-20 h-10 w-10 rounded-full border border-white/70 bg-white/95 text-teal-700 shadow-lg backdrop-blur transition hover:bg-white hover:text-teal-800 disabled:opacity-60 dark:border-emerald-900/40 dark:bg-background/90 dark:text-teal-300"
                           aria-label={`Add ${medicine.name} to cart`}
                           disabled={!isInStock || isAlreadyInCart}
                           onClick={async () => {
@@ -746,51 +823,45 @@ export default function ShopPageContent() {
                         </Button>
                       </div>
 
-                      <div className="flex flex-1 flex-col space-y-3 p-4">
-                          <Link
-                            href={`/shop/${getMedicinePathId(medicine)}`}
-                            className="block space-y-1.5"
-                            aria-label={`Open ${medicine.name} details`}
-                          >
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="inline-flex rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-900/45 dark:text-emerald-300">
-                                {medicine.category?.name || "General"}
-                              </span>
-                              <div className="rounded-full bg-emerald-50 px-2.5 py-1 dark:bg-emerald-900/20">
-                                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-                                  BDT {medicine.price}
-                                </p>
-                              </div>
-                            </div>
-                            <h2 className="line-clamp-2 min-h-13 text-xl leading-tight font-semibold tracking-tight text-emerald-800 dark:text-emerald-200 sm:text-2xl">
+                      <div className="flex flex-1 flex-col p-5">
+                        <Link
+                          href={`/shop/${getMedicinePathId(medicine)}`}
+                          className="block"
+                          aria-label={`Open ${medicine.name} details`}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <h2 className="line-clamp-2 min-h-14 text-xl leading-7 font-semibold tracking-tight text-slate-950 dark:text-slate-100">
                               {medicine.name}
                             </h2>
-                            <p className="text-sm text-emerald-600 dark:text-emerald-400">
-                              by {medicine.manufacturer || "Unknown manufacturer"}
+                            <p className="shrink-0 text-lg font-bold text-teal-800 dark:text-teal-300">
+                              {formatPrice(medicine.price)}
                             </p>
-                            <p className="min-h-12 text-sm leading-6 text-muted-foreground">
-                              {getShortMedicineDescription(medicine)}
-                            </p>
-                          </Link>
+                          </div>
+                          <p className="mt-2 line-clamp-1 text-sm font-medium text-slate-800 dark:text-slate-200">
+                            {medicine.manufacturer || "Unknown manufacturer"}
+                          </p>
+                          <p className="mt-2 line-clamp-2 min-h-11 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                            {getShortMedicineDescription(medicine)}
+                          </p>
+                        </Link>
 
-                            <div className="flex items-center justify-between mt-1">
-                              <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 sm:text-sm">
-                                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                                <span>{averageRating.toFixed(1)}</span>
-                                <span>({totalReviewsForMedicine})</span>
-                              </div>
-                              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                                {isInStock ? `In stock (${medicine.stock})` : "Stock out"}
-                              </span>
-                            </div>
+                        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+                          <span className="rounded-full bg-teal-50 px-3 py-1 font-medium text-teal-700 dark:bg-teal-950/50 dark:text-teal-200">
+                            {medicine.category?.name || "General"}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+                            <PackageCheck className="h-3.5 w-3.5" />
+                            {stockLabel}
+                          </span>
+                        </div>
 
-                          <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
-                            <div className="flex w-full items-center gap-2">
+                        <div className="mt-auto pt-5">
+                          <div className="flex w-full items-center gap-2">
                             <Button
                               type="button"
                               size="sm"
                               variant="outline"
-                              className="h-9 w-full flex-1 rounded-full border-emerald-300 px-3 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
+                              className="h-10 w-full flex-1 rounded-lg border-slate-300 px-3 text-slate-800 hover:bg-slate-50 dark:border-emerald-900 dark:text-slate-100 dark:hover:bg-emerald-950/30"
                               disabled={!medicineCheckoutId || !isInStock}
                               onClick={async () => {
                                 const hasAccess = await guardCustomerPurchaseAccess();
@@ -809,7 +880,7 @@ export default function ShopPageContent() {
                             <Button
                               type="button"
                               size="sm"
-                              className="h-9 w-full flex-1 rounded-full bg-emerald-600 px-4 text-white shadow-sm hover:bg-emerald-700"
+                              className="h-10 w-full flex-1 rounded-lg bg-teal-600 px-4 text-white shadow-sm hover:bg-teal-700"
                               asChild
                             >
                               <Link href={`/shop/${getMedicinePathId(medicine)}`}>
@@ -826,59 +897,59 @@ export default function ShopPageContent() {
             )}
           </div>
 
-          <div className="mt-auto pt-6">
-          <div className="flex items-center justify-center gap-1.5 py-2">
-            <button
-              type="button"
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              disabled={page <= 1}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-35 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
+          <div className="mt-auto pt-10">
+            <div className="flex items-center justify-center gap-3 py-4">
+              <button
+                type="button"
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page <= 1}
+                className="inline-flex h-12 w-12 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-emerald-900 dark:bg-background/70 dark:text-slate-200 dark:hover:bg-emerald-950/30"
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
 
-            {paginationItems.map((item, index) => {
-              if (item === "...") {
+              {paginationItems.map((item, index) => {
+                if (item === "...") {
+                  return (
+                    <span
+                      key={`ellipsis-${index}`}
+                      className="inline-flex h-10 min-w-10 items-center justify-center px-1 text-sm text-slate-500 dark:text-slate-400"
+                    >
+                      ...
+                    </span>
+                  );
+                }
+
+                const isActive = page === item;
+
                 return (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="inline-flex h-8 min-w-8 items-center justify-center px-1 text-sm text-emerald-600/80 dark:text-emerald-400/80"
+                  <button
+                    key={`page-${item}`}
+                    type="button"
+                    onClick={() => setPage(item)}
+                    className={`inline-flex h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-medium transition ${
+                      isActive
+                        ? "bg-teal-700 text-white shadow-sm"
+                        : "text-slate-700 hover:bg-white hover:text-teal-700 dark:text-slate-300 dark:hover:bg-background/70 dark:hover:text-teal-300"
+                    }`}
+                    aria-current={isActive ? "page" : undefined}
                   >
-                    ...
-                  </span>
+                    {item}
+                  </button>
                 );
-              }
+              })}
 
-              const isActive = page === item;
-
-              return (
-                <button
-                  key={`page-${item}`}
-                  type="button"
-                  onClick={() => setPage(item)}
-                  className={`inline-flex h-8 min-w-8 items-center justify-center px-2 text-sm font-medium transition ${
-                    isActive
-                      ? "text-emerald-700 underline decoration-2 underline-offset-6 dark:text-emerald-300"
-                      : "text-emerald-700/80 hover:text-emerald-700 dark:text-emerald-300/80 dark:hover:text-emerald-300"
-                  }`}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  {item}
-                </button>
-              );
-            })}
-
-            <button
-              type="button"
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPage))}
-              disabled={page >= totalPage}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-35 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
-              aria-label="Next page"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() => setPage((prev) => Math.min(prev + 1, totalPage))}
+                disabled={page >= totalPage}
+                className="inline-flex h-12 w-12 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-emerald-900 dark:bg-background/70 dark:text-slate-200 dark:hover:bg-emerald-950/30"
+                aria-label="Next page"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
