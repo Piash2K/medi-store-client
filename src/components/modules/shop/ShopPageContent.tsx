@@ -34,6 +34,7 @@ import { Category, Medicine, MedicinesResponse } from "@/types/medicine";
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 8;
 const STATS_LIMIT = 100;
+const FILTER_PREVIEW_LIMIT = 3;
 
 const formatPrice = (value: number) => `BDT ${value.toFixed(2)}`;
 
@@ -140,6 +141,8 @@ export default function ShopPageContent() {
   const [categoryCounts, setCategoryCounts] = React.useState<Map<string, number>>(new Map());
   const [manufacturerCounts, setManufacturerCounts] = React.useState<Map<string, number>>(new Map());
   const [manufacturers, setManufacturers] = React.useState<string[]>([]);
+  const [showAllCategories, setShowAllCategories] = React.useState(false);
+  const [showAllManufacturers, setShowAllManufacturers] = React.useState(false);
   const [reviewStatsByMedicineId, setReviewStatsByMedicineId] = React.useState<
     Map<string, { averageRating: number; totalReviews: number }>
   >(new Map());
@@ -165,6 +168,14 @@ export default function ShopPageContent() {
       ),
     ).slice(0, 24);
   }, [medicines]);
+
+  const visibleCategories = React.useMemo(() => {
+    return showAllCategories ? categories : categories.slice(0, FILTER_PREVIEW_LIMIT);
+  }, [categories, showAllCategories]);
+
+  const visibleManufacturers = React.useMemo(() => {
+    return showAllManufacturers ? manufacturers : manufacturers.slice(0, FILTER_PREVIEW_LIMIT);
+  }, [manufacturers, showAllManufacturers]);
 
   const loadMedicines = React.useCallback(async () => {
     setIsLoading(true);
@@ -541,7 +552,7 @@ export default function ShopPageContent() {
   return (
     <section className="w-full bg-[#f2fbf8] dark:bg-emerald-950/10">
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-screen-2xl lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-emerald-100 bg-white/80 px-4 py-6 dark:border-emerald-900/60 dark:bg-background/70 sm:px-6 lg:sticky lg:top-20 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto lg:border-r lg:border-b-0 lg:px-6 lg:py-8">
+        <aside className="border-b border-emerald-100 bg-white/80 px-4 py-6 dark:border-emerald-900/60 dark:bg-background/70 sm:px-6 lg:sticky lg:top-12 lg:self-start lg:border-r lg:border-b-0 lg:px-6">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">Filters</h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Precision Search</p>
@@ -553,8 +564,8 @@ export default function ShopPageContent() {
                 <Shapes className="h-5 w-5" />
                 <span>Categories</span>
               </div>
-              <div className="mt-4 max-h-64 space-y-3 overflow-y-auto pr-1">
-                {categories.map((item, index) => (
+              <div className="mt-4 space-y-3">
+                {visibleCategories.map((item, index) => (
                   <label
                     key={`${item._id}-${item.name}-${index}`}
                     className="flex cursor-pointer items-center justify-between gap-3 text-sm text-slate-800 dark:text-slate-200"
@@ -574,6 +585,15 @@ export default function ShopPageContent() {
                   </label>
                 ))}
               </div>
+              {categories.length > FILTER_PREVIEW_LIMIT && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllCategories((prev) => !prev)}
+                  className="mt-4 text-sm font-semibold text-teal-700 transition hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
+                >
+                  {showAllCategories ? "See Less" : "See More"}
+                </button>
+              )}
             </div>
 
             <div>
@@ -581,9 +601,9 @@ export default function ShopPageContent() {
                 <Building2 className="h-5 w-5" />
                 <span>Manufacturers</span>
               </div>
-              <div className="mt-4 max-h-56 space-y-3 overflow-y-auto pr-1">
+              <div className="mt-4 space-y-3">
                 {manufacturers.length > 0 ? (
-                  manufacturers.map((item, index) => (
+                  visibleManufacturers.map((item, index) => (
                     <label
                       key={`${item}-${index}`}
                       className="flex cursor-pointer items-center justify-between gap-3 text-sm text-slate-800 dark:text-slate-200"
@@ -611,6 +631,15 @@ export default function ShopPageContent() {
                   />
                 )}
               </div>
+              {manufacturers.length > FILTER_PREVIEW_LIMIT && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllManufacturers((prev) => !prev)}
+                  className="mt-4 text-sm font-semibold text-teal-700 transition hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200"
+                >
+                  {showAllManufacturers ? "See Less" : "See More"}
+                </button>
+              )}
             </div>
 
             <div>
