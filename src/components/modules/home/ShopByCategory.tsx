@@ -64,56 +64,7 @@ const getCategoryDescription = (categoryName: string) => {
 const getCategoryKey = (category: Category, index: number) =>
   `${category._id || category.name}-${index}`;
 
-type CategoryPalette = {
-  card: string;
-  glow: string;
-  iconWrap: string;
-  icon: string;
-};
 
-const categoryPalettes: CategoryPalette[] = [
-  {
-    card: "from-rose-500/12 via-background to-background dark:from-rose-400/18 dark:via-background dark:to-background",
-    glow: "bg-rose-500/15 dark:bg-rose-300/10",
-    iconWrap: "bg-rose-500/15 ring-rose-500/25 dark:bg-rose-400/20 dark:ring-rose-300/35",
-    icon: "text-rose-600 dark:text-rose-300",
-  },
-  {
-    card: "from-sky-500/12 via-background to-background dark:from-sky-400/18 dark:via-background dark:to-background",
-    glow: "bg-sky-500/15 dark:bg-sky-300/10",
-    iconWrap: "bg-sky-500/15 ring-sky-500/25 dark:bg-sky-400/20 dark:ring-sky-300/35",
-    icon: "text-sky-600 dark:text-sky-300",
-  },
-  {
-    card: "from-violet-500/12 via-background to-background dark:from-violet-400/18 dark:via-background dark:to-background",
-    glow: "bg-violet-500/15 dark:bg-violet-300/10",
-    iconWrap: "bg-violet-500/15 ring-violet-500/25 dark:bg-violet-400/20 dark:ring-violet-300/35",
-    icon: "text-violet-600 dark:text-violet-300",
-  },
-  {
-    card: "from-emerald-500/12 via-background to-background dark:from-emerald-400/18 dark:via-background dark:to-background",
-    glow: "bg-emerald-500/15 dark:bg-emerald-300/10",
-    iconWrap: "bg-emerald-500/15 ring-emerald-500/25 dark:bg-emerald-400/20 dark:ring-emerald-300/35",
-    icon: "text-emerald-600 dark:text-emerald-300",
-  },
-  {
-    card: "from-amber-500/12 via-background to-background dark:from-amber-400/18 dark:via-background dark:to-background",
-    glow: "bg-amber-500/15 dark:bg-amber-300/10",
-    iconWrap: "bg-amber-500/15 ring-amber-500/25 dark:bg-amber-400/20 dark:ring-amber-300/35",
-    icon: "text-amber-600 dark:text-amber-300",
-  },
-  {
-    card: "from-cyan-500/12 via-background to-background dark:from-cyan-400/18 dark:via-background dark:to-background",
-    glow: "bg-cyan-500/15 dark:bg-cyan-300/10",
-    iconWrap: "bg-cyan-500/15 ring-cyan-500/25 dark:bg-cyan-400/20 dark:ring-cyan-300/35",
-    icon: "text-cyan-600 dark:text-cyan-300",
-  },
-];
-
-const getCategoryPalette = (categoryName: string, index: number) => {
-  const hash = Array.from(categoryName).reduce((total, char) => total + char.charCodeAt(0), index);
-  return categoryPalettes[hash % categoryPalettes.length];
-};
 
 export default async function ShopByCategory() {
   const categories = await getCategories();
@@ -124,44 +75,34 @@ export default async function ShopByCategory() {
   }
 
   return (
-    <section className="bg-muted/40 home-section">
-      <div className="home-shell">
-        <div className="text-left">
-          <h2 className="home-heading">Shop by Category</h2>
-          <p className="home-lead">
-            Find the right medicine for your needs
-          </p>
+    <section className="bg-[#f3f8f6] dark:bg-[#101c1a] py-8 w-full">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-[#1a2c23] dark:text-white mb-1">Shop by Category</h2>
+            <p className="text-[#4b6358] dark:text-[#b5cfc2] text-base">Find exactly what you need in our curated pharmacy collection.</p>
+          </div>
+          <Link href="/shop" className="text-emerald-700 dark:text-emerald-300 font-medium text-sm flex items-center hover:underline">
+            View All Categories <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
         </div>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {homeCategories.map((category, index) => {
             const Icon = getCategoryIcon(category.name);
-            const palette = getCategoryPalette(category.name, index);
-
             return (
               <Link
                 key={getCategoryKey(category, index)}
                 href={`/shop?category=${encodeURIComponent(category.name)}`}
-                className={`group relative overflow-hidden rounded-2xl border border-border/70 bg-linear-to-br ${palette.card} p-5 text-center shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-border hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:outline-none sm:p-6`}
+                className="group block rounded-xl bg-white dark:bg-[#162624] border border-[#e6f0ec] dark:border-[#1e2e2b] shadow-sm p-5 transition hover:shadow-md focus-visible:ring-2 focus-visible:ring-emerald-400 outline-none cursor-pointer h-full"
+                tabIndex={0}
               >
-                <div
-                  className={`pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full blur-2xl transition-opacity duration-300 group-hover:opacity-90 ${palette.glow}`}
-                  aria-hidden="true"
-                />
-
-                <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ring-1 sm:h-15 sm:w-15 ${palette.iconWrap}`}>
-                  <Icon className={`h-7 w-7 sm:h-7.5 sm:w-7.5 ${palette.icon}`} />
+                <div className="flex flex-col items-center justify-center h-full">
+                  <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#f3f8f6] dark:bg-[#101c1a]">
+                    <Icon className="h-7 w-7 text-[#168172] dark:text-[#6ee7b7]" />
+                  </span>
+                  <h3 className="text-base font-semibold text-[#1a2c23] dark:text-white mb-1 text-center">{category.name}</h3>
+                  <p className="text-xs text-[#4b6358] dark:text-[#b5cfc2] text-center">{getCategoryDescription(category.name)}</p>
                 </div>
-
-                <h3 className="mt-4 text-lg font-semibold tracking-tight sm:text-xl">{category.name}</h3>
-                <p className="text-muted-foreground mt-1.5 text-sm leading-6 sm:text-sm">
-                  {getCategoryDescription(category.name)}
-                </p>
-
-                <span className="text-foreground/70 mt-4 inline-flex items-center text-xs font-medium">
-                  Explore Category
-                  <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
               </Link>
             );
           })}
