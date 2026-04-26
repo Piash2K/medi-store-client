@@ -1,15 +1,11 @@
 import Link from "next/link";
-import { Pill } from "lucide-react";
-
-import { getCategories } from "@/services/medicine";
+import { BriefcaseMedical } from "lucide-react";
 
 const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@medistore.com";
 const supportPhone = process.env.NEXT_PUBLIC_SUPPORT_PHONE || "+88013-1234-5678";
 const supportHours = process.env.NEXT_PUBLIC_SUPPORT_HOURS || "Mon-Fri 9am-6pm EST";
 
 export async function Footer() {
-  const categories = await getCategories();
-  const quickCategories = categories.slice(0, 3);
   const currentYear = new Date().getFullYear();
 
   return (
@@ -18,10 +14,10 @@ export async function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <Link href="/" className="inline-flex items-center gap-3 text-3xl font-bold tracking-tight">
-              <span className="bg-primary text-primary-foreground inline-flex h-9 w-9 items-center justify-center rounded-xl">
-                <Pill className="h-5 w-5" />
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl">
+                <BriefcaseMedical className="h-8 w-8 text-[#16a085]" />
               </span>
-              MediStore
+              <span className="text-[#16a085]">MediStore</span>
             </Link>
             <p className="max-w-xs text-lg leading-8 text-muted-foreground">
               Your trusted online medicine shop. Quality OTC medicines delivered to your doorstep.
@@ -51,16 +47,6 @@ export async function Footer() {
                   Contact
                 </Link>
               </li>
-              {quickCategories.map((category, index) => (
-                <li key={`${category._id || category.name}-${index}`}>
-                  <Link
-                    href={`/shop?category=${encodeURIComponent(category.name)}`}
-                    className="hover:text-foreground transition-colors"
-                  >
-                    {category.name}
-                  </Link>
-                </li>
-              ))}
             </ul>
           </div>
 
