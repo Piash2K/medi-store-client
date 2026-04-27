@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import * as React from "react";
-import { Minus, Package, Plus, Trash2 } from "lucide-react";
+import { Minus, Package, Plus, Trash2, Lock, Truck, ShieldCheck } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
@@ -145,176 +145,235 @@ export default function CartPageContent() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
-      <h1 className="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-3xl lg:text-4xl">
-        Shopping Cart
-      </h1>
-
-      {items.length === 0 ? (
-        <div className="mt-8 rounded-2xl border-2 border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-8 text-center dark:border-emerald-800/60 dark:from-emerald-950/20 dark:to-emerald-950/10">
-          <p className="text-lg font-semibold text-emerald-800 dark:text-emerald-200">Your cart is empty</p>
-          <Button asChild className="mt-4 bg-emerald-600 text-white hover:bg-emerald-700">
-            <Link href="/shop">Continue Shopping</Link>
-          </Button>
-        </div>
-      ) : (
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="overflow-hidden rounded-2xl border-2 border-emerald-200 bg-linear-to-br from-emerald-50/40 to-white shadow-sm dark:border-emerald-800/60 dark:from-emerald-950/20 dark:to-emerald-950/10">
-            <div className="flex flex-col items-start justify-between gap-2 border-b border-emerald-200 px-4 py-3 dark:border-emerald-800/60 sm:flex-row sm:items-center sm:px-5">
-              <label className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-                <input
-                  type="checkbox"
-                  checked={areAllItemsSelected}
-                  onChange={handleToggleSelectAll}
-                  className="accent-emerald-600"
-                />
-                Select All
-              </label>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 sm:text-sm">
-                {selectedItems.length} of {items.length} selected
-              </p>
+    <main className="bg-[#f2fbf9] dark:bg-emerald-950/10 min-h-screen font-['Inter',sans-serif] text-[#171d1c] dark:text-slate-100">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Cart Items Column */}
+          <div className="grow space-y-8">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl md:text-4xl font-bold text-[#171d1c] dark:text-slate-100 font-['Manrope',sans-serif] tracking-tight drop-shadow-sm">
+                Shopping Cart
+              </h1>
+              <span className="text-[#4f6169] dark:text-slate-300 text-base">
+                {items.length} {items.length === 1 ? "Item" : "Items"}
+              </span>
             </div>
 
-            {items.map((item) => (
-              <article
-                key={item.id}
-                className="flex flex-col gap-4 border-b border-emerald-100 p-4 last:border-b-0 dark:border-emerald-800/50 sm:p-5 lg:flex-row lg:items-center lg:justify-between"
-              >
-                <div className="flex min-w-0 items-center gap-4">
+            {items.length === 0 ? (
+              <div className="p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col items-center text-center group bg-white dark:bg-background/80 hover:bg-[#f8fdfa] dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5">
+                <Package className="w-16 h-16 text-[#006a63] dark:text-teal-200 mx-auto mb-4" />
+                <p className="text-lg font-semibold text-[#171d1c] dark:text-slate-100">Your cart is empty</p>
+                <Button asChild className="mt-6 bg-[#00a69c] text-white hover:bg-[#008a82] rounded-full px-8">
+                  <Link href="/shop">Continue Shopping</Link>
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* Select All Control */}
+                <div className="flex items-center space-x-4 py-4 px-6 bg-white dark:bg-emerald-950/30 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 shadow-sm dark:shadow-none">
                   <input
                     type="checkbox"
-                    checked={selectedItemIds.includes(item.id)}
-                    onChange={() => handleToggleItemSelection(item.id)}
-                    aria-label={`Select ${item.name}`}
-                    className="accent-emerald-600"
+                    checked={areAllItemsSelected}
+                    onChange={handleToggleSelectAll}
+                    className="w-5 h-5 rounded border-[#6c7a78] text-[#006a63] focus:ring-[#006a63] transition-all accent-[#006a63]"
                   />
-
-                  <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-100 dark:bg-emerald-900/45 sm:h-18 sm:w-18">
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        sizes="72px"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <Package className="h-8 w-8 text-emerald-500" />
-                    )}
-                  </div>
-
-                  <div className="min-w-0">
-                    <h2 className="truncate text-base leading-tight font-semibold text-emerald-800 dark:text-emerald-200 sm:text-xl">
-                      {item.name}
-                    </h2>
-                    <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
-                      by {item.manufacturer || "Unknown manufacturer"}
-                    </p>
-                    <p className="mt-1 text-base font-semibold text-gray-900 dark:text-gray-100 sm:text-lg">
-                      BDT {currencyFormatter.format(item.price)}
-                    </p>
-                    <p className="mt-1 text-sm">
-                      {typeof stockByItemId[item.id] === "number" ? (
-                        stockByItemId[item.id]! > 0 ? (
-                          <span className="text-emerald-600">Stock: {stockByItemId[item.id]}</span>
-                        ) : (
-                          <span className="text-destructive font-medium">Stock out</span>
-                        )
-                      ) : (
-                        <span className="text-gray-500 dark:text-gray-400">Stock: N/A</span>
-                      )}
-                    </p>
-                  </div>
+                  <span className="text-sm font-semibold ">Select All Items</span>
+                  <span className="text-sm text-[#4f6169] ml-auto">
+                    {selectedItems.length} of {items.length} selected
+                  </span>
                 </div>
 
-                <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:w-auto lg:justify-end lg:gap-6">
-                  <div className="flex items-center rounded-xl border border-emerald-200 bg-white px-2 py-1 dark:border-emerald-800/60 dark:bg-emerald-950/25">
-                    <button
-                      type="button"
-                      aria-label="Decrease quantity"
-                      className="inline-flex h-8 w-8 items-center justify-center text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
-                      onClick={() => updateQuantity(item.id, Math.max(item.quantity - 1, 1))}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="w-6 text-center text-sm font-semibold text-emerald-800 dark:text-emerald-200">{item.quantity}</span>
-                    <button
-                      type="button"
-                      aria-label="Increase quantity"
-                      className="inline-flex h-8 w-8 items-center justify-center text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
-                      disabled={
-                        typeof stockByItemId[item.id] === "number" &&
-                        stockByItemId[item.id] !== null &&
-                        item.quantity >= stockByItemId[item.id]!
-                      }
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
+                {/* Item List */}
+                <div className="space-y-4">
+                  {items.map((item) => {
+                    const stock = stockByItemId[item.id];
+                    const isOutOfStock = typeof stock === "number" && stock <= 0;
+                    const isOverQuantity = typeof stock === "number" && stock > 0 && item.quantity > stock;
+                    const hasStockIssue = isOutOfStock || isOverQuantity;
 
-                  <div className="text-left sm:text-right">
-                    <p className="text-xl font-bold text-emerald-700 dark:text-emerald-300 sm:text-2xl">
-                      BDT {currencyFormatter.format(item.price * item.quantity)}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveItem(item.id)}
-                      className="mt-1 inline-flex items-center gap-1 text-sm text-rose-600 hover:text-rose-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Remove
-                    </button>
-                  </div>
+                    return (
+                      <div
+                        key={item.id}
+                        className={`p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 group bg-white dark:bg-background/80 hover:bg-[#f8fdfa] dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5 ${
+                          hasStockIssue ? "opacity-80" : ""
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedItemIds.includes(item.id)}
+                          onChange={() => handleToggleItemSelection(item.id)}
+                          className="w-5 h-5 rounded border-[#6c7a78] text-[#006a63] focus:ring-[#006a63] transition-all accent-[#006a63] shrink-0 mt-1"
+                        />
+
+                        <div className="w-24 h-24 bg-[#e9efed] dark:bg-emerald-900/30 rounded-lg overflow-hidden shrink-0 border border-[#bbc9c7] dark:border-emerald-900 relative">
+                          {isOutOfStock && (
+                            <div className="absolute inset-0 bg-[#2b3231]/10 flex items-center justify-center">
+                              <span className="bg-[#ffdad6] text-[#93000a] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                Out of Stock
+                              </span>
+                            </div>
+                          )}
+                          {item.image ? (
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              sizes="96px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="h-8 w-8 text-[#006a63] dark:text-teal-200/40" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="grow">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                            <div>
+                              <h3 className="text-xl font-semibold text-[#171d1c] dark:text-slate-100 font-['Manrope',sans-serif]">
+                                {item.name}
+                              </h3>
+                              <p className="text-sm text-[#4f6169] dark:text-slate-300 mt-1">
+                                Brand: {item.manufacturer || "PharmaCare"}
+                              </p>
+                            </div>
+                            <span className={`text-xl font-semibold ${hasStockIssue ? "text-[#3c4947] dark:text-slate-300" : "text-[#006a63] dark:text-teal-200"}`}>
+                              BDT {currencyFormatter.format(item.price)}
+                            </span>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-4">
+                            <div className="flex items-center bg-[#e9efed] dark:bg-emerald-900/30 rounded-full p-1 border border-[#bbc9c7] dark:border-emerald-900">
+                              <button
+                                type="button"
+                                aria-label="Decrease quantity"
+                                className="w-8 h-8 flex items-center justify-center text-[#006a63] dark:text-teal-200 hover:bg-[#dee4e2] dark:hover:bg-emerald-900/40 rounded-full transition-all disabled:opacity-50"
+                                onClick={() => updateQuantity(item.id, Math.max(item.quantity - 1, 1))}
+                                disabled={hasStockIssue}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                              <span className="px-4 text-sm font-semibold text-[#171d1c] dark:text-slate-100">{item.quantity}</span>
+                              <button
+                                type="button"
+                                aria-label="Increase quantity"
+                                className="w-8 h-8 flex items-center justify-center text-[#006a63] dark:text-teal-200 hover:bg-[#dee4e2] dark:hover:bg-emerald-900/40 rounded-full transition-all disabled:opacity-50"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                disabled={hasStockIssue || (typeof stock === "number" && stock !== null && item.quantity >= stock)}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="flex items-center text-[#ba1a1a] dark:text-[#ffb4ab] hover:opacity-75 transition-opacity text-sm gap-1"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Remove
+                            </button>
+                          </div>
+
+                          {/* Stock info */}
+                          {typeof stock === "number" && stock > 0 && (
+                            <p className="text-xs text-[#006a63] dark:text-teal-200 mt-2">Stock: {stock} available</p>
+                          )}
+                          {isOutOfStock && (
+                            <p className="text-xs text-[#ba1a1a] dark:text-[#ffb4ab] font-medium mt-2">Out of stock</p>
+                          )}
+                          {isOverQuantity && !isOutOfStock && (
+                            <p className="text-xs text-[#ba1a1a] dark:text-[#ffb4ab] font-medium mt-2">Exceeds available stock</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </article>
-            ))}
+
+                
+              </>
+            )}
           </div>
 
-          <aside className="h-fit rounded-2xl border-2 border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-4 shadow-sm dark:border-emerald-800/60 dark:from-emerald-950/20 dark:to-emerald-950/10 sm:p-6">
-            <h2 className="text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300 sm:text-2xl">Order Summary</h2>
+          {/* Order Summary Sidebar */}
+          {items.length > 0 && (
+            <aside className="lg:w-96 w-full">
+              <div className="p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col group bg-white dark:bg-background/80 hover:bg-[#f8fdfa] dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5 shadow-lg dark:shadow-none sticky top-24">
+                <h2 className="text-2xl font-bold text-[#171d1c] dark:text-slate-100 font-['Manrope',sans-serif] mb-6">
+                  Order Summary
+                </h2>
 
-            <div className="mt-5 space-y-2 text-base sm:text-lg">
-              <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-400">
-                <span>Subtotal ({itemsCount} items)</span>
-                <span className="font-semibold text-emerald-900 dark:text-emerald-200">BDT {currencyFormatter.format(subtotal)}</span>
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between text-base text-[#4f6169] dark:text-slate-300">
+                    <span>Subtotal ({itemsCount} items)</span>
+                    <span>BDT {currencyFormatter.format(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-base text-[#4f6169] dark:text-slate-300">
+                    <span>Shipping</span>
+                    <span className="text-[#006a63] dark:text-teal-200 font-medium">
+                      {selectedItems.length > 0 ? `BDT ${currencyFormatter.format(shipping)}` : "—"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-base text-[#4f6169] dark:text-slate-300">
+                    <span>Tax (Estimated)</span>
+                    <span>BDT {currencyFormatter.format(0)}</span>
+                  </div>
+
+                  <div className="pt-4 border-t border-[#bbc9c7] dark:border-emerald-900 flex justify-between items-center">
+                    <span className="text-xl font-semibold text-[#171d1c] dark:text-slate-100">Total</span>
+                    <span className="text-3xl md:text-4xl font-bold text-[#006a63] dark:text-teal-200">
+                      BDT {currencyFormatter.format(total)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {selectedItemIds.length > 0 && !hasCheckoutStockIssue ? (
+                    <Button asChild className="w-full bg-[#00a69c] text-white py-4 rounded-full text-base shadow-md hover:bg-[#008a82] transition-all">
+                      <Link href={checkoutHref}>Proceed to Checkout</Link>
+                    </Button>
+                  ) : (
+                    <Button className="w-full bg-[#00a69c]/50 text-white py-4 rounded-full text-base cursor-not-allowed dark:bg-[#00a69c]/30" disabled>
+                      Proceed to Checkout
+                    </Button>
+                  )}
+
+                  {selectedItemIds.length === 0 && (
+                    <p className="text-sm text-[#ba1a1a] dark:text-[#ffb4ab] text-center">Select at least one product to checkout.</p>
+                  )}
+                  {selectedItemIds.length > 0 && hasCheckoutStockIssue && (
+                    <p className="text-sm text-[#ba1a1a] dark:text-[#ffb4ab] text-center">
+                      Some selected items are out of stock or exceed available quantity. Please update cart first.
+                    </p>
+                  )}
+
+                  <Button asChild variant="outline" className="w-full border-2 border-[#006a63] dark:border-teal-900 text-[#006a63] dark:text-teal-200 hover:bg-[#006a63]/5 dark:hover:bg-emerald-950/30 rounded-full py-4 text-base">
+                    <Link href="/shop">Continue Shopping</Link>
+                  </Button>
+                </div>
+
+                {/* Trust Signals */}
+                <div className="mt-8 space-y-4 pt-8 border-t border-[#bbc9c7] dark:border-emerald-900">
+                  <div className="flex items-center gap-3">
+                    <Lock className="text-[#006a63] dark:text-teal-200 w-5 h-5" />
+                    <span className="text-sm text-[#4f6169] dark:text-slate-300">Secure SSL Encrypted Checkout</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Truck className="text-[#006a63] dark:text-teal-200 w-5 h-5" />
+                    <span className="text-sm text-[#4f6169] dark:text-slate-300">Expected Delivery: 3-5 business days</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <ShieldCheck className="text-[#006a63] dark:text-teal-200 w-5 h-5" />
+                    <span className="text-sm text-[#4f6169] dark:text-slate-300">Licensed Pharmacy Guarantee</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-400">
-                <span>Shipping</span>
-                <span className="font-semibold text-emerald-900 dark:text-emerald-200">BDT {currencyFormatter.format(shipping)}</span>
-              </div>
-            </div>
-
-            <div className="my-5 border-t border-emerald-200 dark:border-emerald-800/60" />
-
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-emerald-800 dark:text-emerald-200 sm:text-2xl">Total</span>
-              <span className="text-2xl font-black text-emerald-700 dark:text-emerald-300 sm:text-3xl">BDT {currencyFormatter.format(total)}</span>
-            </div>
-
-            {selectedItemIds.length > 0 && !hasCheckoutStockIssue ? (
-              <Button asChild className="mt-6 h-11 w-full bg-emerald-600 text-base text-white hover:bg-emerald-700">
-                <Link href={checkoutHref}>Proceed to Checkout</Link>
-              </Button>
-            ) : (
-              <Button className="mt-6 h-11 w-full bg-emerald-400 text-base text-white" disabled>
-                Proceed to Checkout
-              </Button>
-            )}
-            {selectedItemIds.length === 0 && (
-              <p className="mt-2 text-sm text-destructive">Select at least one product to checkout.</p>
-            )}
-            {selectedItemIds.length > 0 && hasCheckoutStockIssue && (
-              <p className="mt-2 text-sm text-destructive">
-                Some selected items are stock out or exceed available stock. Please update cart first.
-              </p>
-            )}
-            <Button asChild variant="outline" className="mt-3 h-11 w-full border-emerald-300 text-base text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30">
-              <Link href="/shop">Continue Shopping</Link>
-            </Button>
-          </aside>
+            </aside>
+          )}
         </div>
-      )}
-    </section>
+      </div>
+    </main>
   );
 }
