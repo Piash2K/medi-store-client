@@ -18,8 +18,16 @@ const quickPrompts = [
   "Out of stock item",
 ];
 
-export default function ChatbotWidget() {
-  const [isOpen, setIsOpen] = useState(false);
+// Accept isOpen and setIsOpen as props for external control
+type ChatbotWidgetProps = {
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
+};
+
+export default function ChatbotWidget({ isOpen: externalIsOpen, setIsOpen: externalSetIsOpen }: ChatbotWidgetProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalOpen;
+  const setIsOpen = externalSetIsOpen || setInternalOpen;
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
