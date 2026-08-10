@@ -11,7 +11,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
-  Loader2,
   PackageCheck,
   Search,
   Shapes,
@@ -148,6 +147,9 @@ export default function ShopPageContent() {
   >(new Map());
   const medicineSectionTopRef = React.useRef<HTMLDivElement | null>(null);
   const hasMountedPaginationScrollRef = React.useRef(false);
+  // Use a ref so loadMedicines can read the latest catalog without
+  // being recreated every time loadFilterStats sets a new array.
+  const allMedicinesCatalogRef = React.useRef<Medicine[]>([]);
 
   const aiSearchCatalog = React.useMemo(() => {
     return Array.from(
@@ -185,8 +187,10 @@ export default function ShopPageContent() {
 
     const normalizedQuery = debouncedSearchTerm.trim().toLowerCase();
 
-    if (normalizedQuery && allMedicinesCatalog.length > 0) {
-      const locallyMatchedMedicines = allMedicinesCatalog.filter((medicine) => {
+    const currentCatalog = allMedicinesCatalogRef.current;
+
+    if (normalizedQuery && currentCatalog.length > 0) {
+      const locallyMatchedMedicines = currentCatalog.filter((medicine) => {
         if (medicine.isDeleted) {
           return false;
         }
@@ -320,7 +324,7 @@ export default function ShopPageContent() {
     setTotalPage(result.meta?.totalPage || 1);
     setTotalMedicines(result.meta?.total || result.data.length);
     setIsLoading(false);
-  }, [debouncedSearchTerm, category, manufacturer, minPrice, maxPrice, inStockOnly, page, allMedicinesCatalog]);
+  }, [debouncedSearchTerm, category, manufacturer, minPrice, maxPrice, inStockOnly, page]);
 
   const loadFilterStats = React.useCallback(async () => {
     const firstPage = await getMedicines({
@@ -384,7 +388,9 @@ export default function ShopPageContent() {
     setCategoryCounts(nextCategoryCounts);
     setManufacturerCounts(nextManufacturerCounts);
     setManufacturers(Array.from(nextManufacturerCounts.keys()).sort());
-    setAllMedicinesCatalog(allMedicines.filter((medicine) => !medicine.isDeleted));
+    const filteredCatalog = allMedicines.filter((medicine) => !medicine.isDeleted);
+    allMedicinesCatalogRef.current = filteredCatalog;
+    setAllMedicinesCatalog(filteredCatalog);
   }, []);
 
   React.useEffect(() => {
@@ -784,8 +790,41 @@ export default function ShopPageContent() {
 
           <div className="min-h-176">
             {isLoading && (
-              <div className="mt-10 flex items-center justify-center">
-                <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+              <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-4">
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <div
+                    key={`shop-skeleton-${index}`}
+                    className="flex h-full min-h-112 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-sm dark:border-emerald-900/70 dark:bg-background/80"
+                  >
+                    {/* Image Skeleton */}
+                    <div className="h-44 w-full bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+
+                    {/* Content Skeleton */}
+                    <div className="flex flex-1 flex-col p-5 space-y-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="h-6 w-3/5 rounded bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                        <div className="h-6 w-1/4 rounded bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                      </div>
+
+                      <div className="h-4 w-2/5 rounded bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+
+                      <div className="space-y-1.5 pt-1">
+                        <div className="h-3.5 w-full rounded bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                        <div className="h-3.5 w-4/5 rounded bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2">
+                        <div className="h-6 w-20 rounded-full bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                        <div className="h-6 w-24 rounded-full bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                      </div>
+
+                      <div className="mt-auto flex items-center gap-2 pt-4">
+                        <div className="h-10 flex-1 rounded-lg bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                        <div className="h-10 flex-1 rounded-lg bg-slate-200/80 dark:bg-slate-800/80 animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
