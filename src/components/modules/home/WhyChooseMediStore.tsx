@@ -27,9 +27,14 @@ export default function WhyChooseMediStore() {
   ];
 
   return (
-    <section className="bg-[#f3f8f6] dark:bg-[#101c1a] py-10 w-full">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center text-lg font-medium text-[#1a2c23] dark:text-white mb-10">Why Choose MediStore</h2>
+    <section id="why-choose-medistore" className="bg-[#f3f8f6] dark:bg-[#101c1a] home-section">
+      <div className="home-shell">
+        <div className="text-center mb-10">
+          <h2 className="home-heading text-[#1a2c23] dark:text-white">Why Choose MediStore</h2>
+          <p className="home-lead max-w-2xl mx-auto text-[#4b6358] dark:text-[#b5cfc2]">
+            Your health and safety are our top priority with verified care and fast fulfillment.
+          </p>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {reasons.map((reason) => {
             const Icon = reason.icon;

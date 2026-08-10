@@ -208,26 +208,33 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="mx-auto w-full  px-4 sm:px-6 lg:px-8">
-        <nav className="hidden h-12 items-center justify-between lg:flex">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="text-lg font-semibold tracking-tight">
-              MediStore 💊
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md transition-all">
+      <div className="home-shell">
+        {/* Desktop Navbar */}
+        <nav className="hidden h-16 items-center justify-between lg:flex">
+          <div className="flex items-center gap-8">
+            <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight transition-opacity hover:opacity-90">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 font-bold text-lg">
+                💊
+              </span>
+              <span className="text-foreground">
+                Medi<span className="text-emerald-600 dark:text-emerald-400">Store</span>
+              </span>
             </Link>
           </div>
-          <div>
-            <NavigationMenu>
-              <NavigationMenuList className="gap-6">
+
+          <div className="flex h-full items-center">
+            <NavigationMenu className="h-full">
+              <NavigationMenuList className="flex h-full gap-1">
                 {primaryMenu.map((item) => (
-                  <NavigationMenuItem key={item.title}>
+                  <NavigationMenuItem key={item.title} className="h-full">
                     <NavigationMenuLink asChild>
                       <Link
                         href={item.url}
-                        className={`border-b-2 py-1 text-sm font-medium transition-colors focus-visible:outline-none ${
+                        className={`relative flex h-16 items-center px-3.5 text-sm font-medium transition-colors focus-visible:outline-none ${
                           isActivePath(item.url)
-                            ? "border-emerald-500 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400"
-                            : "border-transparent text-foreground/80 hover:text-foreground"
+                            ? "text-emerald-600 font-semibold dark:text-emerald-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-emerald-600 dark:after:bg-emerald-400"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
                         {item.title}
@@ -238,17 +245,22 @@ export function Navbar() {
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-3">
             {utilityMenuItems.map((item) => (
               <Button
                 key={item.title}
                 asChild
                 variant={isActivePath(item.url) ? "default" : "outline"}
                 size="sm"
-                className={isActivePath(item.url) ? "h-8 bg-emerald-600 text-white hover:bg-emerald-700" : "h-8 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30"}
+                className={
+                  isActivePath(item.url)
+                    ? "h-9 bg-emerald-600 text-white hover:bg-emerald-700 px-4 shadow-sm"
+                    : "h-9 border-emerald-500/30 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-500/40 dark:text-emerald-300 dark:hover:bg-emerald-950/50 px-4"
+                }
               >
-                <Link href={item.url} className="inline-flex items-center gap-1.5">
-                  <ShoppingCart className="h-3.5 w-3.5" />
+                <Link href={item.url} className="inline-flex items-center gap-2 font-medium">
+                  <ShoppingCart className="h-4 w-4" />
                   {item.title}
                 </Link>
               </Button>
@@ -258,80 +270,86 @@ export function Navbar() {
           </div>
         </nav>
 
-        <div className="flex h-12 items-center justify-between lg:hidden">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="text-lg font-semibold tracking-tight">
-              MediStore 💊
-            </Link>
-          </div>
+        {/* Mobile Navbar */}
+        <div className="flex h-16 items-center justify-between lg:hidden">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+              💊
+            </span>
+            <span>
+              Medi<span className="text-emerald-600 dark:text-emerald-400">Store</span>
+            </span>
+          </Link>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <UserMenu user={user} onLogout={handleLogout} />
             <ThemeToggle />
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Open menu">
-                  <Menu className="size-4" />
+                <Button variant="outline" size="icon" className="h-9 w-9" aria-label="Open menu">
+                  <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent className="overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>
-                  <Link
-                    href="/"
-                    className="text-lg font-semibold tracking-tight"
-                  >
-                    MediStore 💊
-                  </Link>
-                </SheetTitle>
-              </SheetHeader>
-
-              <div className="flex flex-col gap-6 p-4">
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-                    Main Navigation
-                  </p>
-                <div className="flex w-full flex-col gap-2">
-                    {primaryMenu.map((item) => (
-                    <Link
-                      key={item.title}
-                      href={item.url}
-                      prefetch={true}
-                      className={`text-base font-semibold transition-colors ${
-                        isActivePath(item.url)
-                          ? "text-emerald-600 dark:text-emerald-400"
-                          : "text-foreground/90"
-                      }`}
-                    >
-                      {item.title}
+                <SheetHeader>
+                  <SheetTitle>
+                    <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                        💊
+                      </span>
+                      <span>
+                        Medi<span className="text-emerald-600 dark:text-emerald-400">Store</span>
+                      </span>
                     </Link>
-                  ))}
-                </div>
-                </div>
+                  </SheetTitle>
+                </SheetHeader>
 
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-                    Quick Access
-                  </p>
-                  <div className="flex w-full flex-col gap-2">
-                    {utilityMenuItems.map((item) => (
-                      <Link
-                        key={item.title}
-                        href={item.url}
-                        prefetch={true}
-                        className={`inline-flex items-center gap-2 rounded-md px-1 py-1 text-base font-semibold transition-colors ${
-                          isActivePath(item.url)
-                            ? "text-emerald-600 dark:text-emerald-400"
-                            : "text-foreground/90"
-                        }`}
-                      >
-                        <ShoppingCart className="h-4 w-4" />
-                        {item.title}
-                      </Link>
-                    ))}
+                <div className="flex flex-col gap-6 p-4">
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+                      Main Navigation
+                    </p>
+                    <div className="flex w-full flex-col gap-2">
+                      {primaryMenu.map((item) => (
+                        <Link
+                          key={item.title}
+                          href={item.url}
+                          prefetch={true}
+                          className={`text-base font-semibold transition-colors py-1 ${
+                            isActivePath(item.url)
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-foreground/90"
+                          }`}
+                        >
+                          {item.title}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+                      Quick Access
+                    </p>
+                    <div className="flex w-full flex-col gap-2">
+                      {utilityMenuItems.map((item) => (
+                        <Link
+                          key={item.title}
+                          href={item.url}
+                          prefetch={true}
+                          className={`inline-flex items-center gap-2 rounded-md px-1 py-1 text-base font-semibold transition-colors ${
+                            isActivePath(item.url)
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-foreground/90"
+                          }`}
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                          {item.title}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
               </SheetContent>
             </Sheet>
           </div>

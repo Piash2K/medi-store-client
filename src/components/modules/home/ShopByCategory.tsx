@@ -75,18 +75,21 @@ export default async function ShopByCategory() {
   }
 
   return (
-    <section className="bg-[#f3f8f6] dark:bg-[#101c1a] py-8 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-6">
+    <section className="bg-[#f3f8f6] dark:bg-[#101c1a] home-section">
+      <div className="home-shell">
+        <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center sm:gap-3">
           <div>
-            <h2 className="text-2xl font-bold text-[#1a2c23] dark:text-white mb-1">Shop by Category</h2>
-            <p className="text-[#4b6358] dark:text-[#b5cfc2] text-base">Find exactly what you need in our curated pharmacy collection.</p>
+            <h2 className="home-heading text-[#1a2c23] dark:text-white">Shop by Category</h2>
+            <p className="home-lead text-[#4b6358] dark:text-[#b5cfc2]">
+              Find exactly what you need in our curated pharmacy collection.
+            </p>
           </div>
-          <Link href="/shop" className="text-emerald-700 dark:text-emerald-300 font-medium text-sm flex items-center hover:underline">
-            View All Categories <ArrowRight className="ml-1 h-4 w-4" />
+          <Link href="/shop" className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 dark:text-emerald-400 hover:underline sm:mt-0 lg:text-base">
+            View All Categories
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {homeCategories.map((category, index) => {
             const Icon = getCategoryIcon(category.name);
             return (

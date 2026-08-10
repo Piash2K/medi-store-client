@@ -9,8 +9,8 @@ export async function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-muted/40 border-t">
-      <div className="mx-auto w-full px-4 py-8 sm:px-6 lg:px-8">
+    <footer className="bg-muted/40 border-t border-border/50">
+      <div className="home-shell py-12 sm:py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <Link href="/" className="inline-flex items-center gap-3 text-3xl font-bold tracking-tight">

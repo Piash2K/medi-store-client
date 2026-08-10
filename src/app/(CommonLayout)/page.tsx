@@ -12,9 +12,10 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <section className="mx-auto w-full max-w-screen-2xl px-2 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-2xl bg-[#f7fcfa] dark:bg-[#101c1a] p-2 sm:p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="home-section">
+        <div className="home-shell">
+          <div className="rounded-2xl bg-[#f7fcfa] dark:bg-[#101c1a] p-4 sm:p-6 border border-[#e6f0ec] dark:border-[#1e2e2b]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="bg-white dark:bg-[#162624] border border-[#e6f0ec] dark:border-[#1e2e2b] shadow-sm rounded-xl transition-colors">
               <CardContent className="flex flex-col items-start gap-2 p-6">
                 <span className="rounded-md bg-[#e6f4ef] dark:bg-[#1e2e2b] p-2 mb-2">
@@ -59,7 +60,8 @@ export default function Home() {
             </Card>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
       <ShopByCategory />
       <FeaturedMedicines />
       <WhyChooseMediStore />
