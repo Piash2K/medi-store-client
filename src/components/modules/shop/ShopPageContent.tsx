@@ -582,8 +582,9 @@ export default function ShopPageContent() {
 
   return (
     <section className="w-full bg-[#f2fbf8] dark:bg-emerald-950/10">
-      <div className="mx-auto grid min-h-[calc(100vh-5rem)] w-full max-w-screen-2xl lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-emerald-100 bg-white/80 px-4 py-4 dark:border-emerald-900/60 dark:bg-background/70 sm:px-6 lg:sticky lg:top-12 lg:self-start lg:border-r lg:border-b-0 lg:px-6">
+      <div className="home-shell min-h-[calc(100vh-5rem)]">
+        <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+          <aside className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-2xs dark:border-emerald-900/60 dark:bg-background/80 lg:sticky lg:top-20 lg:self-start">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-100">Filters</h2>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Precision Search</p>
@@ -731,7 +732,7 @@ export default function ShopPageContent() {
           </div>
         </aside>
 
-        <div ref={medicineSectionTopRef} className="flex min-w-0 flex-col px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
+          <div ref={medicineSectionTopRef} className="flex min-w-0 flex-col pt-6">
           <div className="mb-8 grid gap-5 xl:grid-cols-[1fr_minmax(520px,0.9fr)] xl:items-end">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-slate-950 dark:text-slate-100 sm:text-4xl">
@@ -1055,6 +1056,7 @@ export default function ShopPageContent() {
               </button>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>

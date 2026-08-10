@@ -245,8 +245,8 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
 
   if (isLoading) {
     return (
-      <section className="w-full bg-[#f2fbf8] px-4 py-8 dark:bg-emerald-950/10 sm:px-6 lg:px-8">
-        <div className="mx-auto w-full max-w-screen-2xl">
+      <section className="w-full bg-[#f2fbf8] dark:bg-emerald-950/10">
+        <div className="home-shell">
           {/* Back link */}
           <div className="mb-6 h-5 w-28 animate-pulse rounded-md bg-slate-200/80 dark:bg-slate-700/60" />
 
@@ -411,8 +411,8 @@ export default function MedicineDetailsContent({ medicineId }: MedicineDetailsCo
   };
 
   return (
-    <section className="w-full bg-[#f2fbf8] px-4 py-8 dark:bg-emerald-950/10 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-screen-2xl">
+    <section className="w-full bg-[#f2fbf8] dark:bg-emerald-950/10">
+      <div className="home-shell">
         <Link href="/shop" className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800 dark:text-teal-300 dark:hover:text-teal-200">
           <ArrowLeft className="h-4 w-4" />
           Back to Shop
