@@ -73,8 +73,8 @@ export default function Hero() {
 
 								<div className="absolute inset-0 flex items-center px-6 sm:px-12 lg:px-20">
 									<div className="max-w-2xl text-left text-white">
-										<span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-950/60 backdrop-blur-md px-4 py-1 text-xs font-semibold tracking-wide text-emerald-300 uppercase">
-											<span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+										<span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full border border-teal-400/40 bg-teal-950/60 backdrop-blur-md px-4 py-1 text-xs font-semibold tracking-wide text-teal-300 uppercase">
+											<span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
 											Verified Care Platform
 										</span>
 										<h1 className="text-3xl leading-tight font-extrabold tracking-tight sm:text-5xl lg:text-6xl drop-shadow-sm">
@@ -86,7 +86,7 @@ export default function Hero() {
 										<div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:items-center sm:gap-4">
 											<Link
 												href="/shop"
-												className={`${buttonVariants({ size: "lg" })} w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-md font-semibold px-7 h-12 sm:h-13 text-base`}
+												className={`${buttonVariants({ size: "lg" })} w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white border-none shadow-md font-semibold px-7 h-12 sm:h-13 text-base`}
 											>
 												Shop Medicines
 											</Link>

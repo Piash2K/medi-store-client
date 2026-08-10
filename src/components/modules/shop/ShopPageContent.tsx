@@ -853,9 +853,8 @@ export default function ShopPageContent() {
                         </div>
 
                         <span
-                          className={`absolute top-4 right-4 z-10 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm ${
-                            stockBadgeClassName
-                          }`}
+                          className={`absolute top-4 right-4 z-10 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm ${stockBadgeClassName
+                            }`}
                         >
                           {stockBadgeLabel}
                         </span>
@@ -995,11 +994,10 @@ export default function ShopPageContent() {
                     key={`page-${item}`}
                     type="button"
                     onClick={() => setPage(item)}
-                    className={`inline-flex h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-medium transition ${
-                      isActive
-                        ? "bg-teal-700 text-white shadow-sm"
-                        : "text-slate-700 hover:bg-white hover:text-teal-700 dark:text-slate-300 dark:hover:bg-background/70 dark:hover:text-teal-300"
-                    }`}
+                    className={`inline-flex h-11 min-w-11 items-center justify-center rounded-lg px-3 text-sm font-medium transition ${isActive
+                      ? "bg-teal-700 text-white shadow-sm"
+                      : "text-slate-700 hover:bg-white hover:text-teal-700 dark:text-slate-300 dark:hover:bg-background/70 dark:hover:text-teal-300"
+                      }`}
                     aria-current={isActive ? "page" : undefined}
                   >
                     {item}

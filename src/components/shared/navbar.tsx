@@ -214,11 +214,11 @@ export function Navbar() {
         <nav className="hidden h-16 items-center justify-between lg:flex">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight transition-opacity hover:opacity-90">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 font-bold text-lg">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400 font-bold text-lg">
                 💊
               </span>
               <span className="text-foreground">
-                Medi<span className="text-emerald-600 dark:text-emerald-400">Store</span>
+                Medi<span className="text-teal-600 dark:text-teal-400">Store</span>
               </span>
             </Link>
           </div>
@@ -233,7 +233,7 @@ export function Navbar() {
                         href={item.url}
                         className={`relative flex h-16 items-center px-3.5 text-sm font-medium transition-colors focus-visible:outline-none ${
                           isActivePath(item.url)
-                            ? "text-emerald-600 font-semibold dark:text-emerald-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-emerald-600 dark:after:bg-emerald-400"
+                            ? "text-teal-600 font-semibold dark:text-teal-400 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-teal-600 dark:after:bg-teal-400"
                             : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
@@ -255,8 +255,8 @@ export function Navbar() {
                 size="sm"
                 className={
                   isActivePath(item.url)
-                    ? "h-9 bg-emerald-600 text-white hover:bg-emerald-700 px-4 shadow-sm"
-                    : "h-9 border-emerald-500/30 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-500/40 dark:text-emerald-300 dark:hover:bg-emerald-950/50 px-4"
+                    ? "h-9 bg-teal-600 text-white hover:bg-teal-700 px-4 shadow-sm"
+                    : "h-9 border-teal-500/30 text-teal-700 hover:bg-teal-50 dark:border-teal-500/40 dark:text-teal-300 dark:hover:bg-teal-950/50 px-4"
                 }
               >
                 <Link href={item.url} className="inline-flex items-center gap-2 font-medium">
@@ -273,11 +273,11 @@ export function Navbar() {
         {/* Mobile Navbar */}
         <div className="flex h-16 items-center justify-between lg:hidden">
           <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400">
               💊
             </span>
             <span>
-              Medi<span className="text-emerald-600 dark:text-emerald-400">Store</span>
+              Medi<span className="text-teal-600 dark:text-teal-400">Store</span>
             </span>
           </Link>
 
@@ -294,11 +294,11 @@ export function Navbar() {
                 <SheetHeader>
                   <SheetTitle>
                     <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-500/10 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400">
                         💊
                       </span>
                       <span>
-                        Medi<span className="text-emerald-600 dark:text-emerald-400">Store</span>
+                        Medi<span className="text-teal-600 dark:text-teal-400">Store</span>
                       </span>
                     </Link>
                   </SheetTitle>
@@ -317,7 +317,7 @@ export function Navbar() {
                           prefetch={true}
                           className={`text-base font-semibold transition-colors py-1 ${
                             isActivePath(item.url)
-                              ? "text-emerald-600 dark:text-emerald-400"
+                              ? "text-teal-600 dark:text-teal-400"
                               : "text-foreground/90"
                           }`}
                         >
@@ -339,7 +339,7 @@ export function Navbar() {
                           prefetch={true}
                           className={`inline-flex items-center gap-2 rounded-md px-1 py-1 text-base font-semibold transition-colors ${
                             isActivePath(item.url)
-                              ? "text-emerald-600 dark:text-emerald-400"
+                              ? "text-teal-600 dark:text-teal-400"
                               : "text-foreground/90"
                           }`}
                         >
