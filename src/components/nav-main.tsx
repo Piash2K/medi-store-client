@@ -58,8 +58,8 @@ export function NavMain({
                   isActive={isActive}
                   className={
                     isActive
-                      ? "bg-sidebar-primary! text-sidebar-primary-foreground! font-semibold! ring-1! ring-sidebar-ring! shadow-sm hover:bg-sidebar-primary! hover:text-sidebar-primary-foreground! active:bg-sidebar-primary! active:text-sidebar-primary-foreground!"
-                      : undefined
+                      ? "bg-[#006a63]! text-white! font-bold! transition-colors hover:bg-[#5bdacf]! hover:text-[#00201d]! dark:bg-teal-600! dark:text-white! dark:hover:bg-teal-700! dark:hover:text-white!"
+                      : "text-[#3c4947] font-semibold transition-colors hover:bg-[#006a63]/5 hover:text-[#006a63] dark:text-slate-400 dark:hover:bg-teal-950/30 dark:hover:text-teal-300"
                   }
                 >
                   <Link href={item.url} prefetch={true}>

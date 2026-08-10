@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Package, ShoppingBag } from "lucide-react";
+import { ChevronRight, Package, ShoppingBag } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
@@ -16,7 +16,7 @@ type StatusKey = "ALL" | "PLACED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CA
 const PER_PAGE = 8;
 
 const statusConfig: { key: StatusKey; label: string }[] = [
-  { key: "ALL", label: "Total Orders" },
+  { key: "ALL", label: "All Orders" },
   { key: "PLACED", label: "Placed" },
   { key: "PROCESSING", label: "Processing" },
   { key: "SHIPPED", label: "Shipped" },
@@ -69,18 +69,18 @@ const formatDate = (isoDate?: string) => {
   });
 };
 
-const getStatusVariant = (status: string) => {
+const getStatusBadgeClasses = (status: string) => {
   const normalizedStatus = normalizeStatus(status);
 
   if (normalizedStatus === "DELIVERED") {
-    return "secondary" as const;
+    return "bg-[#00a69c]/20 text-[#006a63] dark:bg-teal-900/40 dark:text-teal-300";
   }
 
   if (normalizedStatus === "CANCELLED") {
-    return "destructive" as const;
+    return "bg-[#ba1a1a]/10 text-[#ba1a1a] dark:bg-[#ba1a1a]/20 dark:text-[#ffb4ab]";
   }
 
-  return "outline" as const;
+  return "bg-[#006a63]/10 text-[#006a63] dark:bg-teal-900/30 dark:text-teal-300";
 };
 
 type CustomerOrderStatusTabsProps = {
@@ -136,15 +136,20 @@ export default function CustomerOrderStatusTabs({
   };
 
   return (
-    <section className="w-full space-y-4 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-0 dark:from-emerald-950/10 sm:space-y-5 sm:p-1">
-      <div className="space-y-2">
-        <h1 className="text-xl font-semibold tracking-tight text-emerald-700 sm:text-2xl md:text-3xl">Order Status</h1>
-        <p className="text-sm text-emerald-600 dark:text-emerald-400">View your orders by status with quick filters.</p>
+    <section className="w-full space-y-5 pb-8 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight text-[#006a63] font-['Manrope',sans-serif] dark:text-teal-300 md:text-4xl">
+          Order Status
+        </h1>
+        <p className="text-sm text-[#3c4947] dark:text-slate-400">
+          Track, manage, and view the status of all your orders.
+        </p>
       </div>
 
       <Tabs selectedIndex={selectedIndex} onSelect={(index) => setSelectedIndex(index)}>
-        <div className="mt-1 overflow-x-auto sm:mt-2">
-          <TabList className="mt-0! mb-2! pb-0! flex min-w-max list-none items-center gap-1 border-b border-emerald-200 dark:border-emerald-800/60 sm:gap-2">
+        <div className="overflow-x-auto">
+          <TabList className="flex min-w-max list-none items-center gap-2 border-b border-[#006a63]/20 pb-0! mb-4! mt-0! dark:border-emerald-900/60">
             {statusConfig.map((statusItem, index) => {
               const count = statusItem.key === "ALL" ? sortedOrders.length : statusCount[statusItem.key];
               const isActive = selectedIndex === index;
@@ -152,14 +157,23 @@ export default function CustomerOrderStatusTabs({
               return (
                 <Tab
                   key={statusItem.key}
-                  className={`bottom-0! cursor-pointer rounded-t-md border border-transparent border-b-0 bg-transparent px-2.5 py-2 text-xs font-medium whitespace-nowrap outline-none transition-colors sm:px-3 sm:text-sm ${
+                  className={`bottom-[1px]! cursor-pointer border-b-2 px-3 sm:px-4 py-2.5 text-xs font-semibold whitespace-nowrap outline-none transition-colors sm:text-sm ${
                     isActive
-                      ? "text-emerald-700! border-emerald-200! bg-white! border-b-white! dark:text-emerald-300! dark:border-emerald-700! dark:bg-emerald-950/30! dark:border-b-emerald-950/30!"
-                      : "text-emerald-500 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                      ? "border-[#006a63] text-[#006a63] dark:border-teal-300 dark:text-teal-300"
+                      : "border-transparent text-[#3c4947] hover:border-[#006a63]/30 hover:text-[#006a63] dark:text-slate-400 dark:hover:text-teal-300"
                   }`}
                 >
                   <span>{statusItem.label}</span>
-                  <span className="ml-1.5 text-[11px] sm:ml-2 sm:text-xs">{count}</span>
+                  <Badge
+                    variant="secondary"
+                    className={`ml-2 rounded-full px-1.5 py-0 text-[10px] sm:text-[11px] ${
+                      isActive 
+                        ? "bg-[#006a63] text-white dark:bg-teal-700" 
+                        : "bg-[#006a63]/10 text-[#006a63] dark:bg-teal-950/40 dark:text-teal-300"
+                    }`}
+                  >
+                    {count}
+                  </Badge>
                 </Tab>
               );
             })}
@@ -180,16 +194,25 @@ export default function CustomerOrderStatusTabs({
           );
 
           return (
-            <TabPanel key={statusItem.key} className="m-0! p-0! pt-3 sm:pt-4">
+            <TabPanel key={statusItem.key} className="m-0! p-0! pt-2">
               {isError && (
-                <p className="text-destructive text-sm">{errorMessage || "Failed to load orders."}</p>
+                <div className="rounded-xl border border-[#ba1a1a]/30 bg-[#ba1a1a]/5 p-4 text-center dark:border-[#ba1a1a]/50">
+                  <p className="text-sm font-semibold text-[#ba1a1a] dark:text-[#ffb4ab]">
+                    {errorMessage || "Failed to load orders."}
+                  </p>
+                </div>
               )}
 
               {!isError && panelOrders.length === 0 && (
-                <div className="rounded-xl border-2 border-dashed border-emerald-200 bg-white p-4 text-center dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:p-6">
-                  <p className="font-medium text-emerald-800 dark:text-emerald-200">No orders found for this status</p>
-                  <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">Try another tab or place a new order.</p>
-                  <Button asChild size="sm" className="mt-4 bg-emerald-600 text-white hover:bg-emerald-700">
+                <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-[#006a63]/30 bg-[#006a63]/5 p-8 text-center dark:border-emerald-900 dark:bg-emerald-950/20">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#006a63]/10 text-[#006a63] dark:bg-teal-900/40 dark:text-teal-300">
+                    <Package className="h-8 w-8" />
+                  </div>
+                  <p className="text-lg font-bold text-[#171d1c] font-['Manrope',sans-serif] dark:text-slate-100">No Orders Found</p>
+                  <p className="mt-2 text-sm text-[#3c4947] dark:text-slate-400 max-w-sm mx-auto">
+                    There are currently no orders in the {statusItem.label.toLowerCase()} status.
+                  </p>
+                  <Button asChild size="sm" className="mt-6 rounded-lg bg-[#006a63] px-6 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] dark:bg-teal-600 dark:hover:bg-teal-700">
                     <Link href="/shop">Browse Medicines</Link>
                   </Button>
                 </div>
@@ -197,72 +220,77 @@ export default function CustomerOrderStatusTabs({
 
               {!isError && panelPaginatedOrders.length > 0 && (
                 <div className="space-y-4">
-                  {panelPaginatedOrders.map((order) => (
-                    <Card key={order.id} className="border-2 border-emerald-200 bg-white shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/20">
-                      <CardHeader className="pb-2 sm:pb-3">
-                        <CardTitle className="text-sm text-emerald-800 dark:text-emerald-200 sm:text-base md:text-lg">#{order.id.slice(0, 8).toUpperCase()}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2.5 sm:space-y-3">
-                        <div className="flex flex-wrap items-start justify-between gap-2 text-sm sm:items-center sm:gap-3">
-                          <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                            <Package className="h-4 w-4" />
-                            {order.items.length} item(s)
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {panelPaginatedOrders.map((order) => (
+                      <article
+                        key={order.id}
+                        className="flex flex-col justify-between rounded-xl border border-[#006a63]/15 bg-[#f5fbf9] p-4 sm:p-5 shadow-2xs transition-all hover:bg-white hover:shadow-sm dark:border-emerald-900/50 dark:bg-background/80 dark:hover:bg-emerald-950/20"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-mono text-sm font-bold text-[#171d1c] dark:text-slate-100">
+                              #{order.id.slice(0, 8).toUpperCase()}
+                            </p>
+                            <p className="mt-1.5 text-xs text-[#3c4947] dark:text-slate-400">
+                              Placed on {formatDate(order.createdAt)}
+                            </p>
+                          </div>
+                          <Badge className={`rounded-full px-2.5 py-1 text-[10px] font-semibold border-none hover:bg-transparent tracking-wide ${getStatusBadgeClasses(order.status)}`}>
+                            {normalizeStatus(order.status)}
+                          </Badge>
+                        </div>
+
+                        <div className="my-4 flex items-center justify-between border-y border-[#006a63]/10 py-3 text-sm text-[#3c4947] dark:border-slate-800 dark:text-slate-400">
+                          <span className="flex items-center gap-1.5 font-medium">
+                            <Package className="h-4 w-4 opacity-70" />
+                            {order.items.length} Item(s)
                           </span>
-                          <Badge variant={getStatusVariant(order.status)}>{normalizeStatus(order.status)}</Badge>
+                          <span className="font-bold text-[#006a63] dark:text-teal-300">
+                            BDT {currencyFormatter.format(order.totalAmount)}
+                          </span>
                         </div>
 
-                        <div className="grid gap-2 text-sm sm:grid-cols-2">
-                          <p className="text-emerald-600 dark:text-emerald-400">
-                            Date: <span className="text-emerald-800 dark:text-emerald-200">{formatDate(order.createdAt)}</span>
-                          </p>
-                          <p className="text-emerald-600 dark:text-emerald-400 sm:text-right">
-                            Total:
-                            <span className="ml-1 font-semibold text-emerald-800 dark:text-emerald-200">
-                              BDT {currencyFormatter.format(order.totalAmount)}
-                            </span>
-                          </p>
-                        </div>
-
-                        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-                          <Button asChild variant="outline" size="sm" className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:w-auto">
+                        <div className="flex items-center justify-between gap-3 pt-1">
+                          <Button asChild variant="outline" size="sm" className="w-full rounded-lg border border-[#006a63] text-xs font-bold text-[#006a63] transition-colors hover:bg-[#006a63]/5 dark:border-teal-500 dark:text-teal-300 dark:hover:bg-teal-950/30">
                             <Link href={`/orders/${order.id}`}>View Details</Link>
                           </Button>
-                          <Button asChild size="sm" className="w-full bg-emerald-600 text-white hover:bg-emerald-700 sm:w-auto">
-                            <Link href="/shop" className="inline-flex items-center gap-1">
-                              <ShoppingBag className="h-4 w-4" />
-                              Shop More
+                          <Button asChild size="sm" className="w-full rounded-lg bg-[#006a63] text-xs font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] dark:bg-teal-600 dark:hover:bg-teal-700">
+                            <Link href="/shop" className="inline-flex items-center gap-1.5">
+                              Shop More <ChevronRight className="h-3 w-3" />
                             </Link>
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-
-                  <div className="flex flex-col gap-3 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm dark:border-emerald-800/60 dark:bg-emerald-950/20 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-emerald-600 dark:text-emerald-400">
-                      Page {panelCurrentPage} of {panelTotalPages}
-                    </p>
-                    <div className="flex w-full items-center gap-2 sm:w-auto">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:flex-none"
-                        disabled={panelCurrentPage <= 1}
-                        onClick={() => setPage(statusItem.key, panelCurrentPage - 1)}
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30 sm:flex-none"
-                        disabled={panelCurrentPage >= panelTotalPages}
-                        onClick={() => setPage(statusItem.key, panelCurrentPage + 1)}
-                      >
-                        Next
-                      </Button>
-                    </div>
+                      </article>
+                    ))}
                   </div>
+
+                  {panelTotalPages > 1 && (
+                    <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-xl border border-[#006a63]/15 bg-white p-4 sm:flex-row dark:border-emerald-900/50 dark:bg-background/80">
+                      <p className="text-sm font-medium text-[#3c4947] dark:text-slate-400">
+                        Showing page <span className="font-bold text-[#171d1c] dark:text-slate-200">{panelCurrentPage}</span> of {panelTotalPages}
+                      </p>
+                      <div className="flex w-full items-center gap-2 sm:w-auto">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 rounded-lg border-[#006a63]/20 text-xs font-bold text-[#006a63] hover:bg-[#006a63]/5 disabled:opacity-50 dark:border-emerald-800 dark:text-teal-300 dark:hover:bg-teal-950/30 sm:flex-none"
+                          disabled={panelCurrentPage <= 1}
+                          onClick={() => setPage(statusItem.key, panelCurrentPage - 1)}
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 rounded-lg border-[#006a63]/20 text-xs font-bold text-[#006a63] hover:bg-[#006a63]/5 disabled:opacity-50 dark:border-emerald-800 dark:text-teal-300 dark:hover:bg-teal-950/30 sm:flex-none"
+                          disabled={panelCurrentPage >= panelTotalPages}
+                          onClick={() => setPage(statusItem.key, panelCurrentPage + 1)}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </TabPanel>

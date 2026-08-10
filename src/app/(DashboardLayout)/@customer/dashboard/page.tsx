@@ -30,11 +30,11 @@ const formatDate = (isoDate?: string) => {
 };
 
 const orderStatusChartConfig = [
-  { key: "PLACED", label: "Placed", barClass: "bg-chart-1" },
-  { key: "PROCESSING", label: "Processing", barClass: "bg-chart-2" },
-  { key: "SHIPPED", label: "Shipped", barClass: "bg-chart-3" },
-  { key: "DELIVERED", label: "Delivered", barClass: "bg-chart-4" },
-  { key: "CANCELLED", label: "Cancelled", barClass: "bg-chart-5" },
+  { key: "PLACED", label: "Placed", barClass: "bg-[#00a69c]" },
+  { key: "PROCESSING", label: "Processing", barClass: "bg-[#006a63]" },
+  { key: "SHIPPED", label: "Shipped", barClass: "bg-[#5bdacf]" },
+  { key: "DELIVERED", label: "Delivered", barClass: "bg-teal-700" },
+  { key: "CANCELLED", label: "Cancelled", barClass: "bg-[#ba1a1a]" },
 ] as const;
 
 type OrderStatusKey = (typeof orderStatusChartConfig)[number]["key"];
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
   const orders = ordersResult.success ? ordersResult.data : [];
   const totalOrders = orders.length;
   const totalSpent = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-  const recentOrders = [...orders].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)).slice(0, 2);
+  const recentOrders = [...orders].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)).slice(0, 3);
 
   const statusOrderCountMap = new Map<OrderStatusKey, number>();
 
@@ -133,7 +133,7 @@ export default async function DashboardPage() {
   const maxMonthlySpending = Math.max(...spendingValues, 1);
 
   const totalOrdersForPie = statusChartData.reduce((sum, item) => sum + item.count, 0);
-  const piePalette = ["#059669", "#0891b2", "#2563eb", "#7c3aed", "#ef4444"];
+  const piePalette = ["#00a69c", "#006a63", "#5bdacf", "#047857", "#ba1a1a"];
 
   const pieGradient =
     totalOrdersForPie === 0
@@ -153,75 +153,88 @@ export default async function DashboardPage() {
         })();
 
   return (
-    <section className="w-full space-y-5 rounded-xl bg-linear-to-b from-emerald-50/25 to-background p-1 dark:from-emerald-950/10">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section className="w-full space-y-6 pb-6">
+      {/* Header Bar */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-emerald-700 dark:text-emerald-300">Customer Dashboard</h1>
-          <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">
-            Welcome back, {profile?.name || "Customer"}. Here is your order summary.
+          <h1 className="text-3xl font-bold tracking-tight text-[#006a63] font-['Manrope',sans-serif] dark:text-teal-300 md:text-4xl">
+            Customer Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-[#3c4947] dark:text-slate-400">
+            Welcome back, <span className="font-semibold text-[#171d1c] dark:text-slate-200">{profile?.name || "Customer"}</span>. Here is your order overview.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button asChild size="sm" className="bg-emerald-600 text-white hover:bg-emerald-700">
+        <div className="flex items-center gap-3">
+          <Button asChild size="sm" className="rounded-lg bg-[#006a63] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] dark:bg-teal-600 dark:hover:bg-teal-700 dark:hover:text-white">
             <Link href="/shop">Shop Medicines</Link>
           </Button>
-          <Button asChild variant="outline" size="sm" className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30">
+          <Button asChild variant="outline" size="sm" className="rounded-lg border border-[#006a63] px-5 py-2.5 text-xs font-bold text-[#006a63] transition-colors hover:bg-[#006a63]/5 dark:border-teal-500 dark:text-teal-300 dark:hover:bg-teal-950/30">
             <Link href="/orders">Track Orders</Link>
           </Button>
         </div>
       </div>
 
+      {/* Top 3 Metric Cards */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-emerald-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-emerald-400/15">
-          <CardHeader className="relative pb-2">
-            <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-emerald-500/15 blur-2xl dark:bg-emerald-300/10" />
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Orders</CardTitle>
+        <Card className="overflow-hidden border border-[#006a63]/20 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-emerald-900/70 dark:bg-background/80">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-[#3c4947] dark:text-slate-400">
+              Total Orders
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <p className="text-3xl font-bold tracking-tight text-foreground">{totalOrders}</p>
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-background/70 shadow-inner">
-                <ShoppingBag className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
+              <p className="text-3xl font-extrabold text-[#006a63] dark:text-teal-300">{totalOrders}</p>
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#006a63]/10 text-[#006a63] dark:bg-teal-900/40 dark:text-teal-300">
+                <ShoppingBag className="h-5 w-5" />
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-cyan-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-cyan-400/15">
-          <CardHeader className="relative pb-2">
-            <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-cyan-500/15 blur-2xl dark:bg-cyan-300/10" />
-            <CardTitle className="text-sm font-medium text-muted-foreground">Delivered</CardTitle>
+        <Card className="overflow-hidden border border-[#006a63]/20 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-emerald-900/70 dark:bg-background/80">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-[#3c4947] dark:text-slate-400">
+              Delivered Orders
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <p className="text-3xl font-bold tracking-tight text-foreground">{deliveredOrders}</p>
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-background/70 shadow-inner">
-                <PackageCheck className="h-5 w-5 text-cyan-600 dark:text-cyan-300" />
+              <p className="text-3xl font-extrabold text-[#00a69c] dark:text-teal-200">{deliveredOrders}</p>
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#00a69c]/10 text-[#00a69c] dark:bg-teal-900/40 dark:text-teal-200">
+                <PackageCheck className="h-5 w-5" />
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="group overflow-hidden border border-border/70 bg-linear-to-br from-lime-500/10 via-background to-background shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:from-lime-400/15 sm:col-span-2 xl:col-span-1">
-          <CardHeader className="relative pb-2">
-            <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-lime-500/15 blur-2xl dark:bg-lime-300/10" />
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Spent</CardTitle>
+        <Card className="overflow-hidden border border-[#006a63]/20 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-emerald-900/70 dark:bg-background/80 sm:col-span-2 xl:col-span-1">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-[#3c4947] dark:text-slate-400">
+              Total Spent
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-3">
-              <p className="text-3xl font-bold tracking-tight text-foreground">BDT {currencyFormatter.format(totalSpent)}</p>
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-background/70 shadow-inner">
-                <Wallet className="h-5 w-5 text-lime-600 dark:text-lime-300" />
+              <p className="text-3xl font-extrabold text-[#006a63] dark:text-teal-300">
+                BDT {currencyFormatter.format(totalSpent)}
+              </p>
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#006a63]/10 text-[#006a63] dark:bg-teal-900/40 dark:text-teal-300">
+                <Wallet className="h-5 w-5" />
               </span>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <Card className="border border-border/70 bg-card shadow-sm">
+      {/* Analytics Charts Grid */}
+      <div className="grid gap-6 xl:grid-cols-3">
+        {/* Order Status Bar Chart */}
+        <Card className="border border-[#006a63]/20 bg-white shadow-sm dark:border-emerald-900/70 dark:bg-background/80">
           <CardHeader>
-            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Order Status (Bar)</CardTitle>
+            <CardTitle className="font-['Manrope',sans-serif] text-lg font-bold text-[#006a63] dark:text-teal-300">
+              Order Status Overview
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -230,11 +243,11 @@ export default async function DashboardPage() {
 
                 return (
                   <div key={item.key} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-emerald-800 dark:text-emerald-200">{item.label}</span>
-                      <span className="text-emerald-600 dark:text-emerald-400">{item.count}</span>
+                    <div className="flex items-center justify-between text-xs font-semibold">
+                      <span className="text-[#171d1c] dark:text-slate-200">{item.label}</span>
+                      <span className="text-[#006a63] dark:text-teal-300">{item.count}</span>
                     </div>
-                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-emerald-100/80 dark:bg-emerald-900/30">
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#006a63]/10 dark:bg-slate-800">
                       <div
                         className={`h-full rounded-full transition-all ${item.barClass}`}
                         style={{ width: `${percentage}%` }}
@@ -247,34 +260,37 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border/70 bg-card shadow-sm">
+        {/* Monthly Spending Line Chart */}
+        <Card className="border border-[#006a63]/20 bg-white shadow-sm dark:border-emerald-900/70 dark:bg-background/80">
           <CardHeader>
-            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Monthly Spending (Line)</CardTitle>
+            <CardTitle className="font-['Manrope',sans-serif] text-lg font-bold text-[#006a63] dark:text-teal-300">
+              Monthly Spending Trend
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="rounded-lg border border-emerald-100/80 bg-emerald-50/25 p-3 dark:border-emerald-900/50 dark:bg-emerald-900/10">
+              <div className="rounded-xl border border-[#006a63]/15 bg-[#006a63]/5 p-3 dark:border-emerald-900/50 dark:bg-teal-950/20">
                 <svg viewBox="0 0 100 40" className="h-36 w-full" role="img" aria-label="Monthly spending trend">
-                  <path d={monthlyLinePath} fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" />
+                  <path d={monthlyLinePath} fill="none" stroke="#006a63" strokeWidth="2.5" strokeLinecap="round" />
                   {monthlySpending.map((item, index) => {
                     const x = (index / Math.max(monthlySpending.length - 1, 1)) * 100;
                     const y = 40 - (item.amount / maxMonthlySpending) * 34;
 
-                    return <circle key={item.label} cx={x} cy={y} r="1.2" fill="#059669" />;
+                    return <circle key={item.label} cx={x} cy={y} r="1.6" fill="#006a63" />;
                   })}
                 </svg>
-                <div className="mt-2 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-300">
+                <div className="mt-2 flex items-center justify-between text-xs font-semibold text-[#006a63] dark:text-teal-300">
                   {monthlySpending.map((item) => (
                     <span key={item.label}>{item.label}</span>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 pt-1">
                 {monthlySpending.map((item) => (
-                  <div key={item.label} className="flex items-center justify-between text-sm">
-                    <span className="text-emerald-800 dark:text-emerald-200">{item.label}</span>
-                    <span className="font-medium text-emerald-700 dark:text-emerald-300">
+                  <div key={item.label} className="flex items-center justify-between text-xs">
+                    <span className="text-[#3c4947] dark:text-slate-400">{item.label}</span>
+                    <span className="font-bold text-[#006a63] dark:text-teal-300">
                       BDT {currencyFormatter.format(item.amount)}
                     </span>
                   </div>
@@ -284,25 +300,28 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border/70 bg-card shadow-sm xl:col-span-3">
+        {/* Order Distribution Pie Chart */}
+        <Card className="border border-[#006a63]/20 bg-white shadow-sm dark:border-emerald-900/70 dark:bg-background/80">
           <CardHeader>
-            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Order Distribution (Pie)</CardTitle>
+            <CardTitle className="font-['Manrope',sans-serif] text-lg font-bold text-[#006a63] dark:text-teal-300">
+              Order Distribution
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-[220px_1fr] md:items-center">
-              <div className="mx-auto h-40 w-40 rounded-full" style={{ background: pieGradient }} />
+            <div className="flex flex-col items-center gap-6">
+              <div className="h-36 w-36 rounded-full shadow-inner" style={{ background: pieGradient }} />
 
-              <div className="space-y-2">
+              <div className="w-full space-y-2">
                 {statusChartData.map((item, index) => {
                   const percentage = totalOrdersForPie === 0 ? 0 : (item.count / totalOrdersForPie) * 100;
 
                   return (
-                    <div key={item.key} className="flex items-center justify-between gap-3 text-sm">
+                    <div key={item.key} className="flex items-center justify-between gap-3 text-xs">
                       <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: piePalette[index] }} />
-                        <span className="font-medium text-emerald-800 dark:text-emerald-200">{item.label}</span>
+                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: piePalette[index] }} />
+                        <span className="font-semibold text-[#171d1c] dark:text-slate-200">{item.label}</span>
                       </div>
-                      <span className="text-emerald-600 dark:text-emerald-400">
+                      <span className="font-semibold text-[#006a63] dark:text-teal-300">
                         {item.count} ({percentage.toFixed(1)}%)
                       </span>
                     </div>
@@ -313,50 +332,62 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border/70 bg-card shadow-sm xl:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl text-emerald-700 dark:text-emerald-300">Recent Orders</CardTitle>
-            <Button asChild variant="ghost" size="sm" className="text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-200">
-              <Link href="/orders">
+        {/* Recent Orders Section */}
+        <Card className="border border-[#006a63]/20 bg-white shadow-sm dark:border-emerald-900/70 dark:bg-background/80 xl:col-span-3">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-[#006a63]/15 pb-4 dark:border-emerald-900/50">
+            <CardTitle className="font-['Manrope',sans-serif] text-lg font-bold text-[#006a63] dark:text-teal-300">
+              Recent Orders
+            </CardTitle>
+            <Button asChild variant="ghost" size="sm" className="text-xs font-semibold text-[#006a63] hover:bg-[#006a63]/5 hover:text-[#00504b] dark:text-teal-300 dark:hover:bg-teal-950/30 dark:hover:text-teal-200">
+              <Link href="/orders" className="inline-flex items-center gap-1">
                 View all
                 <ChevronRight className="h-4 w-4" />
               </Link>
             </Button>
           </CardHeader>
-          <CardContent>
+
+          <CardContent className="pt-6">
             {recentOrders.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-emerald-200/80 bg-emerald-50/30 p-6 text-center dark:border-emerald-800 dark:bg-emerald-900/10">
-                <p className="font-medium text-emerald-800 dark:text-emerald-200">No orders yet</p>
-                <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">Start shopping to see your recent orders here.</p>
-                <Button asChild size="sm" className="mt-4 bg-emerald-600 text-white hover:bg-emerald-700">
+              <div className="rounded-xl border border-dashed border-[#006a63]/30 bg-[#006a63]/5 p-8 text-center dark:border-emerald-900 dark:bg-emerald-950/20">
+                <p className="font-semibold text-[#171d1c] dark:text-slate-100">No orders placed yet</p>
+                <p className="mt-1 text-xs text-[#3c4947] dark:text-slate-400">Start shopping to see your recent orders here.</p>
+                <Button asChild size="sm" className="mt-4 rounded-lg bg-[#006a63] px-6 text-xs font-bold text-white hover:bg-[#5bdacf] hover:text-[#00201d] dark:bg-teal-600 dark:hover:bg-teal-700">
                   <Link href="/shop">Browse Medicines</Link>
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="grid gap-4 md:grid-cols-3">
                 {recentOrders.map((order) => (
-                  <article key={order.id} className="rounded-xl border border-emerald-200/80 bg-emerald-50/20 p-4 dark:border-emerald-800 dark:bg-emerald-900/10">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
+                  <article
+                    key={order.id}
+                    className="flex flex-col justify-between rounded-xl border border-[#006a63]/15 bg-[#f5fbf9] p-4 shadow-2xs transition-all hover:bg-white hover:shadow-sm dark:border-emerald-900/50 dark:bg-background/80 dark:hover:bg-emerald-950/20"
+                  >
+                    <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">#{order.id.slice(0, 8).toUpperCase()}</p>
-                        <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">{formatDate(order.createdAt)}</p>
+                        <p className="font-mono text-xs font-bold text-[#171d1c] dark:text-slate-100">
+                          #{order.id.slice(0, 8).toUpperCase()}
+                        </p>
+                        <p className="mt-1 text-xs text-[#3c4947] dark:text-slate-400">{formatDate(order.createdAt)}</p>
                       </div>
-                      <Badge variant={order.status?.toUpperCase() === "DELIVERED" ? "secondary" : "outline"}>
+                      <Badge className="rounded-full bg-[#00a69c]/20 px-2.5 py-0.5 text-[10px] font-semibold text-[#006a63] dark:bg-teal-900/40 dark:text-teal-300">
                         {order.status}
                       </Badge>
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between text-sm text-emerald-600 dark:text-emerald-400">
+                    <div className="my-3 flex items-center justify-between border-t border-[#006a63]/10 pt-3 text-xs text-[#3c4947] dark:border-slate-800 dark:text-slate-400">
                       <span>{order.items.length} item(s)</span>
-                      <span className="font-semibold text-emerald-800 dark:text-emerald-200">
+                      <span className="font-bold text-[#006a63] dark:text-teal-300">
                         BDT {currencyFormatter.format(order.totalAmount)}
                       </span>
                     </div>
 
-                    <div className="mt-3 flex justify-end">
-                      <Button asChild variant="ghost" size="sm" className="text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:text-emerald-300 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-200">
-                        <Link href={`/orders/${order.id}`}>Order details</Link>
-                      </Button>
+                    <div className="flex justify-end pt-1">
+                      <Link
+                        href={`/orders/${order.id}`}
+                        className="text-xs font-bold text-[#006a63] hover:underline dark:text-teal-300"
+                      >
+                        Order details →
+                      </Link>
                     </div>
                   </article>
                 ))}

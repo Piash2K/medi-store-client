@@ -176,10 +176,7 @@ function Sidebar({
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => { setMounted(true) }, [])
 
-  if (!mounted && typeof window !== 'undefined') {
-    // Avoid SSR mismatch
-    return null
-  }
+
 
   if (collapsible === "none") {
     return (
