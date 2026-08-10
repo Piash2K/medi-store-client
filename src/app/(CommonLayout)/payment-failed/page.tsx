@@ -7,20 +7,20 @@ import { AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-export default function PaymentFailedPage() {
+const failureReasons: Record<string, string> = {
+  user_cancelled: "You cancelled the payment transaction.",
+  invalid_card: "Your card details are invalid. Please check and try again.",
+  insufficient_funds: "Insufficient funds in your account.",
+  card_expired: "Your card has expired. Please use another card.",
+  transaction_failed: "The transaction could not be processed. Please try again.",
+  gateway_error: "Payment gateway error. Please try again later.",
+};
+
+function PaymentFailedContent() {
   const searchParams = useSearchParams();
   const transactionId = searchParams.get("tran_id") || "";
   const orderId = searchParams.get("order_id") || "";
   const reason = searchParams.get("reason") || "";
-
-  const failureReasons: Record<string, string> = {
-    user_cancelled: "You cancelled the payment transaction.",
-    invalid_card: "Your card details are invalid. Please check and try again.",
-    insufficient_funds: "Insufficient funds in your account.",
-    card_expired: "Your card has expired. Please use another card.",
-    transaction_failed: "The transaction could not be processed. Please try again.",
-    gateway_error: "Payment gateway error. Please try again later.",
-  };
 
   const displayReason = failureReasons[reason] || reason || "Payment was not completed successfully.";
 
@@ -87,5 +87,17 @@ export default function PaymentFailedPage() {
         </p>
       </div>
     </section>
+  );
+}
+
+export default function PaymentFailedPage() {
+  return (
+    <React.Suspense fallback={
+      <section className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mx-auto max-w-md h-96 animate-pulse rounded-2xl border-2 border-rose-200 bg-rose-50 dark:border-rose-800/60 dark:bg-rose-950/20" />
+      </section>
+    }>
+      <PaymentFailedContent />
+    </React.Suspense>
   );
 }

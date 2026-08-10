@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { getPaymentStatus } from "@/services/payment";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isVerifying, setIsVerifying] = React.useState(true);
@@ -196,4 +196,21 @@ export default function PaymentSuccessPage() {
   }
 
   return null;
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/30 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
+          <div className="flex h-96 flex-col items-center justify-center rounded-2xl border-2 border-emerald-200 bg-white dark:border-emerald-800/60 dark:bg-emerald-950/20">
+            <Loader2 className="mb-4 h-12 w-12 animate-spin text-emerald-600" />
+            <p className="text-lg font-semibold text-emerald-800 dark:text-emerald-200">Loading payment status...</p>
+          </div>
+        </section>
+      }
+    >
+      <PaymentSuccessContent />
+    </React.Suspense>
+  );
 }
