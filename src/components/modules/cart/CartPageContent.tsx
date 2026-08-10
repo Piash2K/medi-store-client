@@ -103,7 +103,7 @@ export default function CartPageContent() {
     [selectedItems, stockByItemId],
   );
 
-  const hasSelectedOverQuantity = React.useMemo(
+  const hasSelectedExceedingStock = React.useMemo(
     () =>
       selectedItems.some((item) => {
         const stock = stockByItemId[item.id];
@@ -112,18 +112,31 @@ export default function CartPageContent() {
     [selectedItems, stockByItemId],
   );
 
-  const hasCheckoutStockIssue = hasSelectedOutOfStock || hasSelectedOverQuantity;
+  const hasCheckoutStockIssue = hasSelectedOutOfStock || hasSelectedExceedingStock;
 
-  const subtotal = selectedItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = React.useMemo(
+    () => selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [selectedItems],
+  );
+
+  const itemsCount = React.useMemo(
+    () => selectedItems.reduce((sum, item) => sum + item.quantity, 0),
+    [selectedItems],
+  );
+
   const shipping = selectedItems.length > 0 ? SHIPPING_COST : 0;
   const total = subtotal + shipping;
-  const itemsCount = selectedItems.reduce((totalQty, item) => totalQty + item.quantity, 0);
+
+  const checkoutHref = React.useMemo(() => {
+    if (selectedItemIds.length === 0) {
+      return "/checkout";
+    }
+
+    const query = selectedItemIds.map((id) => `items=${encodeURIComponent(id)}`).join("&");
+    return `/checkout?${query}`;
+  }, [selectedItemIds]);
 
   const areAllItemsSelected = items.length > 0 && selectedItemIds.length === items.length;
-
-  const checkoutSearchParams = new URLSearchParams();
-  selectedItemIds.forEach((itemId) => checkoutSearchParams.append("items", itemId));
-  const checkoutHref = `/checkout?${checkoutSearchParams.toString()}`;
 
   const handleToggleSelectAll = () => {
     setSelectedItemIds((previousSelectedIds) =>
@@ -145,40 +158,40 @@ export default function CartPageContent() {
   };
 
   return (
-    <main className="bg-[#f2fbf9] dark:bg-emerald-950/10 min-h-screen font-['Inter',sans-serif] text-[#171d1c] dark:text-slate-100">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex flex-col lg:flex-row gap-12">
+    <main className="min-h-screen bg-[#f5fbf9] font-['Inter',sans-serif] text-[#171d1c] transition-colors duration-200 dark:bg-background dark:text-slate-100">
+      <div className="home-shell py-8 sm:py-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
           {/* Cart Items Column */}
-          <div className="grow space-y-8">
+          <div className="grow space-y-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl md:text-4xl font-bold text-[#171d1c] dark:text-slate-100 font-['Manrope',sans-serif] tracking-tight drop-shadow-sm">
+              <h1 className="text-3xl font-bold tracking-tight text-[#006a63] font-['Manrope',sans-serif] dark:text-teal-300 md:text-4xl">
                 Shopping Cart
               </h1>
-              <span className="text-[#4f6169] dark:text-slate-300 text-base">
+              <span className="text-base text-[#3c4947] dark:text-slate-300">
                 {items.length} {items.length === 1 ? "Item" : "Items"}
               </span>
             </div>
 
             {items.length === 0 ? (
-              <div className="p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col items-center text-center group bg-white dark:bg-background/80 hover:bg-[#f8fdfa] dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5">
-                <Package className="w-16 h-16 text-[#006a63] dark:text-teal-200 mx-auto mb-4" />
+              <div className="group flex flex-col items-center rounded-xl border border-[#006a63]/20 bg-white p-8 text-center shadow-sm transition-all hover:bg-[#f8fdfa] dark:border-emerald-900/70 dark:bg-background/80 dark:hover:bg-emerald-950/30 sm:p-12">
+                <Package className="mx-auto mb-4 h-16 w-16 text-[#006a63] dark:text-teal-300" />
                 <p className="text-lg font-semibold text-[#171d1c] dark:text-slate-100">Your cart is empty</p>
-                <Button asChild className="mt-6 bg-[#00a69c] text-white hover:bg-[#008a82] rounded-full px-8">
+                <Button asChild className="mt-6 rounded-full bg-[#006a63] px-8 py-3 text-sm font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] dark:bg-teal-600 dark:hover:bg-teal-700 dark:hover:text-white">
                   <Link href="/shop">Continue Shopping</Link>
                 </Button>
               </div>
             ) : (
               <>
                 {/* Select All Control */}
-                <div className="flex items-center space-x-4 py-4 px-6 bg-white dark:bg-emerald-950/30 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 shadow-sm dark:shadow-none">
+                <div className="flex items-center space-x-4 rounded-xl border border-[#006a63]/20 bg-white px-6 py-4 shadow-sm dark:border-emerald-900/70 dark:bg-background/80">
                   <input
                     type="checkbox"
                     checked={areAllItemsSelected}
                     onChange={handleToggleSelectAll}
-                    className="w-5 h-5 rounded border-[#6c7a78] text-[#006a63] focus:ring-[#006a63] transition-all accent-[#006a63]"
+                    className="h-5 w-5 rounded border-[#bbc9c7] text-[#006a63] accent-[#006a63] transition-all focus:ring-[#006a63] dark:border-slate-700 dark:accent-teal-400"
                   />
-                  <span className="text-sm font-semibold ">Select All Items</span>
-                  <span className="text-sm text-[#4f6169] ml-auto">
+                  <span className="text-sm font-semibold text-[#171d1c] dark:text-slate-100">Select All Items</span>
+                  <span className="ml-auto text-sm text-[#3c4947] dark:text-slate-400">
                     {selectedItems.length} of {items.length} selected
                   </span>
                 </div>
@@ -194,7 +207,7 @@ export default function CartPageContent() {
                     return (
                       <div
                         key={item.id}
-                        className={`p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 group bg-white dark:bg-background/80 hover:bg-[#f8fdfa] dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5 ${
+                        className={`group flex flex-col items-center gap-4 rounded-xl border border-[#006a63]/20 bg-white p-6 shadow-sm transition-all hover:bg-[#f8fdfa] dark:border-emerald-900/70 dark:bg-background/80 dark:hover:bg-emerald-950/30 sm:flex-row sm:gap-6 ${
                           hasStockIssue ? "opacity-80" : ""
                         }`}
                       >
@@ -202,13 +215,13 @@ export default function CartPageContent() {
                           type="checkbox"
                           checked={selectedItemIds.includes(item.id)}
                           onChange={() => handleToggleItemSelection(item.id)}
-                          className="w-5 h-5 rounded border-[#6c7a78] text-[#006a63] focus:ring-[#006a63] transition-all accent-[#006a63] shrink-0 mt-1"
+                          className="mt-1 h-5 w-5 shrink-0 rounded border-[#bbc9c7] text-[#006a63] accent-[#006a63] transition-all focus:ring-[#006a63] dark:border-slate-700 dark:accent-teal-400"
                         />
 
-                        <div className="w-24 h-24 bg-[#e9efed] dark:bg-emerald-900/30 rounded-lg overflow-hidden shrink-0 border border-[#bbc9c7] dark:border-emerald-900 relative">
+                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-[#006a63]/15 bg-[#e9efed] dark:border-emerald-900/50 dark:bg-emerald-950/30">
                           {isOutOfStock && (
-                            <div className="absolute inset-0 bg-[#2b3231]/10 flex items-center justify-center">
-                              <span className="bg-[#ffdad6] text-[#93000a] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#171d1c]/20 backdrop-blur-xs">
+                              <span className="rounded-full bg-[#ffdad6] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#93000a] uppercase dark:bg-red-950/80 dark:text-red-300">
                                 Out of Stock
                               </span>
                             </div>
@@ -222,33 +235,33 @@ export default function CartPageContent() {
                               className="object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Package className="h-8 w-8 text-[#006a63] dark:text-teal-200/40" />
+                            <div className="flex h-full w-full items-center justify-center">
+                              <Package className="h-8 w-8 text-[#006a63] dark:text-teal-300/40" />
                             </div>
                           )}
                         </div>
 
-                        <div className="grow">
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                        <div className="grow w-full">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <div>
-                              <h3 className="text-xl font-semibold text-[#171d1c] dark:text-slate-100 font-['Manrope',sans-serif]">
+                              <h3 className="font-['Manrope',sans-serif] text-lg font-bold text-[#171d1c] dark:text-slate-100">
                                 {item.name}
                               </h3>
-                              <p className="text-sm text-[#4f6169] dark:text-slate-300 mt-1">
-                                Brand: {item.manufacturer || "PharmaCare"}
+                              <p className="mt-0.5 text-xs text-[#3c4947] dark:text-slate-400">
+                                Brand: <span className="font-medium text-[#171d1c] dark:text-slate-200">{item.manufacturer || "PharmaCare"}</span>
                               </p>
                             </div>
-                            <span className={`text-xl font-semibold ${hasStockIssue ? "text-[#3c4947] dark:text-slate-300" : "text-[#006a63] dark:text-teal-200"}`}>
+                            <span className={`text-lg font-bold ${hasStockIssue ? "text-[#3c4947] dark:text-slate-400" : "text-[#006a63] dark:text-teal-300"}`}>
                               BDT {currencyFormatter.format(item.price)}
                             </span>
                           </div>
 
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-4">
-                            <div className="flex items-center bg-[#e9efed] dark:bg-emerald-900/30 rounded-full p-1 border border-[#bbc9c7] dark:border-emerald-900">
+                          <div className="mt-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                            <div className="flex items-center rounded-full border border-[#006a63]/20 bg-[#f5fbf9] p-1 dark:border-emerald-900/60 dark:bg-emerald-950/30">
                               <button
                                 type="button"
                                 aria-label="Decrease quantity"
-                                className="w-8 h-8 flex items-center justify-center text-[#006a63] dark:text-teal-200 hover:bg-[#dee4e2] dark:hover:bg-emerald-900/40 rounded-full transition-all disabled:opacity-50"
+                                className="flex h-8 w-8 items-center justify-center rounded-full text-[#006a63] transition-all hover:bg-[#006a63]/10 disabled:opacity-50 dark:text-teal-300 dark:hover:bg-emerald-900/40"
                                 onClick={() => updateQuantity(item.id, Math.max(item.quantity - 1, 1))}
                                 disabled={hasStockIssue}
                               >
@@ -258,7 +271,7 @@ export default function CartPageContent() {
                               <button
                                 type="button"
                                 aria-label="Increase quantity"
-                                className="w-8 h-8 flex items-center justify-center text-[#006a63] dark:text-teal-200 hover:bg-[#dee4e2] dark:hover:bg-emerald-900/40 rounded-full transition-all disabled:opacity-50"
+                                className="flex h-8 w-8 items-center justify-center rounded-full text-[#006a63] transition-all hover:bg-[#006a63]/10 disabled:opacity-50 dark:text-teal-300 dark:hover:bg-emerald-900/40"
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                 disabled={hasStockIssue || (typeof stock === "number" && stock !== null && item.quantity >= stock)}
                               >
@@ -269,7 +282,7 @@ export default function CartPageContent() {
                             <button
                               type="button"
                               onClick={() => handleRemoveItem(item.id)}
-                              className="flex items-center text-[#ba1a1a] dark:text-[#ffb4ab] hover:opacity-75 transition-opacity text-sm gap-1"
+                              className="flex items-center gap-1 text-xs font-semibold text-[#ba1a1a] transition-colors hover:text-[#93000a] dark:text-red-400 dark:hover:text-red-300"
                             >
                               <Trash2 className="h-4 w-4" />
                               Remove
@@ -278,95 +291,97 @@ export default function CartPageContent() {
 
                           {/* Stock info */}
                           {typeof stock === "number" && stock > 0 && (
-                            <p className="text-xs text-[#006a63] dark:text-teal-200 mt-2">Stock: {stock} available</p>
+                            <p className="mt-2 text-xs font-medium text-[#006a63] dark:text-teal-300">Stock: {stock} available</p>
                           )}
                           {isOutOfStock && (
-                            <p className="text-xs text-[#ba1a1a] dark:text-[#ffb4ab] font-medium mt-2">Out of stock</p>
+                            <p className="mt-2 text-xs font-medium text-[#ba1a1a] dark:text-red-400">Out of stock</p>
                           )}
                           {isOverQuantity && !isOutOfStock && (
-                            <p className="text-xs text-[#ba1a1a] dark:text-[#ffb4ab] font-medium mt-2">Exceeds available stock</p>
+                            <p className="mt-2 text-xs font-medium text-[#ba1a1a] dark:text-red-400">Exceeds available stock</p>
                           )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
-
-                
               </>
             )}
           </div>
 
           {/* Order Summary Sidebar */}
           {items.length > 0 && (
-            <aside className="lg:w-96 w-full">
-              <div className="p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col group bg-white dark:bg-background/80 hover:bg-[#f8fdfa] dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5 shadow-lg dark:shadow-none sticky top-24">
-                <h2 className="text-2xl font-bold text-[#171d1c] dark:text-slate-100 font-['Manrope',sans-serif] mb-6">
+            <aside className="w-full shrink-0 lg:w-96">
+              <div className="sticky top-24 rounded-xl border border-[#006a63]/20 bg-white p-6 shadow-sm dark:border-emerald-900/70 dark:bg-background/80 sm:p-8">
+                <h2 className="mb-6 font-['Manrope',sans-serif] text-2xl font-bold text-[#006a63] dark:text-teal-300">
                   Order Summary
                 </h2>
 
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between text-base text-[#4f6169] dark:text-slate-300">
+                <div className="mb-8 space-y-4">
+                  <div className="flex justify-between text-sm text-[#3c4947] dark:text-slate-300">
                     <span>Subtotal ({itemsCount} items)</span>
-                    <span>BDT {currencyFormatter.format(subtotal)}</span>
+                    <span className="font-semibold text-[#171d1c] dark:text-slate-100">BDT {currencyFormatter.format(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-base text-[#4f6169] dark:text-slate-300">
+                  <div className="flex justify-between text-sm text-[#3c4947] dark:text-slate-300">
                     <span>Shipping</span>
-                    <span className="text-[#006a63] dark:text-teal-200 font-medium">
+                    <span className="font-semibold text-[#006a63] dark:text-teal-300">
                       {selectedItems.length > 0 ? `BDT ${currencyFormatter.format(shipping)}` : "—"}
                     </span>
                   </div>
-                  <div className="flex justify-between text-base text-[#4f6169] dark:text-slate-300">
+                  <div className="flex justify-between text-sm text-[#3c4947] dark:text-slate-300">
                     <span>Tax (Estimated)</span>
-                    <span>BDT {currencyFormatter.format(0)}</span>
+                    <span className="font-semibold text-[#171d1c] dark:text-slate-100">BDT {currencyFormatter.format(0)}</span>
                   </div>
 
-                  <div className="pt-4 border-t border-[#bbc9c7] dark:border-emerald-900 flex justify-between items-center">
-                    <span className="text-xl font-semibold text-[#171d1c] dark:text-slate-100">Total</span>
-                    <span className="text-3xl md:text-4xl font-bold text-[#006a63] dark:text-teal-200">
-                      BDT {currencyFormatter.format(total)}
-                    </span>
+                  {/* Total Inset Block */}
+                  <div className="mt-4 rounded-lg border border-[#006a63]/20 bg-[#006a63]/5 p-4 dark:border-teal-800/60 dark:bg-teal-950/30">
+                    <div className="flex items-center justify-between font-bold text-[#006a63] dark:text-teal-300">
+                      <span className="text-lg">Total</span>
+                      <span className="text-2xl font-extrabold sm:text-3xl">BDT {currencyFormatter.format(total)}</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {selectedItemIds.length > 0 && !hasCheckoutStockIssue ? (
-                    <Button asChild className="w-full bg-[#00a69c] text-white py-4 rounded-full text-base shadow-md hover:bg-[#008a82] transition-all">
+                    <Button asChild className="w-full rounded-lg bg-[#006a63] py-4 text-sm font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] dark:bg-teal-600 dark:hover:bg-teal-700 dark:hover:text-white">
                       <Link href={checkoutHref}>Proceed to Checkout</Link>
                     </Button>
                   ) : (
-                    <Button className="w-full bg-[#00a69c]/50 text-white py-4 rounded-full text-base cursor-not-allowed dark:bg-[#00a69c]/30" disabled>
+                    <Button className="w-full rounded-lg bg-[#006a63]/50 py-4 text-sm font-bold text-white cursor-not-allowed dark:bg-teal-800/50" disabled>
                       Proceed to Checkout
                     </Button>
                   )}
 
                   {selectedItemIds.length === 0 && (
-                    <p className="text-sm text-[#ba1a1a] dark:text-[#ffb4ab] text-center">Select at least one product to checkout.</p>
+                    <p className="text-center text-xs font-medium text-[#ba1a1a] dark:text-red-400">Select at least one product to checkout.</p>
                   )}
                   {selectedItemIds.length > 0 && hasCheckoutStockIssue && (
-                    <p className="text-sm text-[#ba1a1a] dark:text-[#ffb4ab] text-center">
+                    <p className="text-center text-xs font-medium text-[#ba1a1a] dark:text-red-400">
                       Some selected items are out of stock or exceed available quantity. Please update cart first.
                     </p>
                   )}
 
-                  <Button asChild variant="outline" className="w-full border-2 border-[#006a63] dark:border-teal-900 text-[#006a63] dark:text-teal-200 hover:bg-[#006a63]/5 dark:hover:bg-emerald-950/30 rounded-full py-4 text-base">
-                    <Link href="/shop">Continue Shopping</Link>
-                  </Button>
+                  <Link
+                    href="/shop"
+                    className="block w-full rounded-lg border border-[#006a63] bg-white py-3.5 text-center text-sm font-bold text-[#006a63] transition-colors hover:bg-[#006a63]/5 dark:border-teal-500 dark:bg-background/60 dark:text-teal-400 dark:hover:bg-teal-950/30"
+                  >
+                    Continue Shopping
+                  </Link>
                 </div>
 
                 {/* Trust Signals */}
-                <div className="mt-8 space-y-4 pt-8 border-t border-[#bbc9c7] dark:border-emerald-900">
+                <div className="mt-8 space-y-3.5 border-t border-[#006a63]/15 pt-6 dark:border-slate-800">
                   <div className="flex items-center gap-3">
-                    <Lock className="text-[#006a63] dark:text-teal-200 w-5 h-5" />
-                    <span className="text-sm text-[#4f6169] dark:text-slate-300">Secure SSL Encrypted Checkout</span>
+                    <Lock className="h-4 w-4 shrink-0 text-[#006a63] dark:text-teal-300" />
+                    <span className="text-xs text-[#3c4947] dark:text-slate-400">Secure SSL Encrypted Checkout</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Truck className="text-[#006a63] dark:text-teal-200 w-5 h-5" />
-                    <span className="text-sm text-[#4f6169] dark:text-slate-300">Expected Delivery: 3-5 business days</span>
+                    <Truck className="h-4 w-4 shrink-0 text-[#006a63] dark:text-teal-300" />
+                    <span className="text-xs text-[#3c4947] dark:text-slate-400">Expected Delivery: 3-5 business days</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <ShieldCheck className="text-[#006a63] dark:text-teal-200 w-5 h-5" />
-                    <span className="text-sm text-[#4f6169] dark:text-slate-300">Licensed Pharmacy Guarantee</span>
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-[#006a63] dark:text-teal-300" />
+                    <span className="text-xs text-[#3c4947] dark:text-slate-400">Licensed Pharmacy Guarantee</span>
                   </div>
                 </div>
               </div>
