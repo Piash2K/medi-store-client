@@ -223,125 +223,171 @@ export default function ProfilePageContent({
   };
 
   return (
-    <section className="mx-auto w-full max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-      <h1 className="text-3xl font-bold tracking-tight text-emerald-700">My Profile</h1>
+    <main className="min-h-screen bg-[#f5fbf9] transition-colors duration-200 dark:bg-background">
+      <div className="home-shell py-8 sm:py-10">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-[#006a63] font-['Manrope',sans-serif] dark:text-teal-300 md:text-4xl">
+            My Profile
+          </h1>
+          <p className="mt-1 text-sm text-[#3c4947] dark:text-slate-400">
+            Manage your personal details, contact info, and account preferences.
+          </p>
+        </div>
 
-      <div className="mt-5 grid items-start gap-5 lg:grid-cols-[300px_1fr]">
-        <aside className="rounded-2xl border bg-card p-5">
-          <div className="flex flex-col items-center text-center">
-            <div className="relative">
-              <Avatar className="h-20 w-20 rounded-full border">
-                {profileImagePreview ? (
-                  <AvatarImage src={profileImagePreview} alt={profileState.name || "User"} />
-                ) : null}
-                <AvatarFallback className="bg-primary/10 text-primary">
-                  <UserCircle2 className="h-10 w-10" />
-                </AvatarFallback>
-              </Avatar>
-              <button
-                type="button"
-                className="bg-primary text-primary-foreground absolute -right-1 -bottom-1 inline-flex h-8 w-8 items-center justify-center rounded-full shadow-sm"
-                onClick={() => imageInputRef.current?.click()}
-                disabled={isUploadingImage}
-                aria-label="Upload profile image"
-              >
-                <Camera className="h-4 w-4" />
-              </button>
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleUploadImage}
-                className="hidden"
-                disabled={isUploadingImage}
-              />
-            </div>
-            <h2 className="mt-4 text-2xl font-bold tracking-tight text-emerald-700">{profileState.name || "User"}</h2>
-            <p className="text-teal-600 mt-1 text-sm font-medium">{profileState.email || "N/A"}</p>
-            <Badge className="mt-2 bg-emerald-600 text-white">{role}</Badge>
-            {isUploadingImage ? (
-              <p className="text-muted-foreground mt-2 text-xs">Uploading image...</p>
-            ) : null}
-          </div>
-
-          <div className="my-4 border-t" />
-
-          <div className="space-y-2 text-sm">
-            <div className="text-muted-foreground flex w-full items-center gap-2">
-              <Mail className="h-4 w-4 shrink-0" />
-              <span className="block">{profileState.email || "N/A"}</span>
-            </div>
-            <div className="text-muted-foreground flex w-full items-center gap-2">
-              <Phone className="h-4 w-4 shrink-0" />
-              <span className="block">{profileState.phone || "N/A"}</span>
-            </div>
-            <div className="text-muted-foreground flex w-full items-center gap-2">
-              <MapPin className="h-4 w-4 shrink-0" />
-              <span className="block">{parsedProfileAddress.fullAddress}</span>
-            </div>
-          </div>
-
-          <div className="my-4 border-t" />
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-linear-to-br from-emerald-500 to-emerald-600 rounded-xl p-4 text-center text-white shadow-md hover:shadow-lg transition-shadow">
-              <ShoppingBag className="text-white mx-auto h-5 w-5" />
-              <p className="mt-2 text-2xl font-bold">{totalOrders}</p>
-              <p className="text-emerald-100 text-sm font-medium">Orders</p>
-            </div>
-            <div className="bg-linear-to-br from-teal-500 to-teal-600 rounded-xl p-4 text-center text-white shadow-md hover:shadow-lg transition-shadow">
-              <PackageCheck className="text-white mx-auto h-5 w-5" />
-              <p className="mt-2 text-2xl font-bold">{deliveredOrders}</p>
-              <p className="text-teal-100 text-sm font-medium">Delivered</p>
-            </div>
-          </div>
-        </aside>
-
-        <div className="space-y-5">
-          <div className="rounded-2xl border bg-card p-5">
-            <h3 className="text-2xl font-bold tracking-tight text-emerald-700">Edit Profile</h3>
-
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-emerald-700">Full Name</label>
-                <Input value={name} onChange={(event) => setName(event.target.value)} />
+        <div className="grid items-start gap-8 lg:grid-cols-[320px_1fr]">
+          {/* Left Column — User Profile Card */}
+          <aside className="rounded-xl border border-[#006a63]/20 bg-white p-6 shadow-sm dark:border-emerald-900/70 dark:bg-background/80">
+            <div className="flex flex-col items-center text-center">
+              <div className="relative">
+                <Avatar className="h-24 w-24 rounded-full border-2 border-[#006a63]/30 shadow-sm dark:border-teal-500/40">
+                  {profileImagePreview ? (
+                    <AvatarImage src={profileImagePreview} alt={profileState.name || "User"} />
+                  ) : null}
+                  <AvatarFallback className="bg-[#006a63]/10 text-[#006a63] dark:bg-teal-900/40 dark:text-teal-300">
+                    <UserCircle2 className="h-12 w-12" />
+                  </AvatarFallback>
+                </Avatar>
+                <button
+                  type="button"
+                  className="absolute -bottom-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#006a63] text-white shadow-md transition-colors hover:bg-[#00504b] dark:bg-teal-600 dark:hover:bg-teal-700"
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={isUploadingImage}
+                  aria-label="Upload profile image"
+                >
+                  <Camera className="h-4 w-4" />
+                </button>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadImage}
+                  className="hidden"
+                  disabled={isUploadingImage}
+                />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-emerald-700">Email</label>
-                <Input value={email} disabled className="bg-muted cursor-not-allowed" />
+
+              <h2 className="mt-4 text-xl font-bold tracking-tight text-[#171d1c] font-['Manrope',sans-serif] dark:text-slate-100">
+                {profileState.name || "User"}
+              </h2>
+              <p className="mt-0.5 text-xs font-medium text-[#3c4947] dark:text-slate-400">
+                {profileState.email || "N/A"}
+              </p>
+              <Badge className="mt-2.5 rounded-full bg-[#006a63]/10 px-3 py-0.5 text-xs font-semibold text-[#006a63] hover:bg-[#006a63]/20 dark:bg-teal-900/40 dark:text-teal-300">
+                {role}
+              </Badge>
+              {isUploadingImage ? (
+                <p className="mt-2 text-xs font-medium text-[#006a63] dark:text-teal-300">Uploading image...</p>
+              ) : null}
+            </div>
+
+            <div className="my-6 border-t border-[#006a63]/15 dark:border-slate-800" />
+
+            {/* Quick Contact Info */}
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center gap-3 text-[#3c4947] dark:text-slate-300">
+                <Mail className="h-4 w-4 shrink-0 text-[#006a63] dark:text-teal-300" />
+                <span className="truncate">{profileState.email || "N/A"}</span>
               </div>
+              <div className="flex items-center gap-3 text-[#3c4947] dark:text-slate-300">
+                <Phone className="h-4 w-4 shrink-0 text-[#006a63] dark:text-teal-300" />
+                <span>{profileState.phone || "N/A"}</span>
+              </div>
+              <div className="flex items-center gap-3 text-[#3c4947] dark:text-slate-300">
+                <MapPin className="h-4 w-4 shrink-0 text-[#006a63] dark:text-teal-300" />
+                <span className="truncate">{parsedProfileAddress.fullAddress}</span>
+              </div>
+            </div>
+
+            <div className="my-6 border-t border-[#006a63]/15 dark:border-slate-800" />
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-[#006a63]/20 bg-[#006a63]/5 p-4 text-center dark:border-teal-800/40 dark:bg-teal-950/40">
+                <ShoppingBag className="mx-auto h-5 w-5 text-[#006a63] dark:text-teal-300" />
+                <p className="mt-2 text-2xl font-extrabold text-[#006a63] dark:text-teal-300">{totalOrders}</p>
+                <p className="text-xs font-semibold text-[#3c4947] dark:text-slate-300">Total Orders</p>
+              </div>
+              <div className="rounded-xl border border-[#00a69c]/20 bg-[#00a69c]/5 p-4 text-center dark:border-teal-700/30 dark:bg-teal-900/30">
+                <PackageCheck className="mx-auto h-5 w-5 text-[#006a63] dark:text-teal-200" />
+                <p className="mt-2 text-2xl font-extrabold text-[#006a63] dark:text-teal-200">{deliveredOrders}</p>
+                <p className="text-xs font-semibold text-[#3c4947] dark:text-slate-300">Delivered</p>
+              </div>
+            </div>
+          </aside>
+
+          {/* Right Column — Edit Profile Form Card */}
+          <div className="rounded-xl border border-[#006a63]/20 bg-white p-6 shadow-sm dark:border-emerald-900/70 dark:bg-background/80 sm:p-8">
+            <h2 className="text-xl font-bold tracking-tight text-[#006a63] font-['Manrope',sans-serif] dark:text-teal-300 sm:text-2xl">
+              Edit Personal Details
+            </h2>
+            <p className="mt-1 mb-6 text-xs text-[#3c4947] dark:text-slate-400">
+              Update your account information and shipping details below.
+            </p>
+
+            <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-emerald-700">Phone</label>
+                <label className="text-xs font-semibold text-[#171d1c] dark:text-slate-200">Full Name</label>
+                <Input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  className="rounded-lg border border-[#bbc9c7] bg-white px-4 py-2.5 text-sm text-[#3c4947] outline-none transition focus:border-[#006a63] focus:ring-2 focus:ring-[#006a63]/20 dark:border-slate-700 dark:bg-background/60 dark:text-slate-200 dark:focus:border-teal-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-[#171d1c] dark:text-slate-200">Email Address</label>
+                <Input
+                  value={email}
+                  disabled
+                  className="cursor-not-allowed rounded-lg border border-[#bbc9c7]/60 bg-slate-100 px-4 py-2.5 text-sm text-slate-500 opacity-70 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-[#171d1c] dark:text-slate-200">Phone Number</label>
                 <Input
                   value={phone}
-                  placeholder="Phone number"
+                  placeholder="+88013-1234-5678"
                   onChange={(event) => setPhone(event.target.value)}
+                  className="rounded-lg border border-[#bbc9c7] bg-white px-4 py-2.5 text-sm text-[#3c4947] outline-none transition focus:border-[#006a63] focus:ring-2 focus:ring-[#006a63]/20 dark:border-slate-700 dark:bg-background/60 dark:text-slate-200 dark:focus:border-teal-500"
                 />
               </div>
+
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-emerald-700">City</label>
+                <label className="text-xs font-semibold text-[#171d1c] dark:text-slate-200">City</label>
                 <Input
                   value={cityInput}
-                  placeholder="City"
+                  placeholder="Dhaka"
                   onChange={(event) => setCityInput(event.target.value)}
+                  className="rounded-lg border border-[#bbc9c7] bg-white px-4 py-2.5 text-sm text-[#3c4947] outline-none transition focus:border-[#006a63] focus:ring-2 focus:ring-[#006a63]/20 dark:border-slate-700 dark:bg-background/60 dark:text-slate-200 dark:focus:border-teal-500"
                 />
               </div>
+
               <div className="space-y-1.5 md:col-span-2">
-                <label className="text-sm font-semibold text-emerald-700">Address</label>
+                <label className="text-xs font-semibold text-[#171d1c] dark:text-slate-200">Full Shipping Address</label>
                 <Input
                   value={address}
-                  placeholder="Address"
+                  placeholder="123 Main St, Sector 4, Uttara"
                   onChange={(event) => setAddress(event.target.value)}
+                  className="rounded-lg border border-[#bbc9c7] bg-white px-4 py-2.5 text-sm text-[#3c4947] outline-none transition focus:border-[#006a63] focus:ring-2 focus:ring-[#006a63]/20 dark:border-slate-700 dark:bg-background/60 dark:text-slate-200 dark:focus:border-teal-500"
                 />
               </div>
             </div>
 
-            <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold" type="button" onClick={handleSaveChanges} disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
+            <div className="mt-8 flex justify-end">
+              <Button
+                type="button"
+                onClick={handleSaveChanges}
+                disabled={isSaving}
+                className="rounded-lg bg-[#006a63] px-8 py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] disabled:opacity-60 dark:bg-teal-600 dark:hover:bg-teal-700 dark:hover:text-white"
+              >
+                {isSaving ? "Saving Changes…" : "Save Changes"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </main>
   );
 }
