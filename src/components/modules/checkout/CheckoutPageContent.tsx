@@ -2,22 +2,21 @@
 
 import Link from "next/link";
 import * as React from "react";
-import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import PaymentMethodSelector from "@/components/modules/checkout/PaymentMethodSelector";
 import { useCart } from "@/providers/cart-provider";
 import { getUser } from "@/services/auth";
 import { getMedicineById } from "@/services/medicine";
 import { createOrder } from "@/services/order";
+import { initializeSSLCommerzPayment } from "@/services/payment";
 
+/* ── Constants ──────────────────────────────────────────────────── */
 const SHIPPING_COST = 60;
 
-const currencyFormatter = new Intl.NumberFormat("en-BD", {
+const fmt = new Intl.NumberFormat("en-BD", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -30,291 +29,399 @@ type CheckoutItem = {
   manufacturer?: string;
 };
 
+/* ── Bento Card (matches reference .bento-card with shop-page dark mode) ── */
+function BentoCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`bento-card rounded-xl border border-[#006a63]/20 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,166,156,0.08)] dark:border-emerald-900/70 dark:bg-background/80 dark:hover:border-teal-800 dark:hover:shadow-lg ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ── Loading Skeleton ───────────────────────────────────────────── */
+function LoadingSkeleton() {
+  return (
+    <main className="min-h-screen bg-[#f5fbf9] transition-colors duration-200 dark:bg-background">
+      <div className="home-shell py-8 sm:py-10">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-8">
+            {[120, 260, 140].map((h) => (
+              <div
+                key={h}
+                style={{ height: h }}
+                className="animate-pulse rounded-xl border border-[#006a63]/20 bg-[#e9efed] dark:border-emerald-900/70 dark:bg-slate-800/80"
+              />
+            ))}
+          </div>
+          <div className="lg:col-span-4">
+            <div className="h-80 animate-pulse rounded-xl border border-[#006a63]/20 bg-[#e9efed] dark:border-emerald-900/70 dark:bg-slate-800/80" />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/* ── Empty State ────────────────────────────────────────────────── */
+function EmptyCheckout({
+  isBuyNow,
+  isSelectedCart,
+  error,
+}: {
+  isBuyNow: boolean;
+  isSelectedCart: boolean;
+  error?: string;
+}) {
+  const message = error
+    ? error
+    : isBuyNow
+    ? "Please return to shop and choose Buy Now again."
+    : isSelectedCart
+    ? "Please return to cart and select products to checkout."
+    : "Add medicines to your cart before checkout.";
+
+  return (
+    <main className="min-h-screen bg-[#f5fbf9] transition-colors duration-200 dark:bg-background">
+      <div className="home-shell py-8 sm:py-10">
+        <BentoCard className="py-16 text-center">
+          <p className="text-lg font-semibold text-[#171d1c] dark:text-slate-100">
+            No items selected for checkout
+          </p>
+          <p className="mt-2 text-sm text-[#3c4947] dark:text-slate-400">
+            {message}
+          </p>
+          <Link
+            href="/shop"
+            className="mt-6 inline-block rounded-lg bg-[#006a63] px-8 py-3 text-sm font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] dark:bg-teal-600 dark:hover:bg-teal-700 dark:hover:text-white"
+          >
+            Browse Medicines
+          </Link>
+        </BentoCard>
+      </div>
+    </main>
+  );
+}
+
+/* ── Main Component ─────────────────────────────────────────────── */
 export default function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items, clearCart, removeItem } = useCart();
+
   const [shippingAddress, setShippingAddress] = React.useState("");
   const [isPlacingOrder, setIsPlacingOrder] = React.useState(false);
-  const [checkoutMessage, setCheckoutMessage] = React.useState("");
+  const [isInitializingPayment, setIsInitializingPayment] = React.useState(false);
   const [checkoutError, setCheckoutError] = React.useState("");
   const [buyNowItem, setBuyNowItem] = React.useState<CheckoutItem | null>(null);
   const [isLoadingBuyNow, setIsLoadingBuyNow] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState<"COD" | "SSLCOMMERZ">("COD");
 
+  /* ── URL params ── */
   const buyNowMedicineId = searchParams.get("buyNow")?.trim() || "";
   const selectedCartItemIds = searchParams
     .getAll("items")
-    .map((itemId) => itemId.trim())
+    .map((id) => id.trim())
     .filter(Boolean);
-  const selectedCartItemIdSet = React.useMemo(() => new Set(selectedCartItemIds), [selectedCartItemIds]);
-  const rawBuyNowQty = Number.parseInt(searchParams.get("qty") || "1", 10);
-  const buyNowQty = Number.isNaN(rawBuyNowQty) ? 1 : Math.max(rawBuyNowQty, 1);
-  const isBuyNowMode = Boolean(buyNowMedicineId);
-  const isSelectedCartMode = !isBuyNowMode && selectedCartItemIds.length > 0;
+  const selectedCartItemIdSet = React.useMemo(
+    () => new Set(selectedCartItemIds),
+    [selectedCartItemIds],
+  );
+  const rawQty = Number.parseInt(searchParams.get("qty") || "1", 10);
+  const buyNowQty = Number.isNaN(rawQty) ? 1 : Math.max(rawQty, 1);
+  const isBuyNow = Boolean(buyNowMedicineId);
+  const isSelectedCart = !isBuyNow && selectedCartItemIds.length > 0;
 
+  /* ── Load buy-now medicine ── */
   React.useEffect(() => {
-    const loadBuyNowMedicine = async () => {
-      if (!isBuyNowMode) {
-        setBuyNowItem(null);
-        return;
-      }
-
+    const load = async () => {
+      if (!isBuyNow) { setBuyNowItem(null); return; }
       setIsLoadingBuyNow(true);
       setCheckoutError("");
-
-      const medicineResult = await getMedicineById(buyNowMedicineId);
+      const res = await getMedicineById(buyNowMedicineId);
       setIsLoadingBuyNow(false);
 
-      if (!medicineResult.success || !medicineResult.data) {
+      if (!res.success || !res.data) {
         setBuyNowItem(null);
-        setCheckoutError(medicineResult.message || "Failed to load selected medicine for checkout.");
+        setCheckoutError(res.message || "Failed to load selected medicine.");
         return;
       }
-
-      const currentMedicineId = medicineResult.data._id || medicineResult.data.id;
-
-      if (!currentMedicineId) {
-        setBuyNowItem(null);
-        setCheckoutError("Selected medicine is not available for checkout.");
-        return;
-      }
+      const id = res.data._id || res.data.id;
+      if (!id) { setCheckoutError("Selected medicine is not available."); return; }
 
       setBuyNowItem({
-        id: String(currentMedicineId),
-        name: medicineResult.data.name,
-        price: medicineResult.data.price,
+        id: String(id),
+        name: res.data.name,
+        price: res.data.price,
         quantity: buyNowQty,
-        manufacturer: medicineResult.data.manufacturer,
+        manufacturer: res.data.manufacturer,
       });
     };
+    load();
+  }, [isBuyNow, buyNowMedicineId, buyNowQty]);
 
-    loadBuyNowMedicine();
-  }, [isBuyNowMode, buyNowMedicineId, buyNowQty]);
+  /* ── Derived values ── */
+  const checkoutItems: CheckoutItem[] = isBuyNow
+    ? buyNowItem ? [buyNowItem] : []
+    : isSelectedCart
+    ? items.filter((i) => selectedCartItemIdSet.has(i.id))
+    : items;
 
-  const checkoutItems = isBuyNowMode
-    ? (buyNowItem ? [buyNowItem] : [])
-    : isSelectedCartMode
-      ? items.filter((item) => selectedCartItemIdSet.has(item.id))
-      : items;
-
-  const subtotal = checkoutItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = checkoutItems.reduce((s, i) => s + i.price * i.quantity, 0);
   const shipping = checkoutItems.length > 0 ? SHIPPING_COST : 0;
   const total = subtotal + shipping;
-  const itemsCount = checkoutItems.reduce((totalQty, item) => totalQty + item.quantity, 0);
+  const itemsCount = checkoutItems.reduce((s, i) => s + i.quantity, 0);
 
-  const handlePlaceOrder = async () => {
-    const currentUser = (await getUser()) as Record<string, unknown> | null;
-    const checkoutPath = isBuyNowMode
+  /* ── Place COD Order ── */
+  const handlePlaceOrderCOD = async () => {
+    const user = (await getUser()) as Record<string, unknown> | null;
+    const checkoutPath = isBuyNow
       ? `/checkout?buyNow=${encodeURIComponent(buyNowMedicineId)}&qty=${buyNowQty}`
-      : isSelectedCartMode
-        ? `/checkout?${selectedCartItemIds.map((itemId) => `items=${encodeURIComponent(itemId)}`).join("&")}`
-        : "/checkout";
+      : isSelectedCart
+      ? `/checkout?${selectedCartItemIds.map((id) => `items=${encodeURIComponent(id)}`).join("&")}`
+      : "/checkout";
 
-    if (!currentUser) {
-      router.push(`/login?redirect=${encodeURIComponent(checkoutPath)}`);
-      return;
-    }
+    if (!user) { router.push(`/login?redirect=${encodeURIComponent(checkoutPath)}`); return; }
 
     if (!shippingAddress.trim()) {
-      const message = "Please provide your shipping address.";
-      setCheckoutError(message);
-      setCheckoutMessage("");
-      await Swal.fire({ icon: "warning", title: "Missing address", text: message });
+      const msg = "Please provide your shipping address.";
+      setCheckoutError(msg);
+      await Swal.fire({ icon: "warning", title: "Missing address", text: msg });
       return;
     }
 
     if (checkoutItems.length === 0) {
-      const message = isSelectedCartMode ? "No selected products found for checkout." : "Your cart is empty.";
-      setCheckoutError(message);
-      setCheckoutMessage("");
-      await Swal.fire({ icon: "warning", title: "Checkout unavailable", text: message });
+      const msg = isSelectedCart ? "No selected products found." : "Your cart is empty.";
+      setCheckoutError(msg);
+      await Swal.fire({ icon: "warning", title: "Checkout unavailable", text: msg });
       return;
     }
 
     setIsPlacingOrder(true);
     setCheckoutError("");
-    setCheckoutMessage("");
 
     const result = await createOrder({
-      paymentMethod,
+      paymentMethod: "COD",
       shippingAddress: shippingAddress.trim(),
       shippingCost: shipping,
-      items: checkoutItems.map((item) => ({
-        medicineId: item.id,
-        quantity: item.quantity,
-      })),
+      items: checkoutItems.map((i) => ({ medicineId: i.id, quantity: i.quantity })),
     });
 
     setIsPlacingOrder(false);
 
     if (!result.success) {
-      const message = result.message || "Failed to place order.";
-      setCheckoutError(message);
-      await Swal.fire({ icon: "error", title: "Order failed", text: message });
+      const msg = result.message || "Failed to place order.";
+      setCheckoutError(msg);
+      await Swal.fire({ icon: "error", title: "Order failed", text: msg });
       return;
     }
 
-    const successMessage = result.message || "Order created successfully.";
-    setCheckoutMessage(successMessage);
-    toast.success(successMessage);
+    toast.success(result.message || "Order created successfully.");
 
-    if (paymentMethod === "COD") {
-      if (!isBuyNowMode) {
-        if (isSelectedCartMode) {
-          checkoutItems.forEach((item) => {
-            removeItem(item.id);
-          });
-        } else {
-          clearCart();
-        }
-      }
-      router.push("/orders");
+    if (!isBuyNow) {
+      isSelectedCart ? checkoutItems.forEach((i) => removeItem(i.id)) : clearCart();
     }
-    // Note: SSLCommerz payment is handled separately by PaymentMethodSelector
+    router.push("/orders");
   };
 
-  if (isBuyNowMode && isLoadingBuyNow) {
-    return (
-      <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
-        <h1 className="text-4xl font-bold tracking-tight">Checkout</h1>
-        <div className="mt-8 flex h-44 items-center justify-center rounded-2xl border bg-card">
-          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-        </div>
-      </section>
-    );
-  }
+  /* ── SSLCommerz Online Payment ── */
+  const handleSSLCommerzPayment = async () => {
+    const user = (await getUser()) as Record<string, unknown> | null;
+    const checkoutPath = isBuyNow
+      ? `/checkout?buyNow=${encodeURIComponent(buyNowMedicineId)}&qty=${buyNowQty}`
+      : isSelectedCart
+      ? `/checkout?${selectedCartItemIds.map((id) => `items=${encodeURIComponent(id)}`).join("&")}`
+      : "/checkout";
+
+    if (!user) { router.push(`/login?redirect=${encodeURIComponent(checkoutPath)}`); return; }
+
+    if (!shippingAddress.trim()) {
+      const msg = "Please provide your shipping address.";
+      setCheckoutError(msg);
+      await Swal.fire({ icon: "warning", title: "Missing address", text: msg });
+      return;
+    }
+
+    if (checkoutItems.length === 0) {
+      const msg = isSelectedCart ? "No selected products found." : "Your cart is empty.";
+      setCheckoutError(msg);
+      await Swal.fire({ icon: "warning", title: "Checkout unavailable", text: msg });
+      return;
+    }
+
+    setIsInitializingPayment(true);
+    setCheckoutError("");
+
+    try {
+      const result = await initializeSSLCommerzPayment({
+        shippingAddress: shippingAddress.trim(),
+        shippingCost: shipping,
+        paymentMethod: "SSLCOMMERZ",
+        items: checkoutItems.map((i) => ({ medicineId: i.id, quantity: i.quantity })),
+      });
+
+      if (!result.success || !result.data?.gatewayPageURL) {
+        const msg = result.message || "Could not initialize online payment.";
+        setCheckoutError(msg);
+        await Swal.fire({ icon: "error", title: "Payment Initialization Failed", text: msg });
+        setIsInitializingPayment(false);
+        return;
+      }
+
+      window.location.href = result.data.gatewayPageURL;
+    } catch (err) {
+      console.error(err);
+      setCheckoutError("Failed to initialize payment.");
+      await Swal.fire({ icon: "error", title: "Error", text: "Failed to initialize payment." });
+      setIsInitializingPayment(false);
+    }
+  };
+
+  /* ── Guard Renders ── */
+  if (isBuyNow && isLoadingBuyNow) return <LoadingSkeleton />;
 
   if (checkoutItems.length === 0) {
     return (
-      <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
-        <h1 className="text-4xl font-bold tracking-tight">Checkout</h1>
-        <div className="mt-8 rounded-2xl border bg-card p-8 text-center">
-          <p className="text-lg font-medium">No item selected for checkout</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isBuyNowMode
-              ? "Please return to shop and choose Buy Now again."
-              : isSelectedCartMode
-                ? "Please return to cart and select products to checkout."
-                : "Add medicines to cart before checkout."}
-          </p>
-          <Button asChild className="mt-4">
-            <Link href="/shop">Browse Medicines</Link>
-          </Button>
-        </div>
-      </section>
+      <EmptyCheckout
+        isBuyNow={isBuyNow}
+        isSelectedCart={isSelectedCart}
+        error={checkoutError}
+      />
     );
   }
 
+  /* ── Full Page Wrapper ── */
   return (
-    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/20 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
-      <h1 className="text-4xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">Checkout</h1>
-
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-6">
-          {/* Shipping Information */}
-          <div className="rounded-2xl border-2 border-emerald-200 bg-linear-to-br from-emerald-50 to-white p-6 dark:border-emerald-800/60 dark:from-emerald-950/20 dark:to-emerald-950/10">
-            <h2 className="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">Shipping Information</h2>
-
-            <div className="mt-5 space-y-2">
-              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Shipping Address</p>
-              <Input
-                value={shippingAddress}
-                onChange={(event) => setShippingAddress(event.target.value)}
-                placeholder="Piash Islam, 123 Main St, City, Country"
-              />
-            </div>
-          </div>
-
-          {/* Payment Method Selection */}
-          <div className="rounded-2xl border-2 border-blue-200 bg-linear-to-br from-blue-50 to-white p-6 dark:border-blue-800/60 dark:from-blue-950/20 dark:to-blue-950/10">
-            <PaymentMethodSelector
-              isLoading={isPlacingOrder}
-              subtotal={subtotal}
-              shipping={shipping}
-              total={total}
-              shippingAddress={shippingAddress}
-              items={checkoutItems.map((item) => ({
-                medicineId: item.id,
-                quantity: item.quantity,
-              }))}
-              shippingCost={shipping}
-              onPaymentMethodChange={(method: "COD" | "SSLCOMMERZ") => setPaymentMethod(method)}
-            />
-          </div>
-
-          {/* COD Place Order Button */}
-          {paymentMethod === "COD" && (
-            <div className="rounded-2xl border-2 border-teal-200 bg-linear-to-br from-teal-50 to-white p-6 dark:border-teal-800/60 dark:from-teal-950/20 dark:to-teal-950/10">
-              {checkoutError && (
-                <p className="text-red-700 mb-2 rounded-lg bg-red-50 border-2 border-red-200 p-3 text-sm font-semibold dark:border-red-800/60 dark:bg-red-950/25 dark:text-red-300">
-                  {checkoutError}
-                </p>
-              )}
-              {checkoutMessage && (
-                <p className="text-emerald-700 mb-2 rounded-lg bg-emerald-50 border-2 border-emerald-200 p-3 text-sm font-semibold dark:border-emerald-800/60 dark:bg-emerald-950/25 dark:text-emerald-300">
-                  {checkoutMessage}
-                </p>
-              )}
-              <Button
-                className="h-11 w-full text-base bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold"
-                onClick={handlePlaceOrder}
-                disabled={isPlacingOrder || (isBuyNowMode && !buyNowItem)}
-              >
-                {isPlacingOrder ? "Placing Order..." : "Place Order with COD"}
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="mt-3 h-11 w-full text-base border-2 border-emerald-300 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900/30"
-              >
-                <Link href={isBuyNowMode ? "/shop" : "/cart"}>
-                  {isBuyNowMode ? "Back to Shop" : "Back to Cart"}
-                </Link>
-              </Button>
-            </div>
-          )}
+    <main className="min-h-screen bg-[#f5fbf9] transition-colors duration-200 dark:bg-background">
+      <div className="home-shell py-8 sm:py-10">
+        {/* ── Back Navigation — professional top placement ── */}
+        <div className="mb-6">
+          <Link
+            href={isBuyNow ? "/shop" : "/cart"}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[#3c4947] transition-colors hover:text-[#006a63] dark:text-slate-400 dark:hover:text-teal-300"
+          >
+            <svg
+              viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+              className="h-4 w-4"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            {isBuyNow ? "Back to Shop" : "Back to Cart"}
+          </Link>
         </div>
 
-        {/* Order Summary Sidebar */}
-        <aside className="h-fit rounded-2xl border-2 border-emerald-200 bg-white p-6 shadow-lg dark:border-emerald-800/60 dark:bg-emerald-950/20">
-          <h2 className="text-2xl font-bold tracking-tight text-emerald-700 dark:text-emerald-300">Order Summary</h2>
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
 
-          <div className="mt-5 space-y-2 border-b-2 border-emerald-100 pb-4 dark:border-emerald-800/60">
-            {checkoutItems.map((item) => (
-              <div key={item.id} className="flex items-start justify-between gap-3 text-sm pb-2">
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-gray-800 dark:text-gray-100">{item.name}</p>
-                  <p className="text-emerald-600 text-xs font-medium dark:text-emerald-400">Qty: {item.quantity}</p>
-                </div>
-                <p className="font-bold text-gray-900 dark:text-gray-100">
-                  ৳{currencyFormatter.format(item.price * item.quantity)}
-                </p>
+          {/* ══ Left Column ══════════════════════════════════════════ */}
+          <div className="space-y-6 lg:col-span-8">
+
+            {/* ── Card 1: Shipping Information ── */}
+            <BentoCard>
+              <h2 className="mb-6 text-2xl font-semibold tracking-tight text-[#006a63] dark:text-teal-300">
+                Shipping Information
+              </h2>
+
+              <div className="space-y-1">
+                <label
+                  htmlFor="shipping-address"
+                  className="block text-sm font-semibold text-[#171d1c] dark:text-slate-100"
+                >
+                  Shipping Address
+                </label>
+                <input
+                  id="shipping-address"
+                  type="text"
+                  value={shippingAddress}
+                  onChange={(e) => {
+                    setShippingAddress(e.target.value);
+                    if (checkoutError) setCheckoutError("");
+                  }}
+                  placeholder="Piash Islam, 123 Main St, City, Country"
+                  className="w-full rounded-lg border border-[#bbc9c7] bg-white px-4 py-2.5 text-sm text-[#3c4947] placeholder-slate-400 outline-none transition focus:border-[#006a63] focus:ring-2 focus:ring-[#006a63]/20 dark:border-slate-700 dark:bg-background/60 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-teal-500"
+                />
               </div>
-            ))}
+            </BentoCard>
+
+            {/* ── Card 2: Payment Method (Radio + Main Action Button + Notices) ── */}
+            <BentoCard>
+              <PaymentMethodSelector
+                selectedMethod={paymentMethod}
+                onPaymentMethodChange={(m) => setPaymentMethod(m)}
+                onPlaceOrderCOD={handlePlaceOrderCOD}
+                onPaySSLCommerz={handleSSLCommerzPayment}
+                isPlacingOrder={isPlacingOrder}
+                isInitializingPayment={isInitializingPayment}
+                checkoutError={checkoutError}
+                total={total}
+                disabled={isBuyNow && !buyNowItem}
+              />
+            </BentoCard>
+
+
           </div>
 
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center justify-between py-2">
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Subtotal ({itemsCount} items)</span>
-              <span className="font-semibold text-gray-800 dark:text-gray-200">৳{currencyFormatter.format(subtotal)}</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b-2 border-emerald-100 pb-3 dark:border-emerald-800/60">
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Shipping</span>
-              <span className="font-semibold text-emerald-700 dark:text-emerald-300">
-                {shipping === 0 ? "FREE" : `৳${currencyFormatter.format(shipping)}`}
-              </span>
-            </div>
-          </div>
+          {/* ══ Right Column — Order Summary ═════════════════════════ */}
+          <aside className="lg:col-span-4">
+            <div className="bento-card sticky top-24 overflow-hidden rounded-xl border border-[#006a63]/20 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,166,156,0.08)] dark:border-emerald-900/70 dark:bg-background/80 dark:hover:border-teal-800">
+              <div className="p-6">
+                {/* Header */}
+                <h3 className="mb-6 text-xl font-semibold text-[#006a63] dark:text-teal-300">
+                  Order Summary
+                </h3>
 
-          <div className="mt-4 rounded-xl bg-linear-to-r from-emerald-50 to-teal-50 p-4 border-2 border-emerald-200 dark:border-emerald-800/60 dark:from-emerald-950/30 dark:to-teal-950/30">
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-bold text-emerald-700 dark:text-emerald-300">Total</span>
-              <span className="text-3xl font-black text-emerald-600 dark:text-emerald-300">৳{currencyFormatter.format(total)}</span>
+                {/* Item List */}
+                <div className="mb-8 space-y-4">
+                  {checkoutItems.map((item) => (
+                    <div key={item.id} className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-[#171d1c] dark:text-slate-100">
+                          {item.name}
+                        </p>
+                        <p className="mt-0.5 text-sm text-[#006a63] dark:text-teal-400">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-base font-bold text-[#171d1c] dark:text-slate-100">
+                        ৳{fmt.format(item.price * item.quantity)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Subtotal / Shipping */}
+                <div className="space-y-4 border-t border-[#bbc9c7]/30 pt-6 text-sm text-[#3c4947] dark:border-slate-700/50 dark:text-slate-300">
+                  <div className="flex justify-between">
+                    <span>Subtotal ({itemsCount} items)</span>
+                    <span>৳{fmt.format(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Shipping</span>
+                    <span className="text-[#006a63] dark:text-teal-300">
+                      {shipping === 0 ? "FREE" : `৳${fmt.format(shipping)}`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Block — m-4 inset with top border */}
+              <div className="m-4 rounded-lg border border-[#006a63]/20 bg-[#006a63]/5 p-4 dark:border-teal-800/60 dark:bg-teal-950/30">
+                <div className="flex items-center justify-between font-bold text-[#006a63] dark:text-teal-300">
+                  <span className="text-xl">Total</span>
+                  <span className="text-3xl font-extrabold">৳{fmt.format(total)}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </aside>
+          </aside>
+        </div>
       </div>
-    </section>
+    </main>
   );
 }

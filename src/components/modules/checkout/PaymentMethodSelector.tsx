@@ -1,208 +1,250 @@
 "use client";
 
 import * as React from "react";
-import { Loader2, CheckCircle2, CreditCard } from "lucide-react";
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
-
-import { Button } from "@/components/ui/button";
-import { initializeSSLCommerzPayment } from "@/services/payment";
+import { Loader2 } from "lucide-react";
 
 export type PaymentMethodSelectorProps = {
-  isLoading: boolean;
-  subtotal: number;
-  shipping: number;
+  selectedMethod: "COD" | "SSLCOMMERZ";
+  onPaymentMethodChange: (method: "COD" | "SSLCOMMERZ") => void;
+  onPlaceOrderCOD: () => void;
+  onPaySSLCommerz: () => void;
+  isPlacingOrder: boolean;
+  isInitializingPayment: boolean;
+  checkoutError?: string;
   total: number;
-  shippingAddress: string;
-  shippingCost: number;
-  items: {
-    medicineId: string;
-    quantity: number;
-  }[];
-  onPaymentMethodChange?: (method: "COD" | "SSLCOMMERZ") => void;
+  disabled?: boolean;
 };
 
 type PaymentMethod = "COD" | "SSLCOMMERZ";
 
-export default function PaymentMethodSelector({
-  isLoading,
-  subtotal,
-  shipping,
-  total,
-  shippingAddress,
-  shippingCost,
-  items,
-  onPaymentMethodChange,
-}: PaymentMethodSelectorProps) {
-  const [selectedMethod, setSelectedMethod] = React.useState<PaymentMethod>("COD");
-  const [isInitializingPayment, setIsInitializingPayment] = React.useState(false);
+const PAYMENT_BADGES = ["Credit Card", "Debit Card", "bKash", "Nagad", "Rocket"];
 
-  const handleMethodChange = (method: PaymentMethod) => {
-    setSelectedMethod(method);
-    onPaymentMethodChange?.(method);
-  };
+const fmt = new Intl.NumberFormat("en-BD", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 
-  const handleSSLCommerzPayment = async () => {
-    if (!items.length) {
-      toast.error("No items in cart");
-      return;
-    }
-
-    if (!shippingAddress.trim()) {
-      toast.error("Please provide a shipping address");
-      return;
-    }
-
-    setIsInitializingPayment(true);
-
-    try {
-      const result = await initializeSSLCommerzPayment(
-        {
-          shippingAddress: shippingAddress.trim(),
-          shippingCost,
-          paymentMethod: "SSLCOMMERZ",
-          items,
-        }
-      );
-
-      if (!result.success || !result.data?.gatewayPageURL) {
-        await Swal.fire({
-          icon: "error",
-          title: "Payment Initialization Failed",
-          text: result.message || "Could not initialize payment. Please try again.",
-        });
-        setIsInitializingPayment(false);
-        return;
-      }
-
-      // Redirect to SSLCommerz gateway
-      window.location.href = result.data.gatewayPageURL;
-    } catch (error) {
-      console.error("Payment initialization error:", error);
-      await Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Failed to initialize payment. Please try again.",
-      });
-      setIsInitializingPayment(false);
-    }
-  };
-
+/* ── SVG Icons ─────────────────────────────────────────────────── */
+function TruckIcon({ className = "h-5 w-5" }: { className?: string }) {
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold tracking-tight">Payment Method</h2>
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zm-.5 1.5 1.96 2.5H17V9.5h2.5zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2.22-3c-.55-.61-1.33-1-2.22-1s-1.67.39-2.22 1H3V6h12v9H8.22zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" />
+    </svg>
+  );
+}
 
-      <div className="space-y-3">
-        {/* COD Option */}
-        <label className="has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all hover:bg-muted/50">
+function ShieldCheckIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+    </svg>
+  );
+}
+
+
+function CreditCardIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+      <line x1="1" y1="10" x2="23" y2="10" />
+    </svg>
+  );
+}
+
+export default function PaymentMethodSelector({
+  selectedMethod,
+  onPaymentMethodChange,
+  onPlaceOrderCOD,
+  onPaySSLCommerz,
+  isPlacingOrder,
+  isInitializingPayment,
+  checkoutError,
+  total,
+  disabled = false,
+}: PaymentMethodSelectorProps) {
+  return (
+    <div>
+      <h2 className="text-2xl font-semibold tracking-tight text-[#171d1c] dark:text-slate-100">
+        Payment Method
+      </h2>
+      <p className="mb-6 mt-1 text-sm text-[#3c4947] dark:text-slate-400">
+        Select how you&apos;d like to pay for your order
+      </p>
+
+      <div className="space-y-4">
+        {/* ─── Cash on Delivery ─── */}
+        <label
+          className={`flex cursor-pointer items-start gap-4 rounded-xl p-4 transition-all ${
+            selectedMethod === "COD"
+              ? "border-2 border-[#006a63] bg-[#006a63]/5 dark:border-teal-500 dark:bg-teal-950/30"
+              : "border border-[#bbc9c7] bg-white hover:border-[#006a63]/40 dark:border-emerald-900/70 dark:bg-background/80 dark:hover:border-teal-700/60"
+          }`}
+        >
           <input
             type="radio"
             name="paymentMethod"
             value="COD"
             checked={selectedMethod === "COD"}
-            onChange={() => handleMethodChange("COD")}
-            className="mt-1"
+            onChange={() => onPaymentMethodChange("COD")}
+            className="sr-only"
           />
-          <div className="flex-1">
-            <p className="font-medium">Cash on Delivery (COD)</p>
-            <p className="text-sm text-muted-foreground">
+
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+              selectedMethod === "COD"
+                ? "bg-[#006a63] text-white dark:bg-teal-600"
+                : "bg-[#e9efed] text-[#3c4947] dark:bg-slate-800 dark:text-slate-300"
+            }`}
+          >
+            <TruckIcon />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <h3
+                className={`text-sm font-semibold ${
+                  selectedMethod === "COD"
+                    ? "text-[#006a63] dark:text-teal-300"
+                    : "text-[#171d1c] dark:text-slate-100"
+                }`}
+              >
+                Cash on Delivery
+              </h3>
+
+              <div
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                  selectedMethod === "COD"
+                    ? "border-2 border-[#006a63] dark:border-teal-400"
+                    : "border border-[#bbc9c7] dark:border-slate-700"
+                }`}
+              >
+                {selectedMethod === "COD" && (
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#006a63] dark:bg-teal-400" />
+                )}
+              </div>
+            </div>
+            <p className="mt-1 text-xs text-[#3c4947] dark:text-slate-400">
               Pay when your order arrives. No payment needed now.
             </p>
           </div>
-          {selectedMethod === "COD" && <CheckCircle2 className="mt-1 h-5 w-5 text-primary" />}
         </label>
 
-        {/* SSLCommerz Option */}
-        <label className="has-checked:border-primary has-checked:bg-primary/5 flex cursor-pointer items-start gap-4 rounded-lg border p-4 transition-all hover:bg-muted/50">
+        {/* ─── Pay Online — SSLCommerz ─── */}
+        <label
+          className={`flex cursor-pointer items-start gap-4 rounded-xl p-4 transition-all ${
+            selectedMethod === "SSLCOMMERZ"
+              ? "border-2 border-[#006a63] bg-[#006a63]/5 dark:border-teal-500 dark:bg-teal-950/30"
+              : "border border-[#bbc9c7] bg-white hover:border-[#006a63]/40 dark:border-emerald-900/70 dark:bg-background/80 dark:hover:border-teal-700/60"
+          }`}
+        >
           <input
             type="radio"
             name="paymentMethod"
             value="SSLCOMMERZ"
             checked={selectedMethod === "SSLCOMMERZ"}
-            onChange={() => handleMethodChange("SSLCOMMERZ")}
-            className="mt-1"
+            onChange={() => onPaymentMethodChange("SSLCOMMERZ")}
+            className="sr-only"
           />
-          <div className="flex-1">
-            <p className="font-medium">Pay Now with SSLCommerz</p>
-            <p className="text-sm text-muted-foreground">
-              Secure online payment using credit/debit card or mobile banking.
+
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+              selectedMethod === "SSLCOMMERZ"
+                ? "bg-[#006a63] text-white dark:bg-teal-600"
+                : "bg-[#e9efed] text-[#3c4947] dark:bg-slate-800 dark:text-slate-300"
+            }`}
+          >
+            <CreditCardIcon />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <h3
+                className={`text-sm font-semibold ${
+                  selectedMethod === "SSLCOMMERZ"
+                    ? "text-[#006a63] dark:text-teal-300"
+                    : "text-[#171d1c] dark:text-slate-100"
+                }`}
+              >
+                Pay Online — SSLCommerz
+              </h3>
+
+              <div
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                  selectedMethod === "SSLCOMMERZ"
+                    ? "border-2 border-[#006a63] dark:border-teal-400"
+                    : "border border-[#bbc9c7] dark:border-slate-700"
+                }`}
+              >
+                {selectedMethod === "SSLCOMMERZ" && (
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#006a63] dark:bg-teal-400" />
+                )}
+              </div>
+            </div>
+            <p className="mb-2 mt-1 text-xs text-[#3c4947] dark:text-slate-400">
+              Credit/Debit Card, bKash, Nagad &amp; more
             </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <span className="inline-block rounded bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
-                Credit Card
-              </span>
-              <span className="inline-block rounded bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
-                Debit Card
-              </span>
-              <span className="inline-block rounded bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
-                bKash
-              </span>
-              <span className="inline-block rounded bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground">
-                Nagad
-              </span>
+
+            <div className="flex flex-wrap gap-1.5">
+              {PAYMENT_BADGES.map((badge) => (
+                <span
+                  key={badge}
+                  className="rounded border border-[#bbc9c7]/30 bg-[#e9efed] px-2 py-0.5 text-[10px] text-[#3c4947] dark:border-slate-700/50 dark:bg-slate-800 dark:text-slate-300"
+                >
+                  {badge}
+                </span>
+              ))}
             </div>
           </div>
-          {selectedMethod === "SSLCOMMERZ" && <CheckCircle2 className="mt-1 h-5 w-5 text-primary" />}
         </label>
-      </div>
 
-      {/* Payment Summary */}
-      <div className="rounded-lg bg-muted/50 p-4">
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span>Subtotal:</span>
-            <span className="font-medium">৳{subtotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Shipping:</span>
-            <span className="font-medium">
-              {shipping === 0 ? "FREE" : `৳${shipping.toFixed(2)}`}
-            </span>
-          </div>
-          <div className="border-t pt-2">
-            <div className="flex justify-between">
-              <span className="font-semibold">Total Amount:</span>
-              <span className="text-lg font-bold text-primary">৳{total.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="space-y-3 pt-4">
-        {selectedMethod === "SSLCOMMERZ" ? (
-          <Button
-            onClick={handleSSLCommerzPayment}
-            disabled={isLoading || isInitializingPayment}
-            size="lg"
-            className="w-full"
+        {/* ─── Selected Payment Action Button (Always First below Radios) ─── */}
+        {selectedMethod === "COD" ? (
+          <button
+            id="place-order-btn"
+            type="button"
+            onClick={onPlaceOrderCOD}
+            disabled={disabled || isPlacingOrder}
+            className="w-full rounded-lg bg-[#006a63] py-4 text-sm font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] disabled:opacity-60 dark:bg-teal-600 dark:hover:bg-teal-700 dark:hover:text-white"
+          >
+            {isPlacingOrder ? "Placing Order…" : "Place Order with COD"}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onPaySSLCommerz}
+            disabled={disabled || isInitializingPayment}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#006a63] py-4 text-sm font-bold text-white transition-colors hover:bg-[#5bdacf] hover:text-[#00201d] disabled:opacity-60 dark:bg-teal-600 dark:hover:bg-teal-700 dark:hover:text-white"
           >
             {isInitializingPayment ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Initializing Payment...
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Initializing Payment…
               </>
             ) : (
-              <>
-                <CreditCard className="mr-2 h-4 w-4" />
-                Pay ৳{total.toFixed(2)} with SSLCommerz
-              </>
+              `Pay ৳${fmt.format(total)} with SSLCommerz`
             )}
-          </Button>
-        ) : (
-          <p className="text-center text-sm text-muted-foreground">
-            Choose your payment method above and proceed to checkout
-          </p>
+          </button>
         )}
-      </div>
 
-      {/* Security Notice */}
-      <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-700">
-        <p className="font-medium">🔒 Secure Payment</p>
-        <p className="mt-1">
-          Your payment information is encrypted and secure. SSLCommerz is a trusted payment gateway
-          in Bangladesh.
-        </p>
+        {/* ─── Error Banner ─── */}
+        {checkoutError && (
+          <div className="rounded-lg border border-[#ba1a1a]/30 bg-[#ffdad6] px-4 py-3 text-sm font-medium text-[#ba1a1a] dark:border-red-800/50 dark:bg-red-950/40 dark:text-red-300">
+            {checkoutError}
+          </div>
+        )}
+
+        {/* ─── Secure notice (Always below the Action Button) ─── */}
+        <div className="flex items-start gap-2 rounded-lg border border-[#006a63]/20 bg-[#006a63]/5 p-4 text-[#006a63] dark:border-teal-800/60 dark:bg-teal-950/40 dark:text-teal-300">
+          <ShieldCheckIcon className="mt-px h-5 w-5 shrink-0" />
+          <div>
+            <p className="text-xs font-bold">Secure &amp; Encrypted Checkout</p>
+            <p className="mt-0.5 text-[12px] opacity-90">
+              Your payment data is protected. SSLCommerz is Bangladesh&apos;s trusted payment gateway.
+            </p>
+          </div>
+        </div>
+
+
       </div>
     </div>
   );
