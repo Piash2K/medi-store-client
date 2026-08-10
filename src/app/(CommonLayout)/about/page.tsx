@@ -25,7 +25,7 @@ export default function AboutPage() {
     <div className="bg-[#f2fbf8] dark:bg-emerald-950/10 text-[#171d1c] dark:text-slate-100 font-body-md antialiased">
       {/* Hero Section */}
       <section className="relative overflow-hidden py-8 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="home-shell">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="z-10">
               <Badge className="inline-block px-4 py-1.5 mb-6 rounded-full bg-teal-50 dark:bg-teal-950/50 text-[#374951] dark:text-teal-200 text-sm font-semibold tracking-wide hover:bg-[#d2e6ef] dark:hover:bg-teal-900/60">
@@ -73,22 +73,20 @@ export default function AboutPage() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="home-shell">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
             <div className="p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col items-center text-center group hover:bg-white dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5">
               <div className="w-16 h-16 rounded-full bg-[#00a69c]/10 dark:bg-teal-900/40 flex items-center justify-center mb-4 text-[#006a63] dark:text-teal-200 group-hover:scale-110 transition-transform">
                 <Truck className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-semibold text-[#171d1c] dark:text-slate-100 mb-2">
-                Fast & Reliable Delivery
+                Fast &amp; Reliable Delivery
               </h3>
               <p className="text-sm text-[#3c4947] dark:text-slate-400">
                 Get your medicines delivered quickly and securely, with real-time order tracking and support.
               </p>
             </div>
 
-          
             <div className="p-6 sm:p-8 rounded-xl bg-teal-600 text-white flex flex-col items-center text-center shadow-lg shadow-[#006a63]/20">
               <div className="w-16 h-16 rounded-full bg-white/20 dark:bg-emerald-900/40 flex items-center justify-center mb-4">
                 <Brain className="w-8 h-8 text-white" />
@@ -101,7 +99,6 @@ export default function AboutPage() {
               </p>
             </div>
 
-      
             <div className="p-6 sm:p-8 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 flex flex-col items-center text-center group hover:bg-white dark:hover:bg-emerald-950/30 transition-all hover:shadow-xl hover:shadow-[#006a63]/5">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#4f6169] dark:text-slate-400 group-hover:scale-110 transition-transform">
                 <Package className="w-8 h-8" />
@@ -117,20 +114,15 @@ export default function AboutPage() {
         </div>
       </section>
 
-   
-
       {/* Values Section */}
       <section className="py-8 lg:py-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none">
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="home-shell relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-[#171d1c] dark:text-slate-100 mb-4">
               The MediStore Standard
             </h2>
             <p className="text-[#3c4947] dark:text-slate-400 max-w-2xl mx-auto">
-              Our core values define every interaction, from browsing to
-              unboxing.
+              Our core values define every interaction, from browsing to unboxing.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -164,10 +156,10 @@ export default function AboutPage() {
             <div className="p-6 rounded-xl border border-[#bbc9c7] dark:border-emerald-900 hover:border-[#006a63]/30 hover:bg-[#f5fbf9] dark:hover:bg-emerald-950/30 transition-all bg-white dark:bg-background/80">
               <Users2 className="text-[#006a63] mb-4 w-8 h-8" />
               <h4 className="text-lg font-bold text-[#171d1c] dark:text-slate-100 mb-2">
-                For Everyone’s Needs
+                For Everyone&apos;s Needs
               </h4>
               <p className="text-sm text-[#3c4947] dark:text-slate-400">
-                Whether you’re a patient, caregiver, or healthcare provider, MediStore is built for you.
+                Whether you&apos;re a patient, caregiver, or healthcare provider, MediStore is built for you.
               </p>
             </div>
           </div>
@@ -175,35 +167,37 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-8 lg:py-12 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto rounded-3xl p-8 sm:p-12 lg:p-16 text-center text-white shadow-2xl relative overflow-hidden bg-linear-to-br from-teal-700 to-teal-500">
-          <div
-            className="absolute inset-0 bg-white/5 dark:bg-white/10 pointer-events-none"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)",
-              backgroundSize: "24px 24px",
-            }}
-          ></div>
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 leading-tight text-white">
-              Ready to experience the future of pharmacy?
-            </h2>
+      <section className="py-8 lg:py-12">
+        <div className="home-shell">
+          <div className="rounded-3xl p-8 sm:p-12 lg:p-16 text-center text-white shadow-2xl relative overflow-hidden bg-linear-to-br from-teal-700 to-teal-500">
+            <div
+              className="absolute inset-0 bg-white/5 dark:bg-white/10 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)",
+                backgroundSize: "24px 24px",
+              }}
+            ></div>
+            <div className="relative z-10 max-w-3xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 leading-tight text-white">
+                Ready to experience the future of pharmacy?
+              </h2>
               <p className="text-base sm:text-lg mb-8 lg:mb-12 opacity-90 text-white/90">
                 Search smarter, get help faster, and keep your orders moving with
                 MediStore&apos;s professional care.
               </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button asChild className="bg-white text-[#006a63] px-8 sm:px-10 py-4 rounded-full text-sm font-semibold hover:bg-gray-100 dark:hover:bg-white/10 transition-all active:scale-95 shadow-lg">
-                <Link href="/shop">Start Shopping Now</Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="bg-teal-600/20 border border-white/30 text-white px-8 sm:px-10 py-4 rounded-full text-sm font-semibold hover:bg-white/10 dark:hover:bg-white/20 transition-all active:scale-95"
-              >
-                <Link href="/contact">Contact Now </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Button asChild className="bg-white text-[#006a63] px-8 sm:px-10 py-4 rounded-full text-sm font-semibold hover:bg-gray-100 dark:hover:bg-white/10 transition-all active:scale-95 shadow-lg">
+                  <Link href="/shop">Start Shopping Now</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="bg-teal-600/20 border border-white/30 text-white px-8 sm:px-10 py-4 rounded-full text-sm font-semibold hover:bg-white/10 dark:hover:bg-white/20 transition-all active:scale-95"
+                >
+                  <Link href="/contact">Contact Now</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
