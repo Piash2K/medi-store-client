@@ -151,7 +151,12 @@ export function Navbar() {
   const [user, setUser] = useState(null);
 
   const primaryMenu = isCustomerUser(user)
-    ? [...primaryBaseMenu, ...customerPrimaryMenu]
+    ? [
+        primaryBaseMenu[0],
+        primaryBaseMenu[1],
+        ...customerPrimaryMenu,
+        ...primaryBaseMenu.slice(2),
+      ]
     : primaryBaseMenu;
   const utilityMenuItems = isSellerOrAdminUser(user) ? [] : utilityMenu;
 
@@ -208,7 +213,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md transition-all">
+    <header suppressHydrationWarning className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md transition-all">
       <div className="home-shell">
         {/* Desktop Navbar */}
         <nav className="hidden h-16 items-center justify-between lg:flex">
