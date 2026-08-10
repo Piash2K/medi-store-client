@@ -15,7 +15,7 @@ const supportHours = process.env.NEXT_PUBLIC_SUPPORT_HOURS || "Mon-Fri 9am-6pm E
 export default function ContactPage() {
   return (
     <main className="bg-[#f5fbf9] dark:bg-emerald-950/10 min-h-screen text-[#171d1c] dark:text-slate-100">
-      <div className="max-w-7xl mx-auto px-6 pt-12 pb-20">
+      <div className="home-shell py-8 sm:py-10">
 
         {/* Hero Header */}
         <section className="mb-12">

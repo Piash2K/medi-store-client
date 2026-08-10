@@ -50,7 +50,7 @@ export default async function OrderDetailsPageContent({ orderId }: OrderDetailsP
   const isDeliveredOrder = ["DELIVERED", "COMPLETED"].includes(order.status?.toUpperCase() || "");
 
   return (
-    <section className="mx-auto w-full max-w-screen-2xl bg-linear-to-b from-emerald-50/30 to-background px-4 py-6 dark:from-emerald-950/10 sm:px-6 sm:py-8 lg:px-8">
+    <section className="home-shell py-8 sm:py-10 bg-linear-to-b from-emerald-50/30 to-background dark:from-emerald-950/10">
       <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200">
         <ArrowLeft className="h-4 w-4" />
         Back to Orders

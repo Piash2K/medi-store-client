@@ -70,7 +70,7 @@ const trustBadges = [
 export default function HelpPage() {
   return (
     <div className="bg-[#f2fbf8] dark:bg-emerald-950/10 text-[#171d1c] dark:text-slate-100 font-body-md antialiased">
-      <main className="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto min-h-screen">
+      <main className="home-shell py-8 sm:py-10 min-h-screen">
         {/* Hero Search Section */}
         <section className="text-center mb-8 md:mb-12">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-on-surface mb-4 md:mb-6">
